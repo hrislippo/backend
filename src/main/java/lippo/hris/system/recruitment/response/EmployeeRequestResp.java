@@ -1,0 +1,20 @@
+package lippo.hris.system.recruitment.response;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDate;
+
+public interface EmployeeRequestResp {
+    Long getId();
+    String getCode();
+    String getName();
+    String getBusinessUnitName();
+    String getHRBPName();
+    Integer getRequestNumber();
+    Integer getRecruitNumber();
+    Boolean getFinal();
+    Boolean getEligible();
+
+    @JsonFormat(pattern = "dd MMMM yyyy")
+    LocalDate getExpDate();
+}

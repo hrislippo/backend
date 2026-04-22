@@ -1,0 +1,88 @@
+package lippo.hris.system.authentication.controller;
+
+import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.authentication.request.LoginRequest;
+import lippo.hris.system.authentication.request.UserActiveRequest;
+import lippo.hris.system.response.ApiResponse;
+import lippo.hris.system.authentication.service.LoginService;
+import lippo.hris.system.authentication.service.UserService;
+import lippo.hris.system.authentication.validation.UserValidation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/authentication")
+public class UserController {
+
+    @Autowired
+    LoginService loginService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    UserValidation userValidation;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/user")
+    public ApiResponse register(@RequestBody LoginRequest loginRequest) {
+        userValidation.registerUserRequired(loginRequest);
+        userValidation.userValidation(loginRequest.getUsername(), true);
+        userService.registerUser(loginRequest);
+        return ApiResponse.ok(null, "User registered");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/user")
+    public ApiResponse changePassword(@RequestBody LoginRequest loginRequest) {
+        User user = userValidation.userValidation(loginRequest.getUsername(), false);
+        userService.changePassword(loginRequest, user);
+        return ApiResponse.ok(null, "Password changed");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/user-active")
+    public ApiResponse changeActive(@RequestBody UserActiveRequest userActiveRequest) {
+        User user = userValidation.userValidation(userActiveRequest.getUsername(), false);
+        userService.changeActive(userActiveRequest.getActive(), user);
+        return ApiResponse.ok(null, "Active changed");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user")
+    public ApiResponse getUsers(@RequestParam(value = "usernameSearch", required = false) String usernameSearch,
+                                @RequestParam(value = "nameSearch", required = false) String nameSearch,
+                                @RequestParam(value = "roleSearch", required = false) String roleSearch,
+                                @RequestParam(value = "activeSearch", required = false) Boolean activeSearch,
+                                Pageable pageable) {
+        return ApiResponse.ok(userService.findAllWithRolesAndSearch(usernameSearch, nameSearch, roleSearch, activeSearch, pageable),
+                "Get Users Successfully");
+    }
+
+    @GetMapping("/user-list")
+    public ApiResponse getUserLists() {
+        return ApiResponse.ok(userService.findAllUsers(), "Get List Users Successfully");
+    }
+
+    @GetMapping("/user-detail")
+    public ApiResponse getUserDetail(@RequestParam String username) {
+        return ApiResponse.ok(userService.findByUsername(username), "Get User Detail Successfully");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/user")
+    public ApiResponse deleteUser(@RequestParam String username) {
+        User user = userValidation.userValidation(username, false);
+        userService.deleteUser(user);
+        return ApiResponse.ok(null, "Delete User Successfully");
+    }
+
+    @PostMapping("/login")
+    public ApiResponse login(@RequestBody LoginRequest loginRequest) {
+        User user = userValidation.userValidation(loginRequest.getUsername(), false);
+        userValidation.userActiveValidation(user);
+        return ApiResponse.ok(loginService.loginUser(loginRequest, user), "Login successful");
+    }
+}
