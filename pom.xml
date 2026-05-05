@@ -8,6 +8,7 @@
         <version>3.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <packaging>jar</packaging>
     <groupId>lippo.hris</groupId>
     <artifactId>system</artifactId>
     <version>0.0.1-SNAPSHOT</version>
