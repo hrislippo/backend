@@ -7,11 +7,15 @@ import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.exception.NotFoundException;
 import lippo.hris.system.authentication.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
 public class UserValidation {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     UserRepository userRepository;
@@ -30,6 +34,13 @@ public class UserValidation {
         return user;
     }
 
+    public void passwordValidation(LoginRequest loginRequest){
+        User user = userRepository.findByusername(loginRequest.getUsername()).orElse(null);
+        if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
+            throw new BadRequestException("Existing Password not match");
+        }
+    }
+
     public void userActiveValidation(User user){
         if(user == null || !user.getActive()){
             throw new ConflictException("User is not active");
@@ -45,6 +56,15 @@ public class UserValidation {
         }
         if(loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()){
             throw new BadRequestException("Password is required");
+        }
+    }
+
+    public void changePasswordRequired(LoginRequest loginRequest){
+        if(loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()){
+            throw new BadRequestException("Password is required");
+        }
+        if(loginRequest.getNewPassword() == null || loginRequest.getNewPassword().trim().isEmpty()){
+            throw new BadRequestException("New Password is required");
         }
     }
 }

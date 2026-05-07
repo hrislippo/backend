@@ -8,6 +8,7 @@ import lippo.hris.system.authentication.repository.RoleRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.authentication.repository.UserRoleRepository;
 import lippo.hris.system.authentication.request.LoginRequest;
+import lippo.hris.system.authentication.response.UserProfileResponse;
 import lippo.hris.system.authentication.response.UserResponse;
 import lippo.hris.system.authentication.response.UserResponsev2;
 import lippo.hris.system.exception.ConflictException;
@@ -56,7 +57,7 @@ public class UserService {
     }
 
     public void changePassword(LoginRequest loginRequest, User user){
-        user.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(loginRequest.getNewPassword()));
         userRepository.save(user);
     }
 
@@ -71,6 +72,15 @@ public class UserService {
 
     public UserResponsev2 findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public UserProfileResponse getUserProfile(String username){
+        User user = userRepository.findByusername(username).orElse(null);
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setUsername(username);
+        userProfileResponse.setName(user.getName());
+        return userProfileResponse;
     }
 
     public void deleteUser(User user){

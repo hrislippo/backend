@@ -7,9 +7,11 @@ import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.authentication.service.LoginService;
 import lippo.hris.system.authentication.service.UserService;
 import lippo.hris.system.authentication.validation.UserValidation;
+import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,10 +36,11 @@ public class UserController {
         return ApiResponse.ok(null, "User registered");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user")
     public ApiResponse changePassword(@RequestBody LoginRequest loginRequest) {
+        userValidation.changePasswordRequired(loginRequest);
         User user = userValidation.userValidation(loginRequest.getUsername(), false);
+        userValidation.passwordValidation(loginRequest);
         userService.changePassword(loginRequest, user);
         return ApiResponse.ok(null, "Password changed");
     }
@@ -59,6 +62,13 @@ public class UserController {
                                 Pageable pageable) {
         return ApiResponse.ok(userService.findAllWithRolesAndSearch(usernameSearch, nameSearch, roleSearch, activeSearch, pageable),
                 "Get Users Successfully");
+    }
+
+    @GetMapping("/user-profile")
+    public ApiResponse getUserProfile(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(userService.getUserProfile(customUserDetails.getUsername()),
+                "Get User Profile");
     }
 
     @GetMapping("/user-list")
