@@ -78,6 +78,7 @@ public class LinkedinExtractService {
                 .collect(Collectors.groupingBy(t -> Math.round(t.getYDirAdj())));
         List<Integer> sortedY = lines.keySet().stream().sorted().toList();
         StringBuilder result = new StringBuilder();
+        Boolean flagLinkedIn = false;
 
         for (Integer y : sortedY) {
             List<TextPosition> line = lines.get(y);
@@ -88,8 +89,16 @@ public class LinkedinExtractService {
                 word.append(position.getUnicode());
             }
 
-            if(word.toString().contains("linkedin") || word.toString().contains("LinkedIn")){
+            if(word.toString().contains("linkedin")){
+                flagLinkedIn = true;
+            }
+
+            if(flagLinkedIn){
                 result.append(word.toString().replace("(LinkedIn)", ""));
+            }
+
+            if(word.toString().contains("(LinkedIn)")){
+                break;
             }
         }
         return result.isEmpty() ? null : result.toString().trim();
