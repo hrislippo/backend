@@ -18,6 +18,7 @@ public class CandidateReq {
     private String mobilePhone;
     private String email;
     private String linkedinLink;
+    private String notes;
     private Long currentSalary;
     private Long expectedSalary;
     private List<String> hashtags;

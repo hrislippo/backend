@@ -31,8 +31,14 @@ public class CandidateController {
     @PostMapping("/candidate")
     public ApiResponse addCandidate(@RequestBody CandidateReq candidateReq){
         candidateValidation.addCandidateRequired(candidateReq);
-        candidateService.saveCandidate(candidateReq);
-        return ApiResponse.ok(null, "Candidate Saved");
+        return ApiResponse.ok(candidateService.saveCandidate(candidateReq), "Candidate Saved");
+    }
+
+    @PostMapping("/candidate-document")
+    public ApiResponse addCandidateDocument(@RequestParam(value = "id") Long id,
+                                            @RequestParam(value = "file") MultipartFile file) {
+        candidateService.saveCandidateDocument(id, file);
+        return ApiResponse.ok(null, "Save Candidate Document Successfully");
     }
 
     @PutMapping("/candidate")

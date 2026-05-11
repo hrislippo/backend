@@ -38,6 +38,10 @@ public class Candidate extends Auditable {
     @Column(name = "CanFgShortlist")
     private Boolean flagShortlist = false;
 
+    @Lob
+    @Column(name = "CanNotes", columnDefinition = "NVARCHAR(MAX)")
+    private String notes;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "UserId")
     private User user;

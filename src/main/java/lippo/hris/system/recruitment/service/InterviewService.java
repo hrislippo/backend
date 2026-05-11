@@ -10,6 +10,7 @@ import lippo.hris.system.recruitment.repository.CandidateRepository;
 import lippo.hris.system.recruitment.repository.EmployeeRequestCandidateActivityRepository;
 import lippo.hris.system.recruitment.repository.InterviewRepository;
 import lippo.hris.system.recruitment.request.InterviewReq;
+import lippo.hris.system.recruitment.response.InterviewCanResp;
 import lippo.hris.system.recruitment.response.InterviewResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -103,6 +105,10 @@ public class InterviewService {
 
     public Page<InterviewResp> getInterview(Pageable pageable) {
         return interviewRepository.getInterview(pageable);
+    }
+
+    public List<InterviewCanResp> getInterviewByCandidate(Long id){
+        return interviewRepository.getInterviewByCandidate(id);
     }
 
     public Interview getInterviewDetail(Long id) {

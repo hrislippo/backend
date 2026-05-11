@@ -34,9 +34,6 @@ public class EmployeeRequestValidation {
         if(employeeRequestReq.getPic().stream().filter(e -> e != null).toList().isEmpty()){
             throw new BadRequestException("PICs are Required");
         }
-        if(employeeRequestReq.getCandidate().stream().filter(e -> e != null).toList().isEmpty()){
-            throw new BadRequestException("Candidates are Required");
-        }
     }
 
     public void checkEmployeeRequestValue(EmployeeRequestReq employeeRequestReq) {

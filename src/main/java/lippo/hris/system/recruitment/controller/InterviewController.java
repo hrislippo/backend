@@ -31,6 +31,11 @@ public class InterviewController {
         return ApiResponse.ok(interviewService.getInterview(pageable), "Get Interview Successfully");
     }
 
+    @GetMapping("/interview-candidate")
+    public ApiResponse getInterviewCandidate(@RequestParam(value = "id") Long id){
+        return ApiResponse.ok(interviewService.getInterviewByCandidate(id), "Get Interview Successfully");
+    }
+
     @GetMapping("/interview-action")
     public ApiResponse getInterviewAction(@RequestParam(value = "actionId") Long actionId){
         return ApiResponse.ok(interviewService.getInterviewByAction(actionId), "Get Interview Successfully");

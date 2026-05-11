@@ -7,11 +7,9 @@ import lippo.hris.system.ocrengine.response.OcrResponse;
 import lippo.hris.system.ocrengine.service.LinkedinOcrService;
 import lippo.hris.system.recruitment.entity.Candidate;
 import lippo.hris.system.recruitment.entity.CandidateAddress;
+import lippo.hris.system.recruitment.entity.CandidateDocument;
 import lippo.hris.system.recruitment.entity.Interview;
-import lippo.hris.system.recruitment.repository.CandidateAddressRepository;
-import lippo.hris.system.recruitment.repository.CandidateRepository;
-import lippo.hris.system.recruitment.repository.EmployeeRequestCandidateRepository;
-import lippo.hris.system.recruitment.repository.InterviewRepository;
+import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
 import lippo.hris.system.recruitment.response.CandidateResp;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -80,6 +79,9 @@ public class CandidateService {
     @Autowired
     InterviewRepository interviewRepository;
 
+    @Autowired
+    CandidateDocumentRepository candidateDocumentRepository;
+
     public String generateRunningNumber(){
         String prefix = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         Long runningNumber = candidateRepository.countByCandidateNumberStartingWith(prefix);
@@ -90,13 +92,14 @@ public class CandidateService {
         }
     }
 
-    public void saveCandidate(CandidateReq candidateReq){
+    public Long saveCandidate(CandidateReq candidateReq){
         Candidate candidate = new Candidate();
         User user = userRepository.findById(candidateReq.getUserId()).get();
         candidate.setName(candidateReq.getName());
         candidate.setCanNumber(generateRunningNumber());
         candidate.setBirthDate(candidateReq.getBirthDate());
         candidate.setHashtag(candidateReq.getHashtags().toString());
+        candidate.setNotes(candidateReq.getNotes());
         candidate.setCurrentSalary(candidateReq.getCurrentSalary());
         candidate.setExpectedSalary(candidateReq.getExpectedSalary());
         candidate.setUser(user);
@@ -113,6 +116,22 @@ public class CandidateService {
         candidateLanguageService.save(candidate, candidateReq.getLanguage());
         candidateEducationService.save(candidate, candidateReq.getEducation());
         candidateExperienceService.save(candidate, candidateReq.getExperience());
+        return candidate.getId();
+    }
+
+    public void saveCandidateDocument(Long id, MultipartFile file){
+        Candidate candidate = candidateRepository.findById(id).get();
+        CandidateDocument candidateDocument = new CandidateDocument();
+        candidateDocument.setCandidate(candidate);
+        try{
+            if(file != null){
+                candidateDocument.setDocument(file.getBytes());
+                candidateDocument.setDocumentName(file.getOriginalFilename());
+                candidateDocument.setDocumentType(file.getContentType());
+            }
+        } catch(IOException e){
+        }
+        candidateDocumentRepository.save(candidateDocument);
     }
 
     public void modifyCandidate(Long id, CandidateReq candidateReq){
@@ -124,6 +143,7 @@ public class CandidateService {
         candidate.setCurrentSalary(candidateReq.getCurrentSalary());
         candidate.setExpectedSalary(candidateReq.getExpectedSalary());
         candidate.setUser(user);
+        candidate.setNotes(candidateReq.getNotes());
         candidate = candidateRepository.save(candidate);
 
         candidateAddressService.modifyAddress(candidate, candidateReq.getAddress());
@@ -189,6 +209,7 @@ public class CandidateService {
         candidateReq.setBirthDate(candidate.getBirthDate());
         candidateReq.setBirthDateFormat(candidate.getBirthDate() == null ? null : candidate.getBirthDate().format(formatter));
         candidateReq.setCanNumber(candidate.getCanNumber());
+        candidateReq.setNotes(candidate.getNotes());
 
         if(candidate.getUser().getUsername().equals(username)){
             candidateReq.setCurrentSalary(candidate.getCurrentSalary());

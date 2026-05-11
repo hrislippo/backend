@@ -28,4 +28,16 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(fileResp.getContentType()))
                 .body(fileResp.getData());
     }
+
+    @GetMapping("/file-cv")
+    public ResponseEntity<byte[]> getFileCV (@RequestParam("id") Long id) {
+        FileResp fileResp = fileService.getFileCV(id);
+        if(fileResp.getData() == null){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileResp.getFileName())
+                .contentType(MediaType.parseMediaType(fileResp.getContentType()))
+                .body(fileResp.getData());
+    }
 }
