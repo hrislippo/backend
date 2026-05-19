@@ -4,12 +4,11 @@ import jakarta.mail.MessagingException;
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
-import lippo.hris.system.emailengine.request.EmailProcessReq;
-import lippo.hris.system.emailengine.service.EmailProcessService;
 import lippo.hris.system.emailengine.service.EmailService;
-import lippo.hris.system.exception.ConflictException;
+import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.*;
 import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormActivityStatus;
+import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.*;
 import lippo.hris.system.recruitment.response.*;
@@ -101,6 +100,9 @@ public class EmployeeRequestFormService {
 
     @Autowired
     EmployeeRequestResultRepository employeeRequestResultRepository;
+
+    @Autowired
+    GoogleDriveService googleDriveService;
 
     public void addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
@@ -262,14 +264,14 @@ public class EmployeeRequestFormService {
 
     public boolean actionEmployeeRequest(Long id, MultipartFile file, String result, String notes) {
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).get();
+        String fileId = null;
 
         if(file != null){
             try{
-                employeeRequestCandidateActivity.setAttachment(file.getBytes());
-                employeeRequestCandidateActivity.setFileName(file.getOriginalFilename());
-                employeeRequestCandidateActivity.setFileType(file.getContentType());
-            } catch(IOException e){
+                fileId = googleDriveService.upload(file, GoogleDriveRecruitmentFolder.RESULT_ACTIVITY_RECRUITMENT);
+            }catch (Exception e){
             }
+            employeeRequestCandidateActivity.setFileId(fileId);
         }
 
         employeeRequestCandidateActivity.setNotes(notes);

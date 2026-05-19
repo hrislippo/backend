@@ -1,9 +1,5 @@
 package lippo.hris.system.recruitment.controller;
 
-import lippo.hris.system.authentication.entity.User;
-import lippo.hris.system.authentication.request.UserActiveRequest;
-import lippo.hris.system.emailengine.service.EmailService;
-import lippo.hris.system.emailengine.service.IcsService;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
 import lippo.hris.system.recruitment.validation.CandidateValidation;
@@ -15,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/recruitment")

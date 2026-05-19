@@ -1,6 +1,5 @@
 package lippo.hris.system.recruitment.controller;
 
-import lippo.hris.system.recruitment.request.EmployeeRequestReq;
 import lippo.hris.system.recruitment.response.FileResp;
 import lippo.hris.system.recruitment.service.FileService;
 import lippo.hris.system.response.ApiResponse;
@@ -18,26 +17,17 @@ public class FileController {
     FileService fileService;
 
     @GetMapping("/file-activity")
-    public ResponseEntity<byte[]> getFileActivity (@RequestParam("id") Long id) {
-        FileResp fileResp = fileService.getFileActivity(id);
-        if(fileResp.getData() == null){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileResp.getFileName())
-                .contentType(MediaType.parseMediaType(fileResp.getContentType()))
-                .body(fileResp.getData());
+    public ApiResponse getFileActivity (@RequestParam("id") Long id) {
+        return ApiResponse.ok(fileService.getFileActivity(id), "Get URL Preview Successfully");
     }
 
     @GetMapping("/file-cv")
-    public ResponseEntity<byte[]> getFileCV (@RequestParam("id") Long id) {
-        FileResp fileResp = fileService.getFileCV(id);
-        if(fileResp.getData() == null){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileResp.getFileName())
-                .contentType(MediaType.parseMediaType(fileResp.getContentType()))
-                .body(fileResp.getData());
+    public ApiResponse getFileCV (@RequestParam("id") Long id) {
+        return ApiResponse.ok(fileService.getFileCV(id), "Get URL Preview Successfully");
+    }
+
+    @GetMapping("/download-file-cv")
+    public ApiResponse downloadCV (@RequestParam("id") Long id) {
+        return ApiResponse.ok(fileService.downloadCV(id), "Get URL Download Successfully");
     }
 }

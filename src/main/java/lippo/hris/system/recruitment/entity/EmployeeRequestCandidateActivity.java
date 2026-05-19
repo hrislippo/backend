@@ -27,15 +27,8 @@ public class EmployeeRequestCandidateActivity extends Auditable {
     @Column(name = "EmpReqCanActStatus")
     private String status;
 
-    @Lob
-    @Column(name = "EmpReqCanActFile", columnDefinition = "VARBINARY(MAX)")
-    private byte[] attachment;
-
-    @Column(name = "EmpReqCanActFileName")
-    private String fileName;
-
-    @Column(name = "EmpReqCanActFileType")
-    private String fileType;
+    @Column(name = "EmpReqFileId")
+    private String fileId;
 
     @Lob
     @Column(name = "EmpReqCanActNotes", columnDefinition = "NVARCHAR(MAX)")

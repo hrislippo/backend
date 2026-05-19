@@ -3,12 +3,11 @@ package lippo.hris.system.recruitment.service;
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.exception.ConflictException;
-import lippo.hris.system.ocrengine.response.OcrResponse;
-import lippo.hris.system.ocrengine.service.LinkedinOcrService;
+import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.Candidate;
 import lippo.hris.system.recruitment.entity.CandidateAddress;
-import lippo.hris.system.recruitment.entity.CandidateDocument;
 import lippo.hris.system.recruitment.entity.Interview;
+import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -80,7 +78,7 @@ public class CandidateService {
     InterviewRepository interviewRepository;
 
     @Autowired
-    CandidateDocumentRepository candidateDocumentRepository;
+    GoogleDriveService googleDriveService;
 
     public String generateRunningNumber(){
         String prefix = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
@@ -121,17 +119,14 @@ public class CandidateService {
 
     public void saveCandidateDocument(Long id, MultipartFile file){
         Candidate candidate = candidateRepository.findById(id).get();
-        CandidateDocument candidateDocument = new CandidateDocument();
-        candidateDocument.setCandidate(candidate);
+        String fileId = null;
+
         try{
-            if(file != null){
-                candidateDocument.setDocument(file.getBytes());
-                candidateDocument.setDocumentName(file.getOriginalFilename());
-                candidateDocument.setDocumentType(file.getContentType());
-            }
-        } catch(IOException e){
+            fileId = googleDriveService.upload(file, GoogleDriveRecruitmentFolder.CV);
+        }catch (Exception e){
         }
-        candidateDocumentRepository.save(candidateDocument);
+        candidate.setFileId(fileId);
+        candidateRepository.save(candidate);
     }
 
     public void modifyCandidate(Long id, CandidateReq candidateReq){

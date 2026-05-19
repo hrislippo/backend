@@ -45,4 +45,7 @@ public class Candidate extends Auditable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "UserId")
     private User user;
+
+    @Column(name = "CanFileId")
+    private String fileId;
 }
