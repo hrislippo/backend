@@ -1,12 +1,8 @@
 package lippo.hris.system.recruitment.controller;
 
-import lippo.hris.system.recruitment.response.FileResp;
 import lippo.hris.system.recruitment.service.FileService;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

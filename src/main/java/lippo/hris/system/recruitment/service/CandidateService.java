@@ -190,8 +190,8 @@ public class CandidateService {
         return candidateRepository.getCandidate(keywords, pageable);
     }
 
-    public List<Candidate> getCandidateList(String keywords){
-        return candidateRepository.getCandidateList(keywords);
+    public List<Candidate> getCandidateList(){
+        return candidateRepository.getCandidateList();
     }
 
     public CandidateReq getCandidateDetail(Long id, String username){

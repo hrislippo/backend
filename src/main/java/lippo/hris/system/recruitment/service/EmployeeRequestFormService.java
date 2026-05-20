@@ -296,6 +296,12 @@ public class EmployeeRequestFormService {
         return false;
     }
 
+    public void revertEmployeeRequest(EmployeeRequestReq employeeRequestReq) {
+        EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(employeeRequestReq.getId()).get();
+        employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
+        employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
+    }
+
     public Page<EmployeeRequestResp> getEmployeeRequest(String code, String name, String buName, String hrbpName,
                                                         String username, Pageable pageable) {
         return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pageable);

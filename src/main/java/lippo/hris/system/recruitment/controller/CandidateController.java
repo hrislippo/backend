@@ -59,8 +59,8 @@ public class CandidateController {
     }
 
     @GetMapping("/candidate-list")
-    public ApiResponse getCandidateList(@RequestParam(value = "keywords", required = false) String keywords){
-        return ApiResponse.ok(candidateService.getCandidateList(keywords), "Get candidate list successfully");
+    public ApiResponse getCandidateList(){
+        return ApiResponse.ok(candidateService.getCandidateList(), "Get candidate list successfully");
     }
 
     @GetMapping("/candidate-detail")

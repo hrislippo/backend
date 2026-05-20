@@ -33,11 +33,11 @@ public class AtsOcrService {
         ocrResponse.setMobilePhone(postProcessMobilePhone(atsExtractService.getATSMobilePhone(positionsList)));
         ocrResponse.setEmail(postProcessEmail(atsExtractService.getATSEmail(positionsList)));
         ocrResponse.setLinkedInLink(null);
-        ocrResponse.setTopSkills(atsExtractService.getATSSkills(positionsList));
+        ocrResponse.setTopSkills(new ArrayList<>());
         ocrResponse.setLanguages(new ArrayList<>());
-        ocrResponse.setCertifications(atsExtractService.getATSCertifications(positionsList));
-        ocrResponse.setAchievements(atsExtractService.getATSAchievements(positionsList));
-        ocrResponse.setPublications(atsExtractService.getATSPublications(positionsList));
+        ocrResponse.setCertifications(new ArrayList<>());
+        ocrResponse.setAchievements(new ArrayList<>());
+        ocrResponse.setPublications(new ArrayList<>());
         ocrResponse.setExperience(new ArrayList<>());
         ocrResponse.setEducation(new ArrayList<>());
         return ocrResponse;

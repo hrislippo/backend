@@ -23,10 +23,10 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     @Query(nativeQuery = true,
             value="SELECT * " +
-                    "FROM f_SearchKeywordCandidate(:keyword) " +
+                    "FROM RCMCANCanData rd " +
                     "WHERE CanFgShortlist = 'true' " +
                     "ORDER BY CanName")
-    List<Candidate> getCandidateList(@Param("keyword") String keyword);
+    List<Candidate> getCandidateList();
 
 
     @Query(nativeQuery = true, value = "SELECT TOP 1 rd.CanNum " +

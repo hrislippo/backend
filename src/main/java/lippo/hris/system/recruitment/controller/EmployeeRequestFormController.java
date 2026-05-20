@@ -51,6 +51,12 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(employeeRequestFormService.actionEmployeeRequest(id, file, result, notes), "Employee Request Progressed");
     }
 
+    @PostMapping("/erf-revert")
+    public ApiResponse revertEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestFormService.revertEmployeeRequest(employeeRequestReq);
+        return ApiResponse.ok(null, "Employee Request Reverted");
+    }
+
     @PutMapping("/erf")
     public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
