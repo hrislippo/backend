@@ -58,9 +58,12 @@ public class EmployeeRequestFormController {
     }
 
     @PutMapping("/erf")
-    public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+    public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
+                                             Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
         employeeRequestValidation.checkEmployeeRequestValue(employeeRequestReq);
+        employeeRequestValidation.eligibleRecruitmentHead(customUserDetails.getRoles());
         employeeRequestFormService.modifyEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Modified");
     }
@@ -81,6 +84,27 @@ public class EmployeeRequestFormController {
     public ApiResponse interviewEmployeeRequest(@RequestBody EmployeeRequestInterviewReq employeeRequestInterviewReq) {
         employeeRequestFormService.interviewEmployeeRequest(employeeRequestInterviewReq);
         return ApiResponse.ok(null, "Employee Request Progressed");
+    }
+
+    @PutMapping("/erf-cancel")
+    public ApiResponse cancelEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
+                                             Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        employeeRequestValidation.eligibleRecruitmentHead(customUserDetails.getRoles());
+        employeeRequestFormService.cancelEmployeeRequest(employeeRequestReq);
+        return ApiResponse.ok(null, "Employee Request Cancelled");
+    }
+
+    @PutMapping("/erf-hold")
+    public ApiResponse holdEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestFormService.holdEmployeeRequest(employeeRequestReq);
+        return ApiResponse.ok(null, "Employee Request Held");
+    }
+
+    @PutMapping("/erf-resume")
+    public ApiResponse resumeEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestFormService.resumeEmployeeRequest(employeeRequestReq);
+        return ApiResponse.ok(null, "Employee Request Resumed");
     }
 
     @GetMapping("/erf")

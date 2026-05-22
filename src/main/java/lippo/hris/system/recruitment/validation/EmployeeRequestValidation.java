@@ -1,10 +1,12 @@
 package lippo.hris.system.recruitment.validation;
 
 import lippo.hris.system.exception.BadRequestException;
+import lippo.hris.system.exception.UnauthorizedException;
 import lippo.hris.system.recruitment.request.EmployeeRequestReq;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class EmployeeRequestValidation {
@@ -25,6 +27,9 @@ public class EmployeeRequestValidation {
         if(employeeRequestReq.getTemplateLevel() == null){
             throw new BadRequestException("Template Level is Required");
         }
+        if(employeeRequestReq.getStartDate() == null){
+            throw new BadRequestException("Start Date is Required");
+        }
         if(employeeRequestReq.getExpDate() == null){
             throw new BadRequestException("Exp Date is Required");
         }
@@ -42,6 +47,12 @@ public class EmployeeRequestValidation {
         }
         if(employeeRequestReq.getRequestNumber() < 1){
             throw new BadRequestException("Recruitment Number must be greater than 0");
+        }
+    }
+
+    public void eligibleRecruitmentHead(List<String> roles){
+        if(!roles.contains("ROLE_TA_HEAD")){
+            throw new UnauthorizedException("Not Eligible to Apply This Action (Recruitment Head)");
         }
     }
 }

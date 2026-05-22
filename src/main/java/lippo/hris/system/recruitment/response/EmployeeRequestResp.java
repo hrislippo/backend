@@ -12,7 +12,7 @@ public interface EmployeeRequestResp {
     String getHRBPName();
     Integer getRequestNumber();
     Integer getRecruitNumber();
-    Boolean getFinal();
+    String getStatus();
     Boolean getEligible();
 
     @JsonFormat(pattern = "dd MMMM yyyy")

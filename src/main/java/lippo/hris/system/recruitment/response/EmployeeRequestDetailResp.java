@@ -13,6 +13,7 @@ public class EmployeeRequestDetailResp {
     private String name;
     private BusinessUnit businessUnit;
     private HRBP hrbp;
+    private LocalDate startDate;
     private LocalDate expiryDate;
     private List<User> pic;
     private List<Candidate> candidate;

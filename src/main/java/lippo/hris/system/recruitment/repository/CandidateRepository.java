@@ -15,11 +15,11 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     @Query(nativeQuery = true,
             value="SELECT * " +
-                    "FROM f_SearchKeywordCandidate(:keyword) " +
+                    "FROM f_SearchKeywordCandidate(:keyword, :username) " +
                     "ORDER BY CanName",
             countQuery = "SELECT COUNT(*) " +
-                    "FROM f_SearchKeywordCandidate(:keyword)")
-    Page<CandidateResp> getCandidate(@Param("keyword") String keyword, Pageable pageable);
+                    "FROM f_SearchKeywordCandidate(:keyword, :username)")
+    Page<CandidateResp> getCandidate(@Param("keyword") String keyword, Pageable pageable, @Param("username") String username);
 
     @Query(nativeQuery = true,
             value="SELECT * " +

@@ -6,6 +6,7 @@ import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.Candidate;
 import lippo.hris.system.recruitment.entity.CandidateAddress;
+import lippo.hris.system.recruitment.entity.CandidateLogSalary;
 import lippo.hris.system.recruitment.entity.Interview;
 import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,6 +81,9 @@ public class CandidateService {
 
     @Autowired
     GoogleDriveService googleDriveService;
+
+    @Autowired
+    CandidateLogSalaryRepository candidateLogSalaryRepository;
 
     public String generateRunningNumber(){
         String prefix = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
@@ -135,8 +140,29 @@ public class CandidateService {
         candidate.setName(candidateReq.getName());
         candidate.setBirthDate(candidateReq.getBirthDate());
         candidate.setHashtag(candidateReq.getHashtags().toString());
-        candidate.setCurrentSalary(candidateReq.getCurrentSalary());
-        candidate.setExpectedSalary(candidateReq.getExpectedSalary());
+
+        if(!Objects.equals(candidate.getCurrentSalary(), candidateReq.getCurrentSalary())){
+            CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+            candidateLogSalary.setCandidate(candidate);
+            candidateLogSalary.setField("Current");
+            candidateLogSalary.setOldValue(candidate.getCurrentSalary());
+            candidateLogSalary.setNewValue(candidateReq.getCurrentSalary());
+            candidateLogSalaryRepository.save(candidateLogSalary);
+
+            candidate.setCurrentSalary(candidateReq.getCurrentSalary());
+        }
+
+        if(!Objects.equals(candidate.getExpectedSalary(), candidateReq.getExpectedSalary())){
+            CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+            candidateLogSalary.setCandidate(candidate);
+            candidateLogSalary.setField("Expected");
+            candidateLogSalary.setOldValue(candidate.getExpectedSalary());
+            candidateLogSalary.setNewValue(candidateReq.getExpectedSalary());
+            candidateLogSalaryRepository.save(candidateLogSalary);
+
+            candidate.setExpectedSalary(candidateReq.getExpectedSalary());
+        }
+
         candidate.setUser(user);
         candidate.setNotes(candidateReq.getNotes());
         candidate = candidateRepository.save(candidate);
@@ -170,8 +196,28 @@ public class CandidateService {
                 candidateAddressRepository.save(candidateAddress);
             }
 
-            candidate.setCurrentSalary(candidateShortlistReq.getCurrentSalary());
-            candidate.setExpectedSalary(candidateShortlistReq.getExpectedSalary());
+            if(!Objects.equals(candidate.getCurrentSalary(), candidateShortlistReq.getCurrentSalary())){
+                CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+                candidateLogSalary.setCandidate(candidate);
+                candidateLogSalary.setField("Current");
+                candidateLogSalary.setOldValue(candidate.getCurrentSalary());
+                candidateLogSalary.setNewValue(candidateShortlistReq.getCurrentSalary());
+                candidateLogSalaryRepository.save(candidateLogSalary);
+
+                candidate.setCurrentSalary(candidateShortlistReq.getCurrentSalary());
+            }
+
+            if(!Objects.equals(candidate.getExpectedSalary(), candidateShortlistReq.getExpectedSalary())){
+                CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+                candidateLogSalary.setCandidate(candidate);
+                candidateLogSalary.setField("Expected");
+                candidateLogSalary.setOldValue(candidate.getExpectedSalary());
+                candidateLogSalary.setNewValue(candidateShortlistReq.getExpectedSalary());
+                candidateLogSalaryRepository.save(candidateLogSalary);
+
+                candidate.setExpectedSalary(candidateShortlistReq.getExpectedSalary());
+            }
+
             candidate.setBirthDate(candidateShortlistReq.getBirthDate());
 
             Interview interview = new Interview();
@@ -186,8 +232,8 @@ public class CandidateService {
         candidateRepository.save(candidate);
     }
 
-    public Page<CandidateResp> getCandidate(String keywords, Pageable pageable){
-        return candidateRepository.getCandidate(keywords, pageable);
+    public Page<CandidateResp> getCandidate(String keywords, Pageable pageable, String username){
+        return candidateRepository.getCandidate(keywords, pageable, username);
     }
 
     public List<Candidate> getCandidateList(){

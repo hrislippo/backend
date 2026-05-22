@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.entity;
 
 import jakarta.persistence.*;
 import lippo.hris.system.entity.Auditable;
+import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -21,6 +22,9 @@ public class EmployeeRequestForm extends Auditable {
 
     @Column(name = "EmpReqName")
     private String name;
+
+    @Column(name = "EmpReqStartDate")
+    private LocalDate startDate;
 
     @Column(name = "EmpReqExpDate")
     private LocalDate expDate;
@@ -44,6 +48,6 @@ public class EmployeeRequestForm extends Auditable {
     @JoinColumn(name = "RcmLvlTempId")
     private RecruitmentLevelTemplate recruitmentLevelTemplate;
 
-    @Column(name = "EmpReqFgFinal")
-    private Boolean flagFinal = false;
+    @Column(name = "EmpReqStatus")
+    private String status = EmployeeRequestFormStatus.IN_PROGRESS.toString();
 }

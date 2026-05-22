@@ -8,6 +8,7 @@ import lippo.hris.system.emailengine.service.EmailService;
 import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.*;
 import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormActivityStatus;
+import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormStatus;
 import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.*;
@@ -21,11 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,6 +104,15 @@ public class EmployeeRequestFormService {
     @Autowired
     GoogleDriveService googleDriveService;
 
+    @Autowired
+    EmployeeRequestHoldRepository employeeRequestHoldRepository;
+
+    @Autowired
+    EmployeeRequestLogExpDateRepository employeeRequestLogExpDateRepository;
+
+    @Autowired
+    CandidateLogSalaryRepository candidateLogSalaryRepository;
+
     public void addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
         RecruitmentLevelTemplate recruitmentLevelTemplate = recruitmentLevelTemplateRepository.findById(employeeRequestReq.getTemplateLevel()).get();
@@ -114,6 +123,7 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = new EmployeeRequestForm();
         employeeRequestForm.setCode(generateRunningNumber());
         employeeRequestForm.setName(employeeRequestReq.getName());
+        employeeRequestForm.setStartDate(employeeRequestReq.getStartDate());
         employeeRequestForm.setExpDate(employeeRequestReq.getExpDate());
         employeeRequestForm.setRecruitmentTemplate(recruitmentTemplate);
         employeeRequestForm.setRecruitmentLevelTemplate(recruitmentLevelTemplate);
@@ -163,7 +173,18 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(employeeRequestReq.getId()).get();
         RecruitmentTemplate oldRecruitmentTemplate = employeeRequestForm.getRecruitmentTemplate();
         employeeRequestForm.setName(employeeRequestReq.getName());
-        employeeRequestForm.setExpDate(employeeRequestReq.getExpDate());
+        employeeRequestForm.setStartDate(employeeRequestReq.getStartDate());
+
+        if(!employeeRequestForm.getExpDate().isEqual(employeeRequestReq.getExpDate())){
+            EmployeeRequestLogExpDate employeeRequestLogExpDate = new EmployeeRequestLogExpDate();
+            employeeRequestLogExpDate.setEmployeeRequestForm(employeeRequestForm);
+            employeeRequestLogExpDate.setOldValue(employeeRequestForm.getExpDate());
+            employeeRequestLogExpDate.setNewValue(employeeRequestReq.getExpDate());
+            employeeRequestLogExpDateRepository.save(employeeRequestLogExpDate);
+
+            employeeRequestForm.setExpDate(employeeRequestReq.getExpDate());
+        }
+
         employeeRequestForm.setRecruitmentTemplate(recruitmentTemplate);
         employeeRequestForm.setRecruitmentLevelTemplate(recruitmentLevelTemplate);
         employeeRequestForm.setBusinessUnit(businessUnit);
@@ -219,8 +240,28 @@ public class EmployeeRequestFormService {
             candidateAddressRepository.save(candidateAddress);
         }
 
-        candidate.setCurrentSalary(employeeRequestInterviewReq.getCurrentSalary());
-        candidate.setExpectedSalary(employeeRequestInterviewReq.getExpectedSalary());
+        if(!Objects.equals(candidate.getCurrentSalary(), employeeRequestInterviewReq.getCurrentSalary())){
+            CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+            candidateLogSalary.setCandidate(candidate);
+            candidateLogSalary.setField("Current");
+            candidateLogSalary.setOldValue(candidate.getCurrentSalary());
+            candidateLogSalary.setNewValue(employeeRequestInterviewReq.getCurrentSalary());
+            candidateLogSalaryRepository.save(candidateLogSalary);
+
+            candidate.setCurrentSalary(employeeRequestInterviewReq.getCurrentSalary());
+        }
+
+        if(!Objects.equals(candidate.getExpectedSalary(), employeeRequestInterviewReq.getExpectedSalary())){
+            CandidateLogSalary candidateLogSalary = new CandidateLogSalary();
+            candidateLogSalary.setCandidate(candidate);
+            candidateLogSalary.setField("Expected");
+            candidateLogSalary.setOldValue(candidate.getExpectedSalary());
+            candidateLogSalary.setNewValue(employeeRequestInterviewReq.getExpectedSalary());
+            candidateLogSalaryRepository.save(candidateLogSalary);
+
+            candidate.setExpectedSalary(employeeRequestInterviewReq.getExpectedSalary());
+        }
+
         candidate.setBirthDate(employeeRequestInterviewReq.getBirthDate());
         candidateRepository.save(candidate);
 
@@ -231,6 +272,38 @@ public class EmployeeRequestFormService {
         interview.setEndTime(LocalDateTime.now());
         interview.setNotes(employeeRequestInterviewReq.getNotes());
         interviewRepository.save(interview);
+    }
+
+    public void cancelEmployeeRequest(EmployeeRequestReq employeeRequestReq) {
+        EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(employeeRequestReq.getId()).get();
+        employeeRequestForm.setStatus(EmployeeRequestFormStatus.CANCELLED.toString());
+        employeeRequestFormRepository.save(employeeRequestForm);
+    }
+
+    public void holdEmployeeRequest(EmployeeRequestReq employeeRequestReq) {
+        EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(employeeRequestReq.getId()).get();
+        employeeRequestForm.setStatus(EmployeeRequestFormStatus.ON_HOLD.toString());
+        employeeRequestFormRepository.save(employeeRequestForm);
+
+        EmployeeRequestHold employeeRequestHold = new EmployeeRequestHold();
+        employeeRequestHold.setEmployeeRequestForm(employeeRequestForm);
+        employeeRequestHold.setStartDate(LocalDate.now());
+        employeeRequestHoldRepository.save(employeeRequestHold);
+    }
+
+    public void resumeEmployeeRequest(EmployeeRequestReq employeeRequestReq) {
+        EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(employeeRequestReq.getId()).get();
+        employeeRequestForm.setStatus(EmployeeRequestFormStatus.IN_PROGRESS.toString());
+
+        List<EmployeeRequestHold> employeeRequestHolds = employeeRequestHoldRepository.findByEmployeeRequestForm(employeeRequestForm)
+                .stream().filter(e -> e.getEndDate() == null).toList();
+        for(EmployeeRequestHold employeeRequestHold : employeeRequestHolds){
+            employeeRequestHold.setEndDate(LocalDate.now());
+            employeeRequestHoldRepository.save(employeeRequestHold);
+
+            employeeRequestForm.setExpDate(employeeRequestForm.getExpDate().plusDays(ChronoUnit.DAYS.between(employeeRequestHold.getStartDate(), employeeRequestHold.getEndDate())));
+            employeeRequestFormRepository.save(employeeRequestForm);
+        }
     }
 
     public void emailEmployeeRequest(Long id, List<String> emailTo, List<String> emailCc,
@@ -288,7 +361,7 @@ public class EmployeeRequestFormService {
             employeeRequestResultRepository.save(employeeRequestResult);
 
             if(checkERFCompleted(employeeRequestForm)){
-                employeeRequestForm.setFlagFinal(true);
+                employeeRequestForm.setStatus(EmployeeRequestFormStatus.COMPLETED.toString());
                 employeeRequestFormRepository.save(employeeRequestForm);
                 return true;
             }
@@ -316,6 +389,7 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(id).get();
         employeeRequestDetailResp.setCode(employeeRequestForm.getCode());
         employeeRequestDetailResp.setName(employeeRequestForm.getName());
+        employeeRequestDetailResp.setStartDate(employeeRequestForm.getStartDate());
         employeeRequestDetailResp.setExpiryDate(employeeRequestForm.getExpDate());
         employeeRequestDetailResp.setTemplate(employeeRequestForm.getRecruitmentTemplate());
         employeeRequestDetailResp.setLevelTemplate(employeeRequestForm.getRecruitmentLevelTemplate());

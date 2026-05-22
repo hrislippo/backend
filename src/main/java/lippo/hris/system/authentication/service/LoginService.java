@@ -28,7 +28,7 @@ public class LoginService {
 
     public String loginUser(LoginRequest loginRequest, User user){
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new UnauthorizedException("Invalid password");
+            throw new UnauthorizedException("Authentication failed. Please try again");
         }
 
         List<String> userRoles = userRoleRepository.findByUser(user.getUsername());

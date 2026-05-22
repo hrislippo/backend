@@ -9,6 +9,7 @@ import java.util.List;
 public class EmployeeRequestReq {
     private Long id;
     private String name;
+    private LocalDate startDate;
     private LocalDate expDate;
     private Long businessUnitId;
     private Long hrbpId;

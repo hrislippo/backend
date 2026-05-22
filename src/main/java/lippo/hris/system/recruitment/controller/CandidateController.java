@@ -54,8 +54,10 @@ public class CandidateController {
 
     @GetMapping("/candidate")
     public ApiResponse getCandidate(@RequestParam(value = "keywords", required = false) String keywords,
-                                    Pageable pageable) {
-        return ApiResponse.ok(candidateService.getCandidate(keywords, pageable), "Get candidate successfully");
+                                    Pageable pageable,
+                                    Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(candidateService.getCandidate(keywords, pageable, customUserDetails.getUsername()), "Get candidate successfully");
     }
 
     @GetMapping("/candidate-list")

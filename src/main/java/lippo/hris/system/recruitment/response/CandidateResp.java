@@ -11,4 +11,5 @@ public interface CandidateResp {
     String getCanPhone();
     String getCanEmail();
     Boolean getCanFgShortlist();
+    Boolean getEligible();
 }
