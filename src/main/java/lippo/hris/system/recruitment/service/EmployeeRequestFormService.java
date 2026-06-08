@@ -492,7 +492,8 @@ public class EmployeeRequestFormService {
 
     public EmployeeRequestEmailResp getEmployeeRequestEmailDetail(Long id){
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).get();
-        EmailTemplate emailTemplate = employeeRequestCandidateActivity.getRecruitmentActivity().getEmailTemplate();
+        EmailTemplate emailTemplate =
+                employeeRequestCandidateActivity.getRecruitmentActivity().getEmailTemplate();
         CandidateContactMaster candidateContactMaster = candidateContactMasterRepository.findByType("Email").get();
         CandidateContact candidateContact = candidateContactRepository.findByCandidateAndCandidateContactMaster(
                 employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate().getId(),
@@ -505,7 +506,6 @@ public class EmployeeRequestFormService {
         employeeRequestEmailResp.setEmailTo(emailTos);
         employeeRequestEmailResp.setSubject(emailTemplate.getSubject());
         employeeRequestEmailResp.setBody(emailTemplate.getContentHtml());
-        employeeRequestEmailResp.setDesignJson(emailTemplate.getDesignJson());
 
         return employeeRequestEmailResp;
     }

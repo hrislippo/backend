@@ -29,6 +29,7 @@ public class MenuService {
             MenuResponse dto = new MenuResponse();
             dto.setId(menu.getId());
             dto.setName(menu.getName());
+            dto.setIcon(menu.getIcon());
             dto.setPath(menu.getPath());
             dto.setChildren(new ArrayList<>());
             map.put(menu.getId(), dto);

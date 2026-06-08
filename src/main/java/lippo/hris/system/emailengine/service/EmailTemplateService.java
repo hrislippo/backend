@@ -25,7 +25,6 @@ public class EmailTemplateService {
         emailTemplate.setName(emailTemplateReq.getName());
         emailTemplate.setSubject(emailTemplateReq.getSubject());
         emailTemplate.setContentHtml(emailTemplateReq.getContentHtml());
-        emailTemplate.setDesignJson(emailTemplateReq.getDesignJson());
         emailTemplateRepository.save(emailTemplate);
     }
 
@@ -35,7 +34,6 @@ public class EmailTemplateService {
         emailTemplate.setName(emailTemplateReq.getName());
         emailTemplate.setSubject(emailTemplateReq.getSubject());
         emailTemplate.setContentHtml(emailTemplateReq.getContentHtml());
-        emailTemplate.setDesignJson(emailTemplateReq.getDesignJson());
         emailTemplateRepository.save(emailTemplate);
     }
 

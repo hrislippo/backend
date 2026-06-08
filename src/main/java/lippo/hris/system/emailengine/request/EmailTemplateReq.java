@@ -8,5 +8,4 @@ public class EmailTemplateReq {
     private String name;
     private String subject;
     private String contentHtml;
-    private String designJson;
 }

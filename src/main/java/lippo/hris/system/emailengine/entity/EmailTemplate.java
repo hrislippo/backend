@@ -26,8 +26,4 @@ public class EmailTemplate extends Auditable {
     @Lob
     @Column(name = "EmailTempContentHtml", columnDefinition = "NVARCHAR(MAX)")
     private String contentHtml;
-
-    @Lob
-    @Column(name = "EmailTempDesignJson", columnDefinition = "NVARCHAR(MAX)")
-    private String designJson;
 }

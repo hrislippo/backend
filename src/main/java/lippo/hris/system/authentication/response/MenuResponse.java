@@ -8,6 +8,7 @@ import java.util.List;
 public class MenuResponse {
     private Long id;
     private String name;
+    private String icon;
     private String path;
     private List<MenuResponse> children;
 }

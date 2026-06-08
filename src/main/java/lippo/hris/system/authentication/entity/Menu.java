@@ -14,6 +14,9 @@ public class Menu extends Auditable {
     @Column(name = "MenuId")
     private Long id;
 
+    @Column(name = "MenuIcon")
+    private String icon;
+
     @Column(name = "MenuName")
     private String name;
 
