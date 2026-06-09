@@ -55,4 +55,10 @@ public class EmployeeRequestValidation {
             throw new UnauthorizedException("Not Eligible to Apply This Action (Recruitment Head)");
         }
     }
+
+    public void requiredEmailParam(String emailBody){
+        if(emailBody.contains("[") || emailBody.contains("]")){
+            throw new BadRequestException("Required Input Email Parameter");
+        }
+    }
 }

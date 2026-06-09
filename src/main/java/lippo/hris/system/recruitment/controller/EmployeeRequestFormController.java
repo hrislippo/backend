@@ -38,8 +38,11 @@ public class EmployeeRequestFormController {
                                             @RequestParam(value = "emailCc", required = false) List<String> emailCc,
                                             @RequestParam(value = "emailBcc", required = false) List<String> emailBcc,
                                             @RequestParam(value = "emailSubject") String emailSubject,
-                                            @RequestParam(value = "emailBody") String emailBody) {
-        employeeRequestFormService.emailEmployeeRequest(id, emailTo, emailCc, emailBcc, emailSubject, emailBody, file);
+                                            @RequestParam(value = "emailBody") String emailBody,
+                                            Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        employeeRequestValidation.requiredEmailParam(emailBody);
+        employeeRequestFormService.emailEmployeeRequest(id, emailTo, emailCc, emailBcc, emailSubject, emailBody, file, customUserDetails.getUsername());
         return ApiResponse.ok(null, "Email Successfully");
     }
 
@@ -140,8 +143,10 @@ public class EmployeeRequestFormController {
     }
 
     @GetMapping("/erf-email-detail")
-    public ApiResponse getEmployeeRequestEmailDetail(@RequestParam(value = "id") Long id) {
-        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestEmailDetail(id), "Get Employee Request Email Detail Successfully");
+    public ApiResponse getEmployeeRequestEmailDetail(@RequestParam(value = "id") Long id,
+                                                     Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestEmailDetail(id, customUserDetails.getUsername()), "Get Employee Request Email Detail Successfully");
     }
 
     @GetMapping("/erf-detail")

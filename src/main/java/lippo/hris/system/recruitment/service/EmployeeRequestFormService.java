@@ -3,6 +3,7 @@ package lippo.hris.system.recruitment.service;
 import jakarta.mail.MessagingException;
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
+import lippo.hris.system.authentication.response.UserResponsev2;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
 import lippo.hris.system.emailengine.service.EmailService;
 import lippo.hris.system.google.service.GoogleDriveService;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -307,7 +309,7 @@ public class EmployeeRequestFormService {
     }
 
     public void emailEmployeeRequest(Long id, List<String> emailTo, List<String> emailCc,
-                                     List<String> emailBcc, String subject, String body, MultipartFile file) {
+                                     List<String> emailBcc, String subject, String body, MultipartFile file, String username) {
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).get();
 
         EmployeeRequestEmail employeeRequestEmail = new EmployeeRequestEmail();
@@ -327,7 +329,8 @@ public class EmployeeRequestFormService {
         }
         employeeRequestEmailRepository.save(employeeRequestEmail);
 
-        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = generateParam(employeeRequestCandidateActivity, username);
+
         try{
             emailService.sendEmail(emailTo, emailCc, emailBcc, subject, body, params, file);
         }catch(IOException e){
@@ -490,7 +493,7 @@ public class EmployeeRequestFormService {
         return recruitmentActivityRepository.getEmployeeRequestActivitySchedule(id);
     }
 
-    public EmployeeRequestEmailResp getEmployeeRequestEmailDetail(Long id){
+    public EmployeeRequestEmailResp getEmployeeRequestEmailDetail(Long id, String username){
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).get();
         EmailTemplate emailTemplate =
                 employeeRequestCandidateActivity.getRecruitmentActivity().getEmailTemplate();
@@ -502,10 +505,12 @@ public class EmployeeRequestFormService {
         List<String> emailTos = new ArrayList<>();
         emailTos.add(candidateContact.getContact());
 
+        Map<String, Object> params = generateParam(employeeRequestCandidateActivity, username);
+
         EmployeeRequestEmailResp employeeRequestEmailResp = new EmployeeRequestEmailResp();
         employeeRequestEmailResp.setEmailTo(emailTos);
         employeeRequestEmailResp.setSubject(emailTemplate.getSubject());
-        employeeRequestEmailResp.setBody(emailTemplate.getContentHtml());
+        employeeRequestEmailResp.setBody(emailService.render(emailTemplate.getContentHtml(), params));
 
         return employeeRequestEmailResp;
     }
@@ -562,5 +567,20 @@ public class EmployeeRequestFormService {
             }
         }
         return result;
+    }
+
+    private Map<String, Object> generateParam(EmployeeRequestCandidateActivity employeeRequestCandidateActivity, String username){
+        DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH:mm");
+        UserResponsev2 userResponse = userRepository.findByUsername(username);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("Candidate Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate().getName());
+        params.put("Schedule Date", employeeRequestCandidateActivity.getSchedule().toLocalDate().format(formatterDate));
+        params.put("Schedule Time", employeeRequestCandidateActivity.getSchedule().toLocalTime().format(formatterTime));
+        params.put("Position Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getEmployeeRequestForm().getName());
+        params.put("Recruiter Name", userResponse.getName());
+
+        return params;
     }
 }

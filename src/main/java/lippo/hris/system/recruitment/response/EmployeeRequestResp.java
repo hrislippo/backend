@@ -16,5 +16,8 @@ public interface EmployeeRequestResp {
     Boolean getEligible();
 
     @JsonFormat(pattern = "dd MMMM yyyy")
+    LocalDate getStartDate();
+
+    @JsonFormat(pattern = "dd MMMM yyyy")
     LocalDate getExpDate();
 }

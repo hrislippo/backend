@@ -22,7 +22,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
                     "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
                     "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
-                    "req.EmpReqStatus AS status, " +
+                    "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
                     "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible " +
                     "FROM RCMEmpRequest req " +
                     "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
@@ -35,7 +35,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
                     "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
                     "GROUP BY req.EmpReqId, req.EmpReqCode, req.EmpReqName, " +
-                    "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqNum, " +
+                    "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqStartDate, req.EmpReqNum, " +
                     "req.EmpReqStatus, pic.EmpReqPICId " +
                     "ORDER BY EmpReqExpDate",
             countQuery = "SELECT COUNT(1) " +
