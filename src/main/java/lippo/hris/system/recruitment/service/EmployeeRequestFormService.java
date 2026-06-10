@@ -5,7 +5,9 @@ import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.authentication.response.UserResponsev2;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
+import lippo.hris.system.emailengine.repository.EmailTemplateRepository;
 import lippo.hris.system.emailengine.service.EmailService;
+import lippo.hris.system.entity.SystemParameter;
 import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.*;
 import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormActivityStatus;
@@ -14,6 +16,7 @@ import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.*;
 import lippo.hris.system.recruitment.response.*;
+import lippo.hris.system.repository.SystemParameterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -115,6 +118,15 @@ public class EmployeeRequestFormService {
     @Autowired
     CandidateLogSalaryRepository candidateLogSalaryRepository;
 
+    @Autowired
+    VenueRepository venueRepository;
+
+    @Autowired
+    SystemParameterRepository systemParameterRepository;
+
+    @Autowired
+    EmailTemplateRepository emailTemplateRepository;
+
     public void addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
         RecruitmentLevelTemplate recruitmentLevelTemplate = recruitmentLevelTemplateRepository.findById(employeeRequestReq.getTemplateLevel()).get();
@@ -209,6 +221,24 @@ public class EmployeeRequestFormService {
         if(scheduleEmployeeReq.getStatus().equals(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString())){
             employeeRequestCandidateActivity.setSchedule(scheduleEmployeeReq.getScheduleTime());
             employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
+
+            Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+            if(interview == null){
+                interview = new Interview();
+                interview.setEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+                interview.setCandidate(employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate());
+            }
+            interview.setInterviewerName(scheduleEmployeeReq.getInterviewerName());
+            interview.setInterviewerPosition(scheduleEmployeeReq.getInterviewerPosition());
+            interview.setInterviewType(scheduleEmployeeReq.getInterviewType());
+            interview.setLinkInterview(scheduleEmployeeReq.getLinkInterview());
+
+            if(scheduleEmployeeReq.getVenueId() != null){
+                Venue venue = venueRepository.findById(scheduleEmployeeReq.getVenueId()).orElse(null);
+                interview.setVenue(venue);
+            }
+
+            interviewRepository.save(interview);
         }
         employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
     }
@@ -267,9 +297,7 @@ public class EmployeeRequestFormService {
         candidate.setBirthDate(employeeRequestInterviewReq.getBirthDate());
         candidateRepository.save(candidate);
 
-        Interview interview = new Interview();
-        interview.setCandidate(candidate);
-        interview.setEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+        Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
         interview.setStartTime(employeeRequestInterviewReq.getStartTime());
         interview.setEndTime(LocalDateTime.now());
         interview.setNotes(employeeRequestInterviewReq.getNotes());
@@ -497,6 +525,10 @@ public class EmployeeRequestFormService {
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).get();
         EmailTemplate emailTemplate =
                 employeeRequestCandidateActivity.getRecruitmentActivity().getEmailTemplate();
+        if(employeeRequestCandidateActivity.getStatus().equals(EmployeeRequestFormActivityStatus.FAILED.toString())){
+            SystemParameter systemParameter = systemParameterRepository.findByKey("Recruitment Rejection Template Email");
+            emailTemplate = emailTemplateRepository.findByCode(systemParameter.getValue());
+        }
         CandidateContactMaster candidateContactMaster = candidateContactMasterRepository.findByType("Email").get();
         CandidateContact candidateContact = candidateContactRepository.findByCandidateAndCandidateContactMaster(
                 employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate().getId(),
@@ -519,6 +551,24 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(id).get();
         return employeeRequestResultRepository.findByEmployeeRequestForm(employeeRequestForm).stream()
                 .map(e -> e.getCandidate().getName()).collect(Collectors.toList());
+    }
+
+    public ScheduleResp getEmployeeRequestSchedule(Long id){
+        EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(id).orElse(null);
+        Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+
+        ScheduleResp scheduleResp = new ScheduleResp();
+        scheduleResp.setScheduleDate(employeeRequestCandidateActivity.getSchedule());
+
+        if(interview != null){
+            scheduleResp.setInterviewerName(interview.getInterviewerName());
+            scheduleResp.setInterviewerPosition(interview.getInterviewerPosition());
+            scheduleResp.setInterviewType(interview.getInterviewType());
+            scheduleResp.setLinkInterview(interview.getLinkInterview());
+            scheduleResp.setVenue(interview.getVenue());
+        }
+
+        return scheduleResp;
     }
 
     public void deleteEmployeeRequest(Long id) {
@@ -573,6 +623,7 @@ public class EmployeeRequestFormService {
         DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("dd MMMM yyyy");
         DateTimeFormatter formatterTime = DateTimeFormatter.ofPattern("HH:mm");
         UserResponsev2 userResponse = userRepository.findByUsername(username);
+        Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
 
         Map<String, Object> params = new HashMap<>();
         params.put("Candidate Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate().getName());
@@ -580,6 +631,10 @@ public class EmployeeRequestFormService {
         params.put("Schedule Time", employeeRequestCandidateActivity.getSchedule().toLocalTime().format(formatterTime));
         params.put("Position Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getEmployeeRequestForm().getName());
         params.put("Recruiter Name", userResponse.getName());
+        params.put("Company Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getEmployeeRequestForm().getBusinessUnit().getName());
+        params.put("Interviewer Name", interview.getInterviewerName());
+        params.put("Interviewer Position", interview.getInterviewerPosition());
+        params.put("Venue", interview.getVenue() == null ? interview.getLinkInterview() : interview.getVenue().getName());
 
         return params;
     }

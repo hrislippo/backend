@@ -1,17 +1,17 @@
-package lippo.hris.system.recruitment.request;
+package lippo.hris.system.recruitment.response;
 
+import lippo.hris.system.recruitment.entity.Venue;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class ScheduleEmployeeReq {
-    private Long id;
-    private LocalDateTime scheduleTime;
-    private String status;
+public class ScheduleResp {
+
+    private LocalDateTime scheduleDate;
     private String interviewerName;
     private String interviewerPosition;
     private String interviewType;
     private String linkInterview;
-    private Long venueId;
+    private Venue venue;
 }

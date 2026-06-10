@@ -30,6 +30,22 @@ public class Interview extends Auditable {
     @Column(name = "EndTime")
     private LocalDateTime endTime;
 
+    @Column(name = "CanInterviewerName")
+    private String interviewerName;
+
+    @Column(name = "CanInterviewerPos")
+    private String interviewerPosition;
+
+    @Column(name = "CanLinkInterview")
+    private String linkInterview;
+
+    @Column(name = "CanInterviewType")
+    private String interviewType;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "RcmVenueId")
+    private Venue venue;
+
     @Lob
     @Column(name = "CanInterviewNotes", columnDefinition = "NVARCHAR(MAX)")
     private String notes;

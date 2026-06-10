@@ -164,6 +164,11 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestResult(id), "Get Employee Request Result");
     }
 
+    @GetMapping("/erf-schedule-detail")
+    public ApiResponse getEmployeeRequestSchedule(@RequestParam(value = "id") Long id) {
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestSchedule(id), "Get Employee Request Schedule Successfully");
+    }
+
     @DeleteMapping("/erf")
     public ApiResponse deleteEmployeeRequest(@RequestParam("id") Long id) {
         employeeRequestFormService.deleteEmployeeRequest(id);

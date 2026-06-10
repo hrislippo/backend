@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Long> {
-    EmailTemplate findByName(String name);
+    EmailTemplate findByCode(String code);
 
     @Query(nativeQuery = true,
     value = "SELECT EmailTempId AS id, EmailTempCode AS code, EmailTempName AS name " +
