@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.controller;
 
 import lippo.hris.system.recruitment.request.VenueReq;
 import lippo.hris.system.recruitment.service.VenueService;
+import lippo.hris.system.recruitment.validation.VenueValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +15,19 @@ public class VenueController {
     @Autowired
     VenueService venueService;
 
+    @Autowired
+    VenueValidation venueValidation;
+
     @PostMapping("/venue")
     public ApiResponse addVenue(@RequestBody VenueReq venueReq) {
+        venueValidation.addVenueRequired(venueReq);
         venueService.addVenue(venueReq);
         return ApiResponse.ok(null, "Venue Saved");
     }
 
     @PutMapping("/venue")
     public ApiResponse modifyVenue(@RequestBody VenueReq venueReq) {
+        venueValidation.addVenueRequired(venueReq);
         venueService.modifyVenue(venueReq);
         return ApiResponse.ok(null, "Venue Modified");
     }

@@ -4,6 +4,7 @@ import lippo.hris.system.recruitment.request.ActivityEmailReq;
 import lippo.hris.system.recruitment.request.ActivityInterviewReq;
 import lippo.hris.system.recruitment.request.ActivityReq;
 import lippo.hris.system.recruitment.service.RecruitmentActivityService;
+import lippo.hris.system.recruitment.validation.RecruitmentActivityValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +17,19 @@ public class RecruitmentActivityController {
     @Autowired
     private RecruitmentActivityService recruitmentActivityService;
 
+    @Autowired
+    private RecruitmentActivityValidation recruitmentActivityValidation;
+
     @PostMapping("/activity")
     public ApiResponse addActivity(@RequestBody ActivityReq activityReq) {
+        recruitmentActivityValidation.addRecruitmentActivityRequired(activityReq);
         recruitmentActivityService.addActivity(activityReq);
         return ApiResponse.ok(null, "Activity Saved");
     }
 
     @PutMapping("/activity")
     public ApiResponse modifyActivity(@RequestBody ActivityReq activityReq) {
+        recruitmentActivityValidation.addRecruitmentActivityRequired(activityReq);
         recruitmentActivityService.modifyActivity(activityReq);
         return ApiResponse.ok(null, "Activity Modified");
     }

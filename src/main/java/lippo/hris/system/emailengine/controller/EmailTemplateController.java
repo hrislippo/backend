@@ -2,6 +2,7 @@ package lippo.hris.system.emailengine.controller;
 
 import lippo.hris.system.emailengine.request.EmailTemplateReq;
 import lippo.hris.system.emailengine.service.EmailTemplateService;
+import lippo.hris.system.emailengine.validation.EmailTemplateValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +15,12 @@ public class EmailTemplateController {
     @Autowired
     EmailTemplateService emailTemplateService;
 
+    @Autowired
+    EmailTemplateValidation emailTemplateValidation;
+
     @PostMapping("/template")
     public ApiResponse addEmailTemplate(@RequestBody EmailTemplateReq emailTemplateReq) {
+        emailTemplateValidation.registerEmailTemplateRequired(emailTemplateReq);
         emailTemplateService.addEmailTemplate(emailTemplateReq);
         return ApiResponse.ok(null, "Email Template Saved");
     }
@@ -23,6 +28,7 @@ public class EmailTemplateController {
     @PutMapping("/template")
     public ApiResponse modifyEmailTemplate(@RequestParam Long id,
             @RequestBody EmailTemplateReq emailTemplateReq) {
+        emailTemplateValidation.registerEmailTemplateRequired(emailTemplateReq);
         emailTemplateService.modifyEmailTemplate(id, emailTemplateReq);
         return ApiResponse.ok(null, "Email Template Modified");
     }

@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.controller;
 
 import lippo.hris.system.recruitment.request.TemplateReq;
 import lippo.hris.system.recruitment.service.RecruitmentTemplateService;
+import lippo.hris.system.recruitment.validation.RecruitmentTemplateValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +15,19 @@ public class RecruitmentTemplateController {
     @Autowired
     RecruitmentTemplateService recruitmentTemplateService;
 
+    @Autowired
+    RecruitmentTemplateValidation recruitmentTemplateValidation;
+
     @PostMapping("/template")
     public ApiResponse addTemplate(@RequestBody TemplateReq templateReq) {
+        recruitmentTemplateValidation.addRecruitmentTemplateRequired(templateReq);
         recruitmentTemplateService.addTemplate(templateReq);
         return ApiResponse.ok(null, "Template Saved");
     }
 
     @PutMapping("/template")
     public ApiResponse modifyTemplate(@RequestBody TemplateReq templateReq) {
+        recruitmentTemplateValidation.addRecruitmentTemplateRequired(templateReq);
         recruitmentTemplateService.modifyTemplate(templateReq);
         return ApiResponse.ok(null, "Template Modified");
     }
