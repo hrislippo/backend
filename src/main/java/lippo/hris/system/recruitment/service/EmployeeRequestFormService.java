@@ -347,14 +347,6 @@ public class EmployeeRequestFormService {
         employeeRequestEmail.setEmailBcc(emailBcc == null ? null : String.join(",", emailBcc));
         employeeRequestEmail.setEmailSubject(subject);
         employeeRequestEmail.setEmailBody(body);
-        try{
-            if(file != null){
-                employeeRequestEmail.setAttachment(file.getBytes());
-                employeeRequestEmail.setAttachmentName(file.getOriginalFilename());
-                employeeRequestEmail.setAttachmentType(file.getContentType());
-            }
-        } catch(IOException e){
-        }
         employeeRequestEmailRepository.save(employeeRequestEmail);
 
         Map<String, Object> params = generateParam(employeeRequestCandidateActivity, username);

@@ -51,6 +51,7 @@ public class EmployeeRequestFormController {
                                              @RequestParam("id") Long id,
                                              @RequestParam("result") String result,
                                              @RequestParam(value = "notes", required = false) String notes) {
+        employeeRequestValidation.employeeRequestActionRequired(result);
         return ApiResponse.ok(employeeRequestFormService.actionEmployeeRequest(id, file, result, notes), "Employee Request Progressed");
     }
 
@@ -73,6 +74,7 @@ public class EmployeeRequestFormController {
 
     @PutMapping("/erf-schedule")
     public ApiResponse scheduleEmployeeRequest(@RequestBody ScheduleEmployeeReq scheduleEmployeeReq) {
+        employeeRequestValidation.employeeRequestScheduleRequired(scheduleEmployeeReq);
         employeeRequestFormService.scheduleEmployeeRequest(scheduleEmployeeReq);
         return ApiResponse.ok(null, "Employee Request Progressed");
     }

@@ -2,7 +2,11 @@ package lippo.hris.system.recruitment.validation;
 
 import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.exception.UnauthorizedException;
+import lippo.hris.system.recruitment.entity.EmployeeRequestCandidateActivity;
+import lippo.hris.system.recruitment.repository.EmployeeRequestCandidateActivityRepository;
 import lippo.hris.system.recruitment.request.EmployeeRequestReq;
+import lippo.hris.system.recruitment.request.ScheduleEmployeeReq;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -10,6 +14,15 @@ import java.util.List;
 
 @Component
 public class EmployeeRequestValidation {
+
+    @Autowired
+    EmployeeRequestCandidateActivityRepository employeeRequestCandidateActivityRepository;
+
+    public void employeeRequestActionRequired(String result){
+        if(result == null || result.trim().isEmpty()) {
+            throw new BadRequestException("Result Action Required");
+        }
+    }
 
     public void employeeRequestRequired(EmployeeRequestReq employeeRequestReq) {
         if(employeeRequestReq.getName() == null || employeeRequestReq.getName().trim().isEmpty()) {
@@ -59,6 +72,33 @@ public class EmployeeRequestValidation {
     public void requiredEmailParam(String emailBody){
         if(emailBody.contains("[") || emailBody.contains("]")){
             throw new BadRequestException("Required Input Email Parameter");
+        }
+    }
+
+    public void employeeRequestScheduleRequired(ScheduleEmployeeReq scheduleEmployeeReq){
+        if(scheduleEmployeeReq.getScheduleTime() == null){
+            throw new BadRequestException("Schedule Time is Required");
+        }
+
+        EmployeeRequestCandidateActivity employeeRequestCandidateActivity =
+                employeeRequestCandidateActivityRepository.findById(scheduleEmployeeReq.getId()).get();
+        if(employeeRequestCandidateActivity.getRecruitmentActivity().getFlagInterview()){
+            if(scheduleEmployeeReq.getInterviewerName() == null || scheduleEmployeeReq.getInterviewerName().trim().isEmpty()){
+                throw new BadRequestException("Interviewer Name is Required");
+            }
+            if(scheduleEmployeeReq.getInterviewerPosition() == null || scheduleEmployeeReq.getInterviewerPosition().trim().isEmpty()){
+                throw new BadRequestException("Interviewer Position is Required");
+            }
+
+            if(scheduleEmployeeReq.getInterviewType().equalsIgnoreCase("offline")){
+                if(scheduleEmployeeReq.getVenueId() == null){
+                    throw new BadRequestException("Venue is Required (OFFLINE)");
+                }
+            } else if(scheduleEmployeeReq.getInterviewType().equalsIgnoreCase("online")){
+                if(scheduleEmployeeReq.getLinkInterview() == null || scheduleEmployeeReq.getLinkInterview().trim().isEmpty()){
+                    throw new BadRequestException("Link Interview is Required (ONLINE)");
+                }
+            }
         }
     }
 }

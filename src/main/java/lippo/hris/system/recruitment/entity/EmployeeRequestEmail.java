@@ -34,14 +34,4 @@ public class EmployeeRequestEmail extends Auditable {
     @Lob
     @Column(name = "EmpReqEmailBody", columnDefinition = "NVARCHAR(MAX)")
     private String emailBody;
-
-    @Lob
-    @Column(name = "EmpReqEmailAttachment", columnDefinition = "VARBINARY(MAX)")
-    private byte[] attachment;
-
-    @Column(name = "EmpReqEmailAttachmentName")
-    private String attachmentName;
-
-    @Column(name = "EmpReqEmailAttachmentType")
-    private String attachmentType;
 }

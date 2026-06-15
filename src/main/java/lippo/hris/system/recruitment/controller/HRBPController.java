@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.controller;
 
 import lippo.hris.system.recruitment.request.HRBPReq;
 import lippo.hris.system.recruitment.service.HRBPService;
+import lippo.hris.system.recruitment.validation.HRBPValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +15,19 @@ public class HRBPController {
     @Autowired
     HRBPService hrbpService;
 
+    @Autowired
+    HRBPValidation hrbpValidation;
+
     @PostMapping("/hrbp")
     public ApiResponse addHRBP(@RequestBody HRBPReq hrbpReq) {
+        hrbpValidation.addHRBPRequired(hrbpReq);
         hrbpService.addHRBP(hrbpReq);
         return ApiResponse.ok(null, "HRBP Saved");
     }
 
     @PutMapping("/hrbp")
     public ApiResponse modifyHRBP(@RequestBody HRBPReq hrbpReq) {
+        hrbpValidation.addHRBPRequired(hrbpReq);
         hrbpService.modifyHRBP(hrbpReq);
         return ApiResponse.ok(null, "HRBP Modified");
     }

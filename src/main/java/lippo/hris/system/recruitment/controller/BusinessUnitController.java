@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.controller;
 
 import lippo.hris.system.recruitment.request.BusinessUnitReq;
 import lippo.hris.system.recruitment.service.BusinessUnitService;
+import lippo.hris.system.recruitment.validation.BusinessUnitValidation;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,14 +15,19 @@ public class BusinessUnitController {
     @Autowired
     BusinessUnitService businessUnitService;
 
+    @Autowired
+    BusinessUnitValidation businessUnitValidation;
+
     @PostMapping("/business-unit")
     public ApiResponse addBusinessUnit(@RequestBody BusinessUnitReq businessUnitReq) {
+        businessUnitValidation.addBusinessUnitRequired(businessUnitReq);
         businessUnitService.addBusinessUnit(businessUnitReq);
         return ApiResponse.ok(null, "Business Unit Saved");
     }
 
     @PutMapping("/business-unit")
     public ApiResponse modifyBusinessUnit(@RequestBody BusinessUnitReq businessUnitReq) {
+        businessUnitValidation.addBusinessUnitRequired(businessUnitReq);
         businessUnitService.modifyBusinessUnit(businessUnitReq);
         return ApiResponse.ok(null, "Business Unit Modified");
     }
