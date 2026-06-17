@@ -62,13 +62,15 @@ public class LinkedinOcrService {
         for(Experience experience : ocrResponse.getExperience()) {
             String durationExperience = experience.getDuration().substring(0, experience.getDuration().indexOf("(")).trim();
 
-            String durationStart = parseMonths(durationExperience.substring(0, durationExperience.indexOf("-")).trim());
-            String durationEnd = parseMonths(durationExperience.substring(durationExperience.indexOf("-") + 1).trim());
+            if(!durationExperience.isEmpty()) {
+                String durationStart = parseMonths(durationExperience.substring(0, durationExperience.indexOf("-")).trim());
+                String durationEnd = parseMonths(durationExperience.substring(durationExperience.indexOf("-") + 1).trim());
 
-            experience.setStartYear(durationStart.contains("-") ? durationStart.substring(0, durationStart.indexOf("-")).trim() : durationStart);
-            experience.setStartMonth(durationStart.contains("-") ? durationStart.substring(durationStart.indexOf("-") + 1).trim() : null);
-            experience.setEndYear(durationEnd.contains("-") ? durationEnd.substring(0, durationEnd.indexOf("-")).trim() : durationEnd);
-            experience.setEndMonth(durationEnd.contains("-") ? durationEnd.substring(durationEnd.indexOf("-") + 1).trim() : null);
+                experience.setStartYear(durationStart.contains("-") ? durationStart.substring(0, durationStart.indexOf("-")).trim() : durationStart);
+                experience.setStartMonth(durationStart.contains("-") ? durationStart.substring(durationStart.indexOf("-") + 1).trim() : null);
+                experience.setEndYear(durationEnd.contains("-") ? durationEnd.substring(0, durationEnd.indexOf("-")).trim() : durationEnd);
+                experience.setEndMonth(durationEnd.contains("-") ? durationEnd.substring(durationEnd.indexOf("-") + 1).trim() : null);
+            }
         }
         return ocrResponse;
     }
