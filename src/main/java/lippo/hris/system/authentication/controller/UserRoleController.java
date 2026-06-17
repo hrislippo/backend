@@ -23,7 +23,6 @@ public class UserRoleController {
     @Autowired
     UserRoleValidation userRoleValidation;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user-role")
     public ApiResponse updateRole(@RequestBody RoleRequest roleRequest) {
         User user = userValidation.userValidation(roleRequest.getUsername(), false);
@@ -32,7 +31,6 @@ public class UserRoleController {
         return ApiResponse.ok(null, "Role Updated");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user-role")
     public ApiResponse getUserRoles(@RequestParam String username) {
         User user = userValidation.userValidation(username, false);
