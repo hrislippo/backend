@@ -222,23 +222,24 @@ public class EmployeeRequestFormService {
             employeeRequestCandidateActivity.setSchedule(scheduleEmployeeReq.getScheduleTime());
             employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
 
-            Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
-            if(interview == null){
-                interview = new Interview();
-                interview.setEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
-                interview.setCandidate(employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate());
-            }
-            interview.setInterviewerName(scheduleEmployeeReq.getInterviewerName());
-            interview.setInterviewerPosition(scheduleEmployeeReq.getInterviewerPosition());
-            interview.setInterviewType(scheduleEmployeeReq.getInterviewType());
-            interview.setLinkInterview(scheduleEmployeeReq.getLinkInterview());
+            if(employeeRequestCandidateActivity.getRecruitmentActivity().getFlagInterview()){
+                Interview interview = interviewRepository.findByEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+                if(interview == null){
+                    interview = new Interview();
+                    interview.setEmployeeRequestCandidateActivity(employeeRequestCandidateActivity);
+                    interview.setCandidate(employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate());
+                }
+                interview.setInterviewerName(scheduleEmployeeReq.getInterviewerName());
+                interview.setInterviewerPosition(scheduleEmployeeReq.getInterviewerPosition());
+                interview.setInterviewType(scheduleEmployeeReq.getInterviewType());
+                interview.setLinkInterview(scheduleEmployeeReq.getLinkInterview());
 
-            if(scheduleEmployeeReq.getVenueId() != null){
-                Venue venue = venueRepository.findById(scheduleEmployeeReq.getVenueId()).orElse(null);
-                interview.setVenue(venue);
+                if(scheduleEmployeeReq.getVenueId() != null){
+                    Venue venue = venueRepository.findById(scheduleEmployeeReq.getVenueId()).orElse(null);
+                    interview.setVenue(venue);
+                }
+                interviewRepository.save(interview);
             }
-
-            interviewRepository.save(interview);
         }
         employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
     }
