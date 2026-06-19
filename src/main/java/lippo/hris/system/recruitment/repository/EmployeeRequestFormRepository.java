@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeRequestForm, Long> {
+    List<EmployeeRequestForm> findByStatus(String status);
 
     @Query(nativeQuery = true,
     value = "SELECT TOP 1 REPLACE(EmpReqCode, :prefix, '') FROM RCMEmpRequest ORDER BY EmpReqCode DESC")

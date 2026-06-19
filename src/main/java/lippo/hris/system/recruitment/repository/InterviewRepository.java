@@ -4,6 +4,7 @@ import lippo.hris.system.recruitment.entity.EmployeeRequestCandidateActivity;
 import lippo.hris.system.recruitment.entity.Interview;
 import lippo.hris.system.recruitment.response.InterviewCanResp;
 import lippo.hris.system.recruitment.response.InterviewResp;
+import lippo.hris.system.recruitment.response.UpcomingInterviewResp;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,4 +36,14 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
                     "LEFT JOIN RCMACTActivity a ON act.RcmActId = a.RcmActId " +
                     "WHERE int.CanId = :candidateId")
     List<InterviewCanResp> getInterviewByCandidate(@Param("candidateId") Long candidateId);
+
+    @Query(nativeQuery = true,
+            value = "SELECT TOP (:limit) d.CanName AS candidateName, r.EmpReqName AS requestName, a.EmpReqCanActSchedule AS interviewTime " +
+                    "FROM RCMCANCanInterview i " +
+                    "INNER JOIN RCMEmpReqCanActivity a ON i.EmpReqCanActId = a.EmpReqCanActId " +
+                    "INNER JOIN RCMEmpReqCandidate c ON a.EmpReqCanId = c.EmpReqCanId " +
+                    "INNER JOIN RCMCANCanData d ON c.CanId = d.CanId " +
+                    "INNER JOIN RCMEmpRequest r ON c.EmpReqId = r.EmpReqId " +
+                    "WHERE i.StartTime IS NULL AND a.EmpReqCanActSchedule > GETDATE()")
+    List<UpcomingInterviewResp> getUpcomingInterview(@Param("limit") Integer limit);
 }
