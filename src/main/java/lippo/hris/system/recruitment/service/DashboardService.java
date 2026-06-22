@@ -4,6 +4,7 @@ import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormActivityStat
 import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormStatus;
 import lippo.hris.system.recruitment.enumeration.RecruitmentGroupActivity;
 import lippo.hris.system.recruitment.repository.*;
+import lippo.hris.system.recruitment.response.DashboardPipelineResp;
 import lippo.hris.system.recruitment.response.DashboardResp;
 import lippo.hris.system.recruitment.response.SummaryResp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,13 @@ public class DashboardService {
         summaryResp.setTotalCandidates(getTotalCandidates());
         summaryResp.setTotalInterviews(getTotalInterviews());
         summaryResp.setTotalHired(getTotalHired());
-        summaryResp.setTotalAssessment(getTotalAssessment());
-        summaryResp.setTotalOffering(getTotalOffering());
-        summaryResp.setTotalBackgroundCheck(getTotalBackgroundCheck());
-        summaryResp.setTotalSignAgreement(getTotalSignAgreement());
-        summaryResp.setTotalOnboarding(getTotalOnboarding());
+
+        DashboardPipelineResp dashboardPipelineResp = getTotalPipeline();
+        summaryResp.setTotalAssessment(dashboardPipelineResp.getTotalAssessment());
+        summaryResp.setTotalOffering(dashboardPipelineResp.getTotalOffering());
+        summaryResp.setTotalBackgroundCheck(dashboardPipelineResp.getTotalBackgroundCheck());
+        summaryResp.setTotalSignAgreement(dashboardPipelineResp.getTotalSignAgreement());
+        summaryResp.setTotalOnboarding(dashboardPipelineResp.getTotalOnboarding());
         summaryResp.setTotalPipeline(
                 summaryResp.getTotalAssessment() + summaryResp.getTotalOffering() + summaryResp.getTotalBackgroundCheck() +
                         summaryResp.getTotalSignAgreement() + summaryResp.getTotalOnboarding()
@@ -72,28 +75,7 @@ public class DashboardService {
         return employeeRequestResultRepository.findAll().size();
     }
 
-    private Integer getTotalAssessment(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipelineByCategoryAndStatus
-                (RecruitmentGroupActivity.ASSESSMENT.getLabel(), EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
-    }
-
-    private Integer getTotalOffering(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipelineByCategoryAndStatus
-                (RecruitmentGroupActivity.OFFERING.getLabel(), EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
-    }
-
-    private Integer getTotalBackgroundCheck(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipelineByCategoryAndStatus
-                (RecruitmentGroupActivity.BACKGROUND_CHECK.getLabel(), EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
-    }
-
-    private Integer getTotalSignAgreement(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipelineByCategoryAndStatus
-                (RecruitmentGroupActivity.SIGN_AGREEMENT.getLabel(), EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
-    }
-
-    private Integer getTotalOnboarding(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipelineByCategoryAndStatus
-                (RecruitmentGroupActivity.ONBOARDING.getLabel(), EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
+    private DashboardPipelineResp getTotalPipeline(){
+        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipeline();
     }
 }
