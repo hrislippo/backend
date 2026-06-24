@@ -40,4 +40,9 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
             "INNER JOIN RCMCANCanContact rc ON rd.CanId = rc.CanId " +
             "WHERE rc.CanContact = :email OR rc.CanContact = :phoneNumber")
     Long getCandidateByEmailOrPhoneNumber(@Param("email") String email, @Param("phoneNumber") String phoneNumber);
+
+    @Query(nativeQuery = true, value = "SELECT * " +
+            "FROM RCMCANCanData " +
+            "WHERE createdDate >= DATEADD(DAY, -7, GETDATE())")
+    List<Candidate> getCandidateAddedLastWeek();
 }

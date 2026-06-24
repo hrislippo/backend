@@ -73,6 +73,13 @@ public class EmailService {
         }
 
         matcher.appendTail(result);
-        return result.toString();
+        return result.toString()// 1. normalize all <p>
+                .replaceAll("<p(\\s+[^>]*)?>", "<p style=\"margin:0;padding:0;\">")
+
+                // 2. remove empty paragraphs
+                .replaceAll("<p[^>]*>(\\s|&nbsp;|<br\\s*/?>)*</p>", "")
+
+                // 3. remove empty <br> paragraphs
+                .replaceAll("<p style=\"margin:0;padding:0;\"><br\\s*/?></p>", "");
     }
 }
