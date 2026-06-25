@@ -625,9 +625,9 @@ public class EmployeeRequestFormService {
         params.put("Position Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getEmployeeRequestForm().getName());
         params.put("Recruiter Name", userResponse.getName());
         params.put("Company Name", employeeRequestCandidateActivity.getEmployeeRequestCandidate().getEmployeeRequestForm().getBusinessUnit().getName());
-        params.put("Interviewer Name", interview.getInterviewerName());
-        params.put("Interviewer Position", interview.getInterviewerPosition());
-        params.put("Venue", interview.getVenue() == null ? interview.getLinkInterview() : interview.getVenue().getName());
+        params.put("Interviewer Name", interview == null ? null : interview.getInterviewerName());
+        params.put("Interviewer Position", interview == null ? null : interview.getInterviewerPosition());
+        params.put("Venue", interview == null ? null : interview.getVenue() == null ? interview.getLinkInterview() : interview.getVenue().getName());
 
         return params;
     }
