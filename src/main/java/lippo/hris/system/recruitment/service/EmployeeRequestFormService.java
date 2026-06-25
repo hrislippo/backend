@@ -146,13 +146,7 @@ public class EmployeeRequestFormService {
         employeeRequestForm.setRequestNumber(employeeRequestReq.getRequestNumber());
         employeeRequestForm = employeeRequestFormRepository.save(employeeRequestForm);
 
-        for(Long picId : employeeRequestReq.getPic()){
-            User user = userRepository.findById(picId).get();
-            EmployeeRequestPIC employeeRequestPIC = new EmployeeRequestPIC();
-            employeeRequestPIC.setEmployeeRequestForm(employeeRequestForm);
-            employeeRequestPIC.setUser(user);
-            employeeRequestPICRepository.save(employeeRequestPIC);
-        }
+        employeeRequestPICService.save(employeeRequestForm, employeeRequestReq.getPic());
 
         for(Long candidateId : employeeRequestReq.getCandidate()){
             Candidate candidate = candidateRepository.findById(candidateId).get();

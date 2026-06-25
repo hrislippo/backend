@@ -51,6 +51,9 @@ public class UserValidation {
         if(loginRequest.getUsername() == null || loginRequest.getUsername().trim().isEmpty()){
             throw new BadRequestException("Username is required");
         }
+        if(loginRequest.getEmail() == null || loginRequest.getEmail().trim().isEmpty()){
+            throw new BadRequestException("Email is required");
+        }
         if(loginRequest.getName() == null || loginRequest.getName().trim().isEmpty()){
             throw new BadRequestException("Name is required");
         }
