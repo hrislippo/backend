@@ -11,7 +11,7 @@ public class RecruitmentScheduler {
     @Autowired
     RecruitmentSchedulerService recruitmentSchedulerService;
 
-    @Scheduled(cron = "0 0 23 * * *", zone = "Asia/Jakarta")
+    @Scheduled(cron = "0 0 23 * * ?", zone = "Asia/Jakarta")
     public void sendAddCandidateReminder() {
         recruitmentSchedulerService.sendAddCandidateReminder();
     }
