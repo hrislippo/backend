@@ -29,7 +29,7 @@ public class EmailService {
         MimeMessageHelper helper =
                 new MimeMessageHelper(message, true, "UTF-8");
 
-        helper.setFrom("hrislippo2025@gmail.com");
+        helper.setFrom("hris@lippokarawaci.co.id");
         helper.setTo(to.toArray(String[]::new));
         helper.setCc(cc.toArray(String[]::new));
         helper.setBcc(bcc.toArray(String[]::new));
