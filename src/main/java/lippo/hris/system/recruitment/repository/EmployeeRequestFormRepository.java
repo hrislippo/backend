@@ -40,7 +40,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "FROM RCMEmpRequest req " +
                     "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
                     "LEFT JOIN RCMEmpReqPIC pic ON pic.EmpReqId = req.EmpReqId " +
-                    "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username) " +
+                    "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
                     "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
                     "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
@@ -60,12 +60,13 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "WHERE (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
                     "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
-                    "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%')")
+                    "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
+                    "AND (:userName IS NULL OR 1 = 1)")
     Page<EmployeeRequestResp> getEmployeeRequest(@Param("code") String code,
                                                  @Param("name") String name,
                                                  @Param("buName") String buName,
                                                  @Param("hrbpName") String hrbpName,
-                                                 @Param("username") String username,
+                                                 @Param("userName") String username,
                                                  Pageable pageable);
 
     @Query(nativeQuery = true,
