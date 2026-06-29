@@ -35,7 +35,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
                     "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
                     "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
-                    "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, agg.StageName AS stage, " +
+                    "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
+                    "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
                     "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible " +
                     "FROM RCMEmpRequest req " +
                     "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
