@@ -15,6 +15,7 @@ public interface EmployeeRequestResp {
     String getStatus();
     Boolean getEligible();
     String getStage();
+    String getPic();
 
     @JsonFormat(pattern = "dd MMMM yyyy")
     LocalDate getStartDate();

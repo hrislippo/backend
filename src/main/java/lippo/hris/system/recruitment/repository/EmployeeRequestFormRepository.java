@@ -36,6 +36,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
                     "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
                     "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
+                    "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
                     "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
                     "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible " +
                     "FROM RCMEmpRequest req " +
@@ -44,6 +45,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
                     "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
+                    "LEFT JOIN RCMEmpReqPIC pic2 ON pic2.EmpReqId = req.EmpReqId " +
+                    "LEFT JOIN URMUser usr ON pic2.UserId = usr.UserId " +
                     "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
                     "ON agg.EmpReqId = req.EmpReqId " +
                     "WHERE (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
