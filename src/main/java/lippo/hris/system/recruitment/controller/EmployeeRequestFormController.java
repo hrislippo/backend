@@ -64,10 +64,8 @@ public class EmployeeRequestFormController {
     @PutMapping("/erf")
     public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
                                              Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
         employeeRequestValidation.checkEmployeeRequestValue(employeeRequestReq);
-        employeeRequestValidation.eligibleRecruitmentHead(customUserDetails.getRoles());
         employeeRequestFormService.modifyEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Modified");
     }
