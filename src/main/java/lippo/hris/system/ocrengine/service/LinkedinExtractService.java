@@ -476,8 +476,8 @@ public class LinkedinExtractService {
         }
         if(!degreeName.toString().isEmpty()){
             education.setInstitutionName(instituteName.toString().trim());
-            education.setDegreeName(degreeName.toString().substring(0, degreeName.toString().indexOf('·')).trim());
-            education.setDuration(degreeName.toString().substring(degreeName.toString().indexOf('·') + 1).trim());
+            education.setDegreeName(degreeName.toString().indexOf('·') > 0 ? degreeName.substring(0, degreeName.toString().indexOf('·')).trim() : degreeName.toString().trim());
+            education.setDuration(degreeName.toString().indexOf('·') > 0 ? degreeName.substring(degreeName.toString().indexOf('·') + 1).trim() : null);
             result.add(education);
         }
         return result;

@@ -22,7 +22,7 @@ public class OcrService {
 
     public OcrResponse readText(MultipartFile file) throws Exception {
         List<List<TextPosition>> positionsList = pdfLayoutService.extract(file);
-        if(positionsList.getFirst().getFirst().getY() == 10.314026F){
+        if(!positionsList.isEmpty() && !positionsList.getFirst().isEmpty() && positionsList.getFirst().getFirst().getY() == 10.314026F){
             return linkedinOcrService.readText(file);
         } else{
             return atsOcrService.readText(file);

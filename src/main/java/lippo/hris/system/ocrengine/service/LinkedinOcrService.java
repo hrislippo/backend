@@ -47,16 +47,18 @@ public class LinkedinOcrService {
 
     public OcrResponse postProcess(OcrResponse ocrResponse) {
         for(Education education : ocrResponse.getEducation()) {
-            String durationEducation = education.getDuration().replace("(", "")
-                    .replace(")", "");
+            if(education.getDuration() != null){
+                String durationEducation = education.getDuration().replace("(", "")
+                        .replace(")", "");
 
-            String durationStart = parseMonths(durationEducation.substring(0, Math.max(durationEducation.indexOf("-"), 0)).trim());
-            String durationEnd = parseMonths(durationEducation.substring(Math.max(durationEducation.indexOf("-") + 1, 0)).trim());
+                String durationStart = parseMonths(durationEducation.substring(0, Math.max(durationEducation.indexOf("-"), 0)).trim());
+                String durationEnd = parseMonths(durationEducation.substring(Math.max(durationEducation.indexOf("-") + 1, 0)).trim());
 
-            education.setStartYear(durationStart.contains("-") ? durationStart.substring(0, Math.max(durationStart.indexOf("-"), 0)).trim() : durationStart);
-            education.setStartMonth(durationStart.contains("-") ? durationStart.substring(Math.max(durationStart.indexOf("-") + 1, 0)).trim() : null);
-            education.setEndYear(durationEnd.contains("-") ? durationEnd.substring(0, Math.max(durationEnd.indexOf("-"), 0)).trim() : durationEnd);
-            education.setEndMonth(durationEnd.contains("-") ? durationEnd.substring(Math.max(durationEnd.indexOf("-") + 1, 0)).trim() : null);
+                education.setStartYear(durationStart.contains("-") ? durationStart.substring(0, Math.max(durationStart.indexOf("-"), 0)).trim() : durationStart);
+                education.setStartMonth(durationStart.contains("-") ? durationStart.substring(Math.max(durationStart.indexOf("-") + 1, 0)).trim() : null);
+                education.setEndYear(durationEnd.contains("-") ? durationEnd.substring(0, Math.max(durationEnd.indexOf("-"), 0)).trim() : durationEnd);
+                education.setEndMonth(durationEnd.contains("-") ? durationEnd.substring(Math.max(durationEnd.indexOf("-") + 1, 0)).trim() : null);
+            }
         }
 
         for(Experience experience : ocrResponse.getExperience()) {
