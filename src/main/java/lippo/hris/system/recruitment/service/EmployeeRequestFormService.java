@@ -394,8 +394,8 @@ public class EmployeeRequestFormService {
     }
 
     public Page<EmployeeRequestResp> getEmployeeRequest(String code, String name, String buName, String hrbpName,
-                                                        String username, Pageable pageable) {
-        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pageable);
+                                                        String username, String pic, Pageable pageable) {
+        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, pageable);
     }
 
     public List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(Long candidateId) {

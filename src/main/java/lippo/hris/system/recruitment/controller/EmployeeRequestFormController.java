@@ -115,9 +115,10 @@ public class EmployeeRequestFormController {
                                           @RequestParam(value = "name", required = false) String name,
                                           @RequestParam(value = "buName", required = false) String buName,
                                           @RequestParam(value = "hrbpName", required = false) String hrbpName,
+                                          @RequestParam(value = "pic", required = false) String pic,
                                           Pageable pageable, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName, customUserDetails.getUsername(), pageable),
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName, customUserDetails.getUsername(), pic, pageable),
                 "Get Employee Request Successfully");
     }
 

@@ -20,8 +20,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
 
     @Query(nativeQuery = true,
             value = "WITH StageOrder AS (SELECT * FROM (VALUES " +
-                    "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
-                    ") v(StageOrder, StageName)), " +
+                    "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding')) v(StageOrder, StageName)), " +
                     "StageAgg AS (SELECT req.EmpReqId, so.StageOrder, so.StageName, " +
                     "ROW_NUMBER() OVER (PARTITION BY req.EmpReqId ORDER BY so.StageOrder DESC) AS rn " +
                     "FROM RCMEmpReqCanActivity ca " +
@@ -30,7 +29,17 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
                     "JOIN StageOrder so ON so.StageName = act.RcmActGrp " +
                     "WHERE req.EmpReqStatus = 'IN_PROGRESS' AND ca.EmpReqCanActStatus IN ('IN_PROGRESS', 'COMPLETED') " +
-                    "GROUP BY req.EmpReqId, so.StageOrder, so.StageName) " +
+                    "GROUP BY req.EmpReqId, so.StageOrder, so.StageName), " +
+                    "OfferingCompleted AS(SELECT rc.EmpReqId, COUNT(DISTINCT rc.EmpReqCanId) AS CompletedOfferingCandidate " +
+                    "FROM RCMEmpReqCandidate rc " +
+                    "JOIN RCMEmpReqCanActivity ca ON rc.EmpReqCanId = ca.EmpReqCanId " +
+                    "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
+                    "WHERE act.RcmActGrp = 'Offering' AND ca.EmpReqCanActStatus = 'COMPLETED' " +
+                    "AND NOT EXISTS (SELECT 1 FROM RCMEmpReqCanActivity ca2 " +
+                    "JOIN RCMACTActivity act2 ON act2.RcmActId = ca2.RcmActId " +
+                    "WHERE ca2.EmpReqCanId = rc.EmpReqCanId " +
+                    "AND act2.RcmActGrp IN ('Background Check', 'Sign Agreement', 'Onboarding') " +
+                    "AND ca2.EmpReqCanActStatus = 'FAILED') GROUP BY rc.EmpReqId) " +
                     "SELECT COUNT(res.EmpReqResId) AS recruitNumber, " +
                     "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
                     "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
@@ -38,8 +47,11 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
                     "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
                     "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
-                    "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible " +
+                    "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
+                    "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) " +
+                    "END AS StopSLA " +
                     "FROM RCMEmpRequest req " +
+                    "LEFT JOIN OfferingCompleted oc ON oc.EmpReqId = req.EmpReqId " +
                     "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
                     "LEFT JOIN RCMEmpReqPIC pic ON pic.EmpReqId = req.EmpReqId " +
                     "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
@@ -53,6 +65,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
                     "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
+                    "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p JOIN URMUser u ON u.UserId = p.UserId " +
+                    "WHERE p.EmpReqId = req.EmpReqId AND u.UserRealName LIKE '%' + :pic + '%')) " +
                     "GROUP BY req.EmpReqId, req.EmpReqCode, req.EmpReqName, " +
                     "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqStartDate, req.EmpReqNum, " +
                     "req.EmpReqStatus, pic.EmpReqPICId, agg.StageName " +
@@ -65,12 +79,16 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
                     "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
+                    "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p " +
+                    "INNER JOIN URMUser u ON p.UserId = u.UserId " +
+                    "WHERE p.EmpReqId = req.EmpReqId AND u.UserRealName LIKE '%'+:pic+'%')) " +
                     "AND (:userName IS NULL OR 1 = 1)")
     Page<EmployeeRequestResp> getEmployeeRequest(@Param("code") String code,
                                                  @Param("name") String name,
                                                  @Param("buName") String buName,
                                                  @Param("hrbpName") String hrbpName,
                                                  @Param("userName") String username,
+                                                 @Param("pic") String pic,
                                                  Pageable pageable);
 
     @Query(nativeQuery = true,
