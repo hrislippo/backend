@@ -13,6 +13,7 @@ import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
 import lippo.hris.system.recruitment.response.CandidateResp;
+import lippo.hris.system.utility.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -98,7 +99,7 @@ public class CandidateService {
     public Long saveCandidate(CandidateReq candidateReq){
         Candidate candidate = new Candidate();
         User user = userRepository.findById(candidateReq.getUserId()).get();
-        candidate.setName(candidateReq.getName());
+        candidate.setName(StringUtil.properCase(candidateReq.getName()));
         candidate.setCanNumber(generateRunningNumber());
         candidate.setBirthDate(candidateReq.getBirthDate());
         candidate.setHashtag(candidateReq.getHashtags().toString());
@@ -137,7 +138,7 @@ public class CandidateService {
     public void modifyCandidate(Long id, CandidateReq candidateReq){
         Candidate candidate = candidateRepository.findById(id).get();
         User user = userRepository.findById(candidateReq.getUserId()).get();
-        candidate.setName(candidateReq.getName());
+        candidate.setName(StringUtil.properCase(candidateReq.getName()));
         candidate.setBirthDate(candidateReq.getBirthDate());
         candidate.setHashtag(candidateReq.getHashtags().toString());
 

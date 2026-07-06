@@ -7,6 +7,7 @@ import lippo.hris.system.recruitment.entity.CandidateContactMaster;
 import lippo.hris.system.recruitment.repository.CandidateContactMasterRepository;
 import lippo.hris.system.recruitment.repository.CandidateContactRepository;
 import lippo.hris.system.recruitment.request.CandidateReq;
+import lippo.hris.system.utility.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class CandidateContactService {
         CandidateContact candidateContact = new CandidateContact();
         candidateContact.setCandidate(candidate);
         candidateContact.setType(candidateContactMasterRepository.findByType("Mobile Phone").get());
-        candidateContact.setContact(mobilePhone);
+        candidateContact.setContact(StringUtil.formatPhoneNumber(mobilePhone));
         candidateContactRepository.save(candidateContact);
     }
 
@@ -48,7 +49,7 @@ public class CandidateContactService {
         if(mobilePhone == null || mobilePhone.isEmpty()){
             return;
         }
-        candidateContact.setContact(mobilePhone);
+        candidateContact.setContact(StringUtil.formatPhoneNumber(mobilePhone));
         candidateContactRepository.save(candidateContact);
     }
 
