@@ -106,28 +106,6 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
     List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(@Param("id") Long id);
 
     @Query(nativeQuery = true,
-            value = "WITH ValidOffering AS " +
-                    "(SELECT rc.EmpReqId, rc.EmpReqCanId, ca.UpdatedDate, " +
-                    "ROW_NUMBER() OVER(PARTITION BY rc.EmpReqId ORDER BY ca.UpdatedDate) AS OfferingRank " +
-                    "FROM RCMEmpReqCandidate rc " +
-                    "INNER JOIN RCMEmpReqCanActivity ca ON ca.EmpReqCanId = rc.EmpReqCanId " +
-                    "INNER JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
-                    "WHERE act.RcmActGrp = 'Offering' AND ca.EmpReqCanActStatus = 'COMPLETED' " +
-                    "AND NOT EXISTS (SELECT 1 FROM RCMEmpReqCanActivity ca2 " +
-                    "INNER JOIN RCMACTActivity act2 ON act2.RcmActId = ca2.RcmActId " +
-                    "WHERE ca2.EmpReqCanId = rc.EmpReqCanId AND act2.RcmActGrp IN " +
-                    "('Background Check', 'Sign Agreement', 'Onboarding') AND ca2.EmpReqCanActStatus = 'FAILED')), " +
-                    "SLAStop AS (SELECT req.EmpReqId, vo.UpdatedDate AS SLAStopDate FROM RCMEmpRequest req " +
-                    "INNER JOIN ValidOffering vo ON vo.EmpReqId = req.EmpReqId AND vo.OfferingRank = req.EmpReqNum) " +
-                    "SELECT TOP (10) req.EmpReqName AS Name, lvl.RcmLvlTempDays AS SLA, " +
-                    "DATEDIFF(DAY, req.EmpReqStartDate, ISNULL(stop.SLAStopDate, GETDATE())) AS HiringDays, " +
-                    "lvl.RcmLvlTempDays - DATEDIFF(DAY, req.EmpReqStartDate, ISNULL(stop.SLAStopDate, GETDATE())) AS RemainingDays " +
-                    "FROM RCMEmpRequest req " +
-                    "INNER JOIN RCMLvlTemplate lvl ON lvl.RcmLvlTempId = req.RcmLvlTempId " +
-                    "INNER JOIN RCMBusinessUnit bu ON bu.RcmBsUnitId = req.RcmBsUnitId " +
-                    "INNER JOIN RCMHRBP hrbp ON hrbp.RcmHRBPId = req.RcmHRBPId " +
-                    "LEFT JOIN SLAStop stop ON stop.EmpReqId = req.EmpReqId " +
-                    "WHERE req.EmpReqStatus = 'IN_PROGRESS' " +
-                    "ORDER BY RemainingDays ASC, req.EmpReqStartDate ASC")
+            value = "EXECUTE sp_GetTop10EmployeeRequestDashboard")
     List<EmployeeRequestSLAResp> getEmployeeRequestSLA();
 }
