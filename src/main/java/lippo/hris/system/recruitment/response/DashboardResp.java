@@ -11,4 +11,5 @@ public class DashboardResp {
     private List<ApplicationResp> applications;
     private List<JobOpeningResp> jobOpenings;
     private List<UpcomingInterviewResp> interviews;
+    private List<EmployeeRequestSLAResp> employeeRequestSLA;
 }

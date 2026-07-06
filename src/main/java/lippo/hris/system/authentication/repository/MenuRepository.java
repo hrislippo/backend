@@ -14,6 +14,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
                     "FROM URMMenu m " +
                     "JOIN URMMenuRole mr ON m.MenuId = mr.MenuId " +
                     "JOIN URMRole r ON mr.RoleId = r.RoleId " +
-                    "WHERE r.RoleName IN (:roles)")
+                    "WHERE r.RoleName IN (:roles) " +
+                    "ORDER BY m.MenuOrder")
     List<Menu> findMenusByRoles(@Param("roles") List<String> roles);
 }

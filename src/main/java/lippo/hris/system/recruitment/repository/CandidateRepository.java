@@ -1,5 +1,6 @@
 package lippo.hris.system.recruitment.repository;
 
+import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.recruitment.entity.Candidate;
 import lippo.hris.system.recruitment.response.CandidateResp;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
+    Integer countByUser(User user);
 
     @Query(nativeQuery = true,
             value="SELECT * " +

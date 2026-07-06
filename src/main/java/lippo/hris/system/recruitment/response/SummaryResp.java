@@ -8,6 +8,7 @@ public class SummaryResp {
     private Integer totalVacancies;
     private Integer totalCandidates;
     private Integer totalInterviews;
+    private Integer totalOffered;
     private Integer totalHired;
     private Integer totalAssessment;
     private Integer totalOffering;

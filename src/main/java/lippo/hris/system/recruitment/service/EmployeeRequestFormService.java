@@ -213,6 +213,9 @@ public class EmployeeRequestFormService {
                 employeeRequestCandidateActivityRepository.findById(scheduleEmployeeReq.getId()).get();
 
         if(scheduleEmployeeReq.getStatus().equals(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString())){
+            if(employeeRequestCandidateActivity.getSchedule() == null){
+                employeeRequestCandidateActivity.setStartTime(LocalDateTime.now());
+            }
             employeeRequestCandidateActivity.setSchedule(scheduleEmployeeReq.getScheduleTime());
             employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
 
@@ -367,6 +370,9 @@ public class EmployeeRequestFormService {
 
         employeeRequestCandidateActivity.setNotes(notes);
         employeeRequestCandidateActivity.setStatus(result);
+        if(employeeRequestCandidateActivity.getStatus().equals(EmployeeRequestFormActivityStatus.COMPLETED.toString())){
+            employeeRequestCandidateActivity.setCompletedTime(LocalDateTime.now());
+        }
         employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
 
         if(checkAllCompleted(employeeRequestCandidateActivity.getEmployeeRequestCandidate())){

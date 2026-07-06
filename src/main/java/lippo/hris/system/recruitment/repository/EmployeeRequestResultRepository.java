@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface EmployeeRequestResultRepository extends JpaRepository<EmployeeRequestResult, Long> {
     List<EmployeeRequestResult> findByEmployeeRequestForm(EmployeeRequestForm employeeRequestForm);
+    Integer countByCreatedBy(String createdBy);
 }

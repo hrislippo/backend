@@ -36,10 +36,39 @@ public interface EmployeeRequestCandidateRepository extends JpaRepository<Employ
     List<ApplicationResp> getEmployeeRequestCandidateLastSixMonths();
 
     @Query(nativeQuery = true,
+            value = "WITH LastSixMonths AS ( " +
+                    "    SELECT DATEADD(MONTH, -5, DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1)) AS month_start " +
+                    "    UNION ALL " +
+                    "    SELECT DATEADD(MONTH, 1, month_start) " +
+                    "    FROM LastSixMonths " +
+                    "    WHERE month_start < DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1) " +
+                    ") " +
+                    "SELECT LEFT(DATENAME(MONTH, m.month_start), 3) AS month, " +
+                    "COUNT(CASE WHEN usr.UserName = :nik THEN a.EmpReqCanId END) AS applications " +
+                    "FROM LastSixMonths m " +
+                    "LEFT JOIN RCMEmpReqCandidate a ON YEAR(a.createdDate) = YEAR(m.month_start) AND MONTH(a.createdDate) = MONTH(m.month_start) " +
+                    "LEFT JOIN RCMEmpReqPIC p ON a.EmpReqId = p.EmpReqId " +
+                    "LEFT JOIN URMUser usr ON p.UserId = usr.UserId " +
+                    "GROUP BY m.month_start ORDER BY m.month_start " +
+                    "OPTION (MAXRECURSION 6)")
+    List<ApplicationResp> getEmployeeRequestCandidateLastSixMonthsByUsername(@Param("nik") String username);
+
+    @Query(nativeQuery = true,
             value = "SELECT TOP(:limit) req.EmpReqName AS name, COUNT(c.EmpReqCanId) AS applicant " +
-                    "FROM RCMEmpReqCandidate c " +
-                    "LEFT JOIN RCMEmpRequest req ON c.EmpReqId = req.EmpReqId " +
+                    "FROM RCMEmpRequest req " +
+                    "LEFT JOIN RCMEmpReqCandidate c ON c.EmpReqId = req.EmpReqId " +
                     "GROUP BY req.EmpReqName, req.createdDate " +
                     "ORDER BY req.createdDate DESC")
     List<JobOpeningResp> getRecentEmployeeRequestWithLimit(@Param("limit") Integer limit);
+
+    @Query(nativeQuery = true,
+            value = "SELECT TOP(:limit) req.EmpReqName AS name, COUNT(c.EmpReqCanId) AS applicant " +
+                    "FROM RCMEmpRequest req " +
+                    "LEFT JOIN RCMEmpReqCandidate c ON c.EmpReqId = req.EmpReqId " +
+                    "LEFT JOIN RCMEmpReqPIC pic ON req.EmpReqId = pic.EmpReqId " +
+                    "LEFT JOIN URMUser usr ON pic.UserId = usr.UserId " +
+                    "WHERE usr.UserName = :nik " +
+                    "GROUP BY req.EmpReqName, req.createdDate " +
+                    "ORDER BY req.createdDate DESC")
+    List<JobOpeningResp> getRecentEmployeeRequestWithLimitAndUsername(@Param("limit") Integer limit, @Param("nik") String username);
 }

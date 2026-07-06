@@ -36,4 +36,10 @@ public class EmployeeRequestCandidateActivity extends Auditable {
 
     @Column(name = "EmpReqCanActSchedule")
     private LocalDateTime schedule;
+
+    @Column(name = "EmpReqCanActStartTime")
+    private LocalDateTime startTime;
+
+    @Column(name = "EmpReqCanActCompletedTime")
+    private LocalDateTime completedTime;
 }

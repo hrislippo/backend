@@ -57,4 +57,59 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
                     "FROM CurrentStage cs")
     DashboardPipelineResp getEmployeeRequestPipeline();
+
+    @Query(nativeQuery = true,
+            value = "WITH StageOrder AS ( " +
+                    "    SELECT * FROM (VALUES " +
+                    "    (1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
+                    "    ) v(StageOrder, StageName) " +
+                    "), " +
+                    "StageAgg AS ( " +
+                    "    SELECT " +
+                    "        ca.EmpReqCanId, " +
+                    "        so.StageOrder, " +
+                    "        so.StageName, " +
+                    "        MAX(CASE WHEN ca.EmpReqCanActStatus = 'IN_PROGRESS' THEN 1 ELSE 0 END) AS HasInProgress, " +
+                    "        MAX(CASE WHEN ca.EmpReqCanActStatus <> 'COMPLETED' OR ca.EmpReqCanActStatus IS NULL THEN 1 ELSE 0 END) AS HasNotCompleted " +
+                    "    FROM RCMEmpReqCanActivity ca " +
+                    "    LEFT JOIN RCMEmpReqCandidate rc ON ca.EmpReqCanId = rc.EmpReqCanId " +
+                    "    LEFT JOIN RCMEmpRequest req ON rc.EmpReqId = req.EmpReqId " +
+                    "    LEFT JOIN RCMEmpReqPIC pic ON req.EmpReqId = pic.EmpReqId " +
+                    "    LEFT JOIN URMUser usr ON pic.UserId = usr.UserId " +
+                    "    LEFT JOIN RCMACTActivity a ON ca.RcmActId = a.RcmActId " +
+                    "    LEFT JOIN StageOrder so ON a.RcmActGrp = so.StageName " +
+                    "    WHERE req.EmpReqStatus = 'IN_PROGRESS' AND usr.UserName = :nik " +
+                    "    GROUP BY ca.EmpReqCanId, so.StageOrder, so.StageName " +
+                    "), " +
+                    "CurrentStage AS ( " +
+                    "    SELECT * FROM ( " +
+                    "    SELECT sa.*, ROW_NUMBER() OVER ( " +
+                    "    PARTITION BY sa.EmpReqCanId " +
+                    "    ORDER BY CASE WHEN sa.HasInProgress = 1 THEN 0 ELSE 1 END, sa.StageOrder) AS rn " +
+                    "    FROM StageAgg sa) x " +
+                    "    WHERE rn = 1 " +
+                    ") " +
+                    "SELECT " +
+                    "    SUM(CASE WHEN cs.StageName = 'Assessment' THEN 1 ELSE 0 END) AS totalAssessment, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Offering' THEN 1 ELSE 0 END) AS totalOffering, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Background Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Sign Agreement' THEN 1 ELSE 0 END) AS totalSignAgreement, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
+                    "FROM CurrentStage cs")
+    DashboardPipelineResp getEmployeeRequestPipelineByUsername(@Param("nik") String username);
+
+    @Query(nativeQuery = true,
+            value = "SELECT COUNT(1) " +
+                    "FROM RCMEmpReqCanActivity a " +
+                    "INNER JOIN RCMACTActivity a2 ON a.RcmActId = a2.RcmActId " +
+                    "WHERE a2.RcmActGrp = 'Offering' AND a.EmpReqCanActStatus = 'COMPLETED'")
+    Integer getCompletedOfferings();
+
+    @Query(nativeQuery = true,
+            value = "SELECT COUNT(1) " +
+                    "FROM RCMEmpReqCanActivity a " +
+                    "INNER JOIN RCMACTActivity a2 ON a.RcmActId = a2.RcmActId " +
+                    "WHERE a2.RcmActGrp = 'Offering' AND a.EmpReqCanActStatus = 'COMPLETED' " +
+                    "AND a.updatedBy = :nik")
+    Integer getCompletedOfferingsByUsername(@Param("nik") String username);
 }
