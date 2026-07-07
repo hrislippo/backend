@@ -61,6 +61,12 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Reverted");
     }
 
+    @PostMapping("/erf-add-interview")
+    public ApiResponse addInterviewEmployeeRequest(@RequestBody AddInterviewReq addInterviewReq) {
+        employeeRequestFormService.addInterview(addInterviewReq);
+        return ApiResponse.ok(null, "Interview Added Successfully");
+    }
+
     @PutMapping("/erf")
     public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
                                              Authentication authentication) {

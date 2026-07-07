@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RecruitmentActivityRepository extends JpaRepository<RecruitmentActivity, Long> {
+    RecruitmentActivity findByName(String name);
 
     @Query(nativeQuery = true,
             value="SELECT a.RcmActId AS id, a.RcmActGrp AS groupName, " +

@@ -172,6 +172,17 @@ public class EmployeeRequestFormService {
         }
     }
 
+    public void addInterview(AddInterviewReq addInterviewReq) {
+        EmployeeRequestCandidate employeeRequestCandidate = employeeRequestCandidateRepository.findById(addInterviewReq.getId()).get();
+        RecruitmentActivity recruitmentActivity = recruitmentActivityRepository.findByName(addInterviewReq.getName());
+
+        EmployeeRequestCandidateActivity employeeRequestCandidateActivity = new EmployeeRequestCandidateActivity();
+        employeeRequestCandidateActivity.setEmployeeRequestCandidate(employeeRequestCandidate);
+        employeeRequestCandidateActivity.setRecruitmentActivity(recruitmentActivity);
+        employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.NOT_STARTED.toString());
+        employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
+    }
+
     public void modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
         RecruitmentLevelTemplate recruitmentLevelTemplate = recruitmentLevelTemplateRepository.findById(employeeRequestReq.getTemplateLevel()).get();
@@ -604,7 +615,8 @@ public class EmployeeRequestFormService {
         List<String> stages = recruitmentActivityService.getGroupActivity();
         for(String stage : stages){
             result.addAll(employeeRequestCandidateActivities.stream().filter(e ->
-                    e.getRecruitmentActivity().getGroup().equalsIgnoreCase(stage)).toList());
+                    e.getRecruitmentActivity().getGroup().equalsIgnoreCase(stage))
+                    .sorted(Comparator.comparing(e -> e.getRecruitmentActivity().getName())).toList());
             if(stage.equalsIgnoreCase(selectedStage)){
                 break;
             }
