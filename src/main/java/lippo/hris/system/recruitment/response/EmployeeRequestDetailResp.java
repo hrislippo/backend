@@ -20,4 +20,18 @@ public class EmployeeRequestDetailResp {
     private RecruitmentTemplate template;
     private RecruitmentLevelTemplate levelTemplate;
     private Integer requestNumber;
+    private String hiringName;
+    private String hiringPositionName;
+    private String hiringCompanyName;
+    private String hiringDivisionName;
+    private String reportTo;
+    private EmploymentType employmentType;
+    private String requisitionType;
+    private String replacementEmployee;
+    private PositionLevel positionLevel;
+    private Integer workingDays;
+    private String jobDescription;
+    private String educationBackground;
+    private String minimumExperience;
+    private String skillRequirement;
 }

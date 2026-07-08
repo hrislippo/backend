@@ -18,4 +18,18 @@ public class EmployeeRequestReq {
     private Long template;
     private Long templateLevel;
     private Integer requestNumber;
+    private String hiringName;
+    private String hiringPositionName;
+    private String hiringCompanyName;
+    private String hiringDivisionName;
+    private String reportTo;
+    private Long employmentType;
+    private String requisitionType;
+    private String replacementEmployee;
+    private Long positionLevel;
+    private Integer workingDays;
+    private String jobDescription;
+    private String educationBackground;
+    private String minimumExperience;
+    private String skillRequirement;
 }

@@ -49,5 +49,51 @@ public class EmployeeRequestForm extends Auditable {
     private RecruitmentLevelTemplate recruitmentLevelTemplate;
 
     @Column(name = "EmpReqStatus")
-    private String status = EmployeeRequestFormStatus.IN_PROGRESS.toString();
+    private String status = EmployeeRequestFormStatus.OPEN.toString();
+
+    @Column(name = "EmpReqHireName")
+    private String hiringName;
+
+    @Column(name = "EmpReqHirePosName")
+    private String hiringPositionName;
+
+    @Column(name = "EmpReqHireCompName")
+    private String hiringCompanyName;
+
+    @Column(name = "EmpReqHireDivName")
+    private String hiringDivisionName;
+
+    @Column(name = "EmpReqReportTo")
+    private String reportTo;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "RcmEmployTypeId")
+    private EmploymentType employmentType;
+
+    @Column(name = "EmpReqRequisitionType")
+    private String requisitionType;
+
+    @Column(name = "EmpReqReplacementEmp")
+    private String replacementEmployee;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "RCMPosLevelId")
+    private PositionLevel positionLevel;
+
+    @Column(name = "EmpReqWorkDays")
+    private Integer workingDays;
+
+    @Lob
+    @Column(name = "EmpReqJobDesc", columnDefinition = "NVARCHAR(MAX)")
+    private String jobDescription;
+
+    @Column(name = "EmpReqEduBackground")
+    private String educationBackground;
+
+    @Column(name = "EmpReqMinExp")
+    private String minimumExperience;
+
+    @Lob
+    @Column(name = "EmpReqSkillReq", columnDefinition = "NVARCHAR(MAX)")
+    private String skillRequirement;
 }

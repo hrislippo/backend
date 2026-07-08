@@ -67,6 +67,15 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Interview Added Successfully");
     }
 
+    @PostMapping("/erf-process")
+    public ApiResponse processEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
+        employeeRequestValidation.checkEmployeeRequestValue(employeeRequestReq);
+        employeeRequestFormService.modifyEmployeeRequest(employeeRequestReq);
+        employeeRequestFormService.processEmployeeRequest(employeeRequestReq);
+        return ApiResponse.ok(null, "Employee Request Processed");
+    }
+
     @PutMapping("/erf")
     public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
                                              Authentication authentication) {
@@ -174,6 +183,11 @@ public class EmployeeRequestFormController {
     @GetMapping("/erf-schedule-detail")
     public ApiResponse getEmployeeRequestSchedule(@RequestParam(value = "id") Long id) {
         return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestSchedule(id), "Get Employee Request Schedule Successfully");
+    }
+
+    @GetMapping("/requisition-type")
+    public ApiResponse getRequisitionType(){
+        return ApiResponse.ok(employeeRequestFormService.getRequisitionType(), "Get Requisition Type Successfully");
     }
 
     @DeleteMapping("/erf")

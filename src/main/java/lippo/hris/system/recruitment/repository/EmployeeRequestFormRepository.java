@@ -71,7 +71,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "GROUP BY req.EmpReqId, req.EmpReqCode, req.EmpReqName, " +
                     "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqStartDate, req.EmpReqNum, " +
                     "req.EmpReqStatus, pic.EmpReqPICId, agg.StageName " +
-                    "ORDER BY CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' THEN 0 ELSE 1 END, RcmBsUnitName, EmpReqExpDate",
+                    "ORDER BY CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' THEN 0 WHEN req.EmpReqStatus = 'OPEN' THEN 1 ELSE 2 END, RcmBsUnitName, EmpReqExpDate",
             countQuery = "SELECT COUNT(1) " +
                     "FROM RCMEmpRequest req " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +

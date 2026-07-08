@@ -49,8 +49,23 @@ public class EmployeeRequestValidation {
         if(employeeRequestReq.getRequestNumber() == null){
             throw new BadRequestException("Request Amount is Required");
         }
-        if(employeeRequestReq.getPic().stream().filter(e -> e != null).toList().isEmpty()){
+        if(employeeRequestReq.getId() != null && employeeRequestReq.getPic().stream().filter(e -> e != null).toList().isEmpty()){
             throw new BadRequestException("PICs are Required");
+        }
+        if(employeeRequestReq.getHiringName() == null || employeeRequestReq.getHiringName().trim().isEmpty()) {
+            throw new BadRequestException("Hiring Manager Name is Required");
+        }
+        if(employeeRequestReq.getHiringPositionName() == null || employeeRequestReq.getHiringPositionName().trim().isEmpty()) {
+            throw new BadRequestException("Hiring Manager Position Name is Required");
+        }
+        if(employeeRequestReq.getReportTo() == null || employeeRequestReq.getReportTo().trim().isEmpty()) {
+            throw new BadRequestException("Reporting To is Required");
+        }
+        if(employeeRequestReq.getEmploymentType() == null) {
+            throw new BadRequestException("Employment Type is Required");
+        }
+        if(employeeRequestReq.getRequisitionType() == null || employeeRequestReq.getRequisitionType().trim().isEmpty()) {
+            throw new BadRequestException("Requisition Type is Required");
         }
     }
 
