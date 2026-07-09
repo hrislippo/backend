@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface HRBPRepository extends JpaRepository<HRBP, Long> {
+    HRBP findByCode(String code);
     List<HRBP> findByBusinessUnit(BusinessUnit businessUnit);
 
     @Query(nativeQuery = true,

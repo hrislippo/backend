@@ -50,8 +50,11 @@ public class HRBPService {
     }
 
     public List<HRBP> getHRBPList(Long BUId) {
-        BusinessUnit businessUnit = businessUnitRepository.findById(BUId).get();
-        return hrbpRepository.findByBusinessUnit(businessUnit);
+        if(BUId != null){
+            BusinessUnit businessUnit = businessUnitRepository.findById(BUId).get();
+            return hrbpRepository.findByBusinessUnit(businessUnit);
+        }
+        return hrbpRepository.findAll();
     }
 
     public HRBP getHRBPDetail(Long id) {

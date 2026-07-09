@@ -41,7 +41,7 @@ public class HRBPController {
     }
 
     @GetMapping("/hrbp-list")
-    public ApiResponse getHRBPList(@RequestParam(value = "BUId") Long BUId) {
+    public ApiResponse getHRBPList(@RequestParam(value = "BUId", required = false) Long BUId) {
         return ApiResponse.ok(hrbpService.getHRBPList(BUId), "Get HRBP List Successfully");
     }
 

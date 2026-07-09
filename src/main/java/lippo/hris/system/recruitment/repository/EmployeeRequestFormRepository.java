@@ -13,7 +13,15 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeRequestForm, Long> {
-    List<EmployeeRequestForm> findByStatus(String status);
+    @Query(nativeQuery = true,
+    value = "SELECT COUNT(1) " +
+            "FROM RCMEmpRequest req " +
+            "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
+            "WHERE req.EmpReqStatus IN ('OPEN', 'IN_PROGRESS') " +
+            "AND (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN " +
+            "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer countOpenRequest(@Param("username") String username,
+                             @Param("flagHRBP") Boolean flagHRBP);
 
     @Query(nativeQuery = true,
     value = "SELECT TOP 1 REPLACE(EmpReqCode, :prefix, '') FROM RCMEmpRequest ORDER BY EmpReqCode DESC")
@@ -62,7 +70,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "LEFT JOIN URMUser usr ON pic2.UserId = usr.UserId " +
                     "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
                     "ON agg.EmpReqId = req.EmpReqId " +
-                    "WHERE (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
+                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
+                    "AND (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
                     "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
                     "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
@@ -76,7 +85,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "FROM RCMEmpRequest req " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
                     "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
-                    "WHERE (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
+                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
+                    "AND (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
                     "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
                     "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
@@ -90,6 +100,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                                                  @Param("hrbpName") String hrbpName,
                                                  @Param("userName") String username,
                                                  @Param("pic") String pic,
+                                                 @Param("flagHRBP") Boolean flagHRBP,
                                                  Pageable pageable);
 
     @Query(nativeQuery = true,
@@ -106,6 +117,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
     List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(@Param("id") Long id);
 
     @Query(nativeQuery = true,
-            value = "EXECUTE sp_GetTop10EmployeeRequestDashboard")
-    List<EmployeeRequestSLAResp> getEmployeeRequestSLA();
+            value = "EXECUTE sp_GetTop10EmployeeRequestDashboard @FlagHRBP = :flagHRBP, @Username = :username")
+    List<EmployeeRequestSLAResp> getEmployeeRequestSLA(@Param("username") String username,
+                                                       @Param("flagHRBP") Boolean flagHRBP);
 }

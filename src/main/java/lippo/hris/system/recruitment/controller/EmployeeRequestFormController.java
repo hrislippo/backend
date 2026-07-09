@@ -133,7 +133,7 @@ public class EmployeeRequestFormController {
                                           @RequestParam(value = "pic", required = false) String pic,
                                           Pageable pageable, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName, customUserDetails.getUsername(), pic, pageable),
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName, customUserDetails.getUsername(), customUserDetails.getRoles(), pic, pageable),
                 "Get Employee Request Successfully");
     }
 

@@ -17,8 +17,9 @@ public class DashboardController {
     DashboardService dashboardService;
 
     @GetMapping("/dashboard")
-    public ApiResponse getDashboard() {
-        return ApiResponse.ok(dashboardService.getDashboard(), "Get recruitment dashboard successfully");
+    public ApiResponse getDashboard(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(dashboardService.getDashboard(customUserDetails.getUsername(), customUserDetails.getRoles()), "Get recruitment dashboard successfully");
     }
 
     @GetMapping("/dashboard-personal")

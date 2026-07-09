@@ -31,15 +31,17 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "        ca.EmpReqCanId, " +
                     "        so.StageOrder, " +
                     "        so.StageName, " +
+                    "        h.RcmHRBPId, " +
                     "        MAX(CASE WHEN ca.EmpReqCanActStatus = 'IN_PROGRESS' THEN 1 ELSE 0 END) AS HasInProgress, " +
                     "        MAX(CASE WHEN ca.EmpReqCanActStatus <> 'COMPLETED' OR ca.EmpReqCanActStatus IS NULL THEN 1 ELSE 0 END) AS HasNotCompleted " +
                     "    FROM RCMEmpReqCanActivity ca " +
                     "    LEFT JOIN RCMEmpReqCandidate rc ON ca.EmpReqCanId = rc.EmpReqCanId " +
                     "    LEFT JOIN RCMEmpRequest req ON rc.EmpReqId = req.EmpReqId " +
+                    "    LEFT JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
                     "    LEFT JOIN RCMACTActivity a ON ca.RcmActId = a.RcmActId " +
                     "    LEFT JOIN StageOrder so ON a.RcmActGrp = so.StageName " +
                     "    WHERE req.EmpReqStatus = 'IN_PROGRESS' " +
-                    "    GROUP BY ca.EmpReqCanId, so.StageOrder, so.StageName " +
+                    "    GROUP BY ca.EmpReqCanId, so.StageOrder, so.StageName, h.RcmHRBPId " +
                     "), " +
                     "CurrentStage AS ( " +
                     "    SELECT * FROM ( " +
@@ -55,8 +57,10 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "    SUM(CASE WHEN cs.StageName = 'Background Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
                     "    SUM(CASE WHEN cs.StageName = 'Sign Agreement' THEN 1 ELSE 0 END) AS totalSignAgreement, " +
                     "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
-                    "FROM CurrentStage cs")
-    DashboardPipelineResp getEmployeeRequestPipeline();
+                    "FROM CurrentStage cs " +
+                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR cs.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    DashboardPipelineResp getEmployeeRequestPipeline(@Param("username") String username,
+                                                     @Param("flagHRBP") Boolean flagHRBP);
 
     @Query(nativeQuery = true,
             value = "WITH StageOrder AS ( " +
@@ -102,8 +106,13 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
             value = "SELECT COUNT(1) " +
                     "FROM RCMEmpReqCanActivity a " +
                     "INNER JOIN RCMACTActivity a2 ON a.RcmActId = a2.RcmActId " +
-                    "WHERE a2.RcmActGrp = 'Offering' AND a.EmpReqCanActStatus = 'COMPLETED'")
-    Integer getCompletedOfferings();
+                    "INNER JOIN RCMEmpReqCandidate c ON a.EmpReqCanId = c.EmpReqCanId " +
+                    "INNER JOIN RCMEmpRequest req ON c.EmpReqId = req.EmpReqId " +
+                    "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
+                    "WHERE a2.RcmActGrp = 'Offering' AND a.EmpReqCanActStatus = 'COMPLETED' " +
+                    "AND (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer getCompletedOfferings(@Param("username") String username,
+                                  @Param("flagHRBP") Boolean flagHRBP);
 
     @Query(nativeQuery = true,
             value = "SELECT COUNT(1) " +

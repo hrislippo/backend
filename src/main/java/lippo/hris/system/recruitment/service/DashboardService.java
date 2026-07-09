@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class DashboardService {
@@ -41,15 +43,20 @@ public class DashboardService {
     @Autowired
     UserRepository userRepository;
 
-    public DashboardResp getDashboard(){
-        SummaryResp summaryResp = new SummaryResp();
-        summaryResp.setTotalVacancies(getTotalVacancies());
-        summaryResp.setTotalCandidates(getTotalCandidates());
-        summaryResp.setTotalInterviews(getTotalInterviews());
-        summaryResp.setTotalOffered(getTotalOffered());
-        summaryResp.setTotalHired(getTotalHired());
+    public DashboardResp getDashboard(String username, List<String> roles){
+        Boolean flagHRBP = false;
+        if(roles.contains("ROLE_HRBP")){
+            flagHRBP = true;
+        }
 
-        DashboardPipelineResp dashboardPipelineResp = getTotalPipeline();
+        SummaryResp summaryResp = new SummaryResp();
+        summaryResp.setTotalVacancies(getTotalVacancies(username, flagHRBP));
+        summaryResp.setTotalCandidates(getTotalCandidates(username, flagHRBP));
+        summaryResp.setTotalInterviews(getTotalInterviews(username, flagHRBP));
+        summaryResp.setTotalOffered(getTotalOffered(username, flagHRBP));
+        summaryResp.setTotalHired(getTotalHired(username, flagHRBP));
+
+        DashboardPipelineResp dashboardPipelineResp = getTotalPipeline(username, flagHRBP);
         summaryResp.setTotalAssessment(dashboardPipelineResp.getTotalAssessment());
         summaryResp.setTotalOffering(dashboardPipelineResp.getTotalOffering());
         summaryResp.setTotalBackgroundCheck(dashboardPipelineResp.getTotalBackgroundCheck());
@@ -62,10 +69,10 @@ public class DashboardService {
 
         DashboardResp dashboardResp = new DashboardResp();
         dashboardResp.setSummary(summaryResp);
-        dashboardResp.setApplications(employeeRequestCandidateRepository.getEmployeeRequestCandidateLastSixMonths());
-        dashboardResp.setJobOpenings(employeeRequestCandidateRepository.getRecentEmployeeRequestWithLimit(3));
-        dashboardResp.setInterviews(interviewRepository.getUpcomingInterview(3));
-        dashboardResp.setEmployeeRequestSLA(employeeRequestFormRepository.getEmployeeRequestSLA());
+        dashboardResp.setApplications(employeeRequestCandidateRepository.getEmployeeRequestCandidateLastSixMonths(username, flagHRBP));
+        dashboardResp.setJobOpenings(employeeRequestCandidateRepository.getRecentEmployeeRequestWithLimit(3, username, flagHRBP));
+        dashboardResp.setInterviews(interviewRepository.getUpcomingInterview(3, username, flagHRBP));
+        dashboardResp.setEmployeeRequestSLA(employeeRequestFormRepository.getEmployeeRequestSLA(username, flagHRBP));
         return dashboardResp;
     }
 
@@ -96,15 +103,18 @@ public class DashboardService {
         return dashboardResp;
     }
 
-    private Integer getTotalVacancies(){
-        return employeeRequestFormRepository.findByStatus(EmployeeRequestFormStatus.IN_PROGRESS.toString()).size();
+    private Integer getTotalVacancies(String username, Boolean flagHRBP){
+        return employeeRequestFormRepository.countOpenRequest(username, flagHRBP);
     }
 
     private Integer getTotalVacancies(String username){
         return employeeRequestPICRepository.countByUserAndInProgress(username);
     }
 
-    private Integer getTotalCandidates(){
+    private Integer getTotalCandidates(String username, Boolean flagHRBP){
+        if(flagHRBP){
+            return employeeRequestCandidateRepository.countTotalCandidate(username, flagHRBP);
+        }
         return candidateRepository.findAll().size();
     }
 
@@ -113,32 +123,32 @@ public class DashboardService {
         return candidateRepository.countByUser(user);
     }
 
-    private Integer getTotalInterviews(){
-        return interviewRepository.countByEmployeeRequestCandidateActivityIsNotNull();
+    private Integer getTotalInterviews(String username, Boolean flagHRBP){
+        return interviewRepository.countTotalInterview(username, flagHRBP);
     }
 
     private Integer getTotalInterviews(String username){
         return interviewRepository.countByCreatedByAndEmployeeRequestCandidateActivityIsNotNull(username);
     }
 
-    private Integer getTotalOffered(){
-        return employeeRequestCandidateActivityRepository.getCompletedOfferings();
+    private Integer getTotalOffered(String username, Boolean flagHRBP){
+        return employeeRequestCandidateActivityRepository.getCompletedOfferings(username, flagHRBP);
     }
 
     private Integer getTotalOffered(String username){
         return employeeRequestCandidateActivityRepository.getCompletedOfferingsByUsername(username);
     }
 
-    private Integer getTotalHired(){
-        return employeeRequestResultRepository.findAll().size();
+    private Integer getTotalHired(String username, Boolean flagHRBP){
+        return employeeRequestResultRepository.countAllHired(username, flagHRBP);
     }
 
     private Integer getTotalHired(String username){
         return employeeRequestResultRepository.countByCreatedBy(username);
     }
 
-    private DashboardPipelineResp getTotalPipeline(){
-        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipeline();
+    private DashboardPipelineResp getTotalPipeline(String username, Boolean flagHRBP){
+        return employeeRequestCandidateActivityRepository.getEmployeeRequestPipeline(username, flagHRBP);
     }
 
     private DashboardPipelineResp getTotalPipeline(String username){

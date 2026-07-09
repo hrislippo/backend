@@ -453,8 +453,12 @@ public class EmployeeRequestFormService {
     }
 
     public Page<EmployeeRequestResp> getEmployeeRequest(String code, String name, String buName, String hrbpName,
-                                                        String username, String pic, Pageable pageable) {
-        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, pageable);
+                                                        String username, List<String> roles, String pic, Pageable pageable) {
+        Boolean flagHRBP = false;
+        if(roles.contains("ROLE_HRBP")){
+            flagHRBP = true;
+        }
+        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, flagHRBP, pageable);
     }
 
     public List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(Long candidateId) {
