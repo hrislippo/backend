@@ -4,8 +4,10 @@ import lippo.hris.system.recruitment.request.BusinessUnitReq;
 import lippo.hris.system.recruitment.service.BusinessUnitService;
 import lippo.hris.system.recruitment.validation.BusinessUnitValidation;
 import lippo.hris.system.response.ApiResponse;
+import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -40,8 +42,9 @@ public class BusinessUnitController {
     }
 
     @GetMapping("/business-unit-list")
-    public ApiResponse getBusinessUnitList() {
-        return ApiResponse.ok(businessUnitService.getBusinessUnitList(), "Get Business Unit List Successfully");
+    public ApiResponse getBusinessUnitList(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(businessUnitService.getBusinessUnitList(customUserDetails.getUsername(), customUserDetails.getRoles()), "Get Business Unit List Successfully");
     }
 
     @GetMapping("/business-unit-detail")

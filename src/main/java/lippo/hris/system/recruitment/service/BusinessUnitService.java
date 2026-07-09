@@ -38,7 +38,10 @@ public class BusinessUnitService {
         return businessUnitRepository.findByCodeAndName(code, name, pageable);
     }
 
-    public List<BusinessUnit> getBusinessUnitList() {
+    public List<BusinessUnit> getBusinessUnitList(String username, List<String> roles) {
+        if(roles.contains("ROLE_HRBP")){
+            return businessUnitRepository.findByHRBP(username);
+        }
         return businessUnitRepository.findAll(Sort.by("name"));
     }
 
