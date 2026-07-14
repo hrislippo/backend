@@ -50,7 +50,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "AND act2.RcmActGrp IN ('Background Check', 'Sign Agreement', 'Onboarding') " +
                     "AND ca2.EmpReqCanActStatus = 'FAILED') GROUP BY rc.EmpReqId) " +
                     "SELECT * FROM ( " +
-                    "SELECT COUNT(res.EmpReqResId) AS recruitNumber, " +
+                    "SELECT COUNT(DISTINCT res.EmpReqResId) AS recruitNumber, " +
                     "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
                     "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
                     "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
