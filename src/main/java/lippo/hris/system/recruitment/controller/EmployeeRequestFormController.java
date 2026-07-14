@@ -125,15 +125,28 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Resumed");
     }
 
+    @GetMapping("/erf-sla-status")
+    public ApiResponse getSLAStatusEmployeeRequest() {
+        return ApiResponse.ok(employeeRequestFormService.getSLAStatus(), "Get Employee Request SLA Status Successfully");
+    }
+
+    @GetMapping("/erf-status")
+    public ApiResponse getStatusEmployeeRequest() {
+        return ApiResponse.ok(employeeRequestFormService.getStatus(), "Get Employee Request Status Successfully");
+    }
+
     @GetMapping("/erf")
     public ApiResponse getEmployeeRequest(@RequestParam(value = "code", required = false) String code,
                                           @RequestParam(value = "name", required = false) String name,
                                           @RequestParam(value = "buName", required = false) String buName,
                                           @RequestParam(value = "hrbpName", required = false) String hrbpName,
                                           @RequestParam(value = "pic", required = false) String pic,
+                                          @RequestParam(value = "sla", required = false) String sla,
+                                          @RequestParam(value = "status", required = false) String status,
                                           Pageable pageable, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName, customUserDetails.getUsername(), customUserDetails.getRoles(), pic, pageable),
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName,
+                        customUserDetails.getUsername(), customUserDetails.getRoles(), pic, sla, status, pageable),
                 "Get Employee Request Successfully");
     }
 

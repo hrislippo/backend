@@ -13,6 +13,7 @@ public interface EmployeeRequestResp {
     Integer getRequestNumber();
     Integer getRecruitNumber();
     String getStatus();
+    String getDeadlineStatus();
     Boolean getEligible();
     String getStage();
     String getPic();

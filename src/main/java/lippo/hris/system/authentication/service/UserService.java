@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,8 +67,15 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<UserResponsev2> findAllUsers(){
-        return userRepository.findByActiveTrue();
+    public List<UserResponsev2> findAllUsers(String role){
+        List<UserResponsev2> list = new ArrayList<>();
+        list.add(null);
+        if(role != null){
+            list.addAll(userRepository.findByActiveTrueAndRole(role));
+        } else{
+            list.addAll(userRepository.findByActiveTrue());
+        }
+        return list;
     }
 
     public UserResponsev2 findByUsername(String username) {

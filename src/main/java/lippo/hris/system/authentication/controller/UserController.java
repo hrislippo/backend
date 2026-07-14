@@ -72,8 +72,8 @@ public class UserController {
     }
 
     @GetMapping("/user-list")
-    public ApiResponse getUserLists() {
-        return ApiResponse.ok(userService.findAllUsers(), "Get List Users Successfully");
+    public ApiResponse getUserLists(@RequestParam(value = "role", required = false) String role) {
+        return ApiResponse.ok(userService.findAllUsers(role), "Get List Users Successfully");
     }
 
     @GetMapping("/user-detail")

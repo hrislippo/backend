@@ -41,4 +41,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
                                                  @Param("roleSearch") String roleSearch,
                                                  @Param("activeSearch") Boolean activeSearch,
                                                  Pageable pageable);
+
+    @Query(nativeQuery = true,
+    value = "SELECT u.UserId AS id, u.UserRealName AS name, " +
+            "u.UserName AS username, u.UserActive AS active " +
+            "FROM URMUser u " +
+            "INNER JOIN URMUserRole ur ON u.UserId = ur.UserId " +
+            "INNER JOIN URMRole r ON ur.RoleId = r.RoleId " +
+            "WHERE r.RoleName = :role " +
+            "ORDER BY u.UserRealName")
+    List<UserResponsev2> findByActiveTrueAndRole(@Param("role") String role);
 }

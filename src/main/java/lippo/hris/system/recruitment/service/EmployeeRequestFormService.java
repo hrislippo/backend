@@ -452,13 +452,37 @@ public class EmployeeRequestFormService {
         employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
     }
 
+    public List<String> getSLAStatus() {
+        List<String> slaStatus = new ArrayList<>();
+        slaStatus.add(null);
+        slaStatus.addAll(Arrays.stream(EmployeeRequestFormSLAStatus.values())
+                .map(EmployeeRequestFormSLAStatus::getLabel)
+                .toList());
+        return slaStatus;
+    }
+
+    public List<String> getStatus() {
+        List<String> status = new ArrayList<>();
+        status.add(null);
+        status.add("Sourcing");
+        status.addAll(Arrays.stream(RecruitmentGroupActivity.values())
+                .sorted(Comparator.comparing(RecruitmentGroupActivity::getOrder))
+                .map(RecruitmentGroupActivity::getLabel)
+                .toList());
+        status.addAll(Arrays.stream(EmployeeRequestFormStatus.values())
+                .filter(e -> !e.equals(EmployeeRequestFormStatus.IN_PROGRESS))
+                .map(EmployeeRequestFormStatus::toString)
+                .toList());
+        return status;
+    }
+
     public Page<EmployeeRequestResp> getEmployeeRequest(String code, String name, String buName, String hrbpName,
-                                                        String username, List<String> roles, String pic, Pageable pageable) {
+                                                        String username, List<String> roles, String pic, String sla, String status, Pageable pageable) {
         Boolean flagHRBP = false;
         if(roles.contains("ROLE_HRBP")){
             flagHRBP = true;
         }
-        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, flagHRBP, pageable);
+        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, sla, status, flagHRBP, pageable);
     }
 
     public List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(Long candidateId) {
