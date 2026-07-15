@@ -131,6 +131,9 @@ public class EmployeeRequestFormService {
     @Autowired
     PositionLevelRepository positionLevelRepository;
 
+    @Autowired
+    EmployeeRequestCancelRepository employeeRequestCancelRepository;
+
     public void addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
         RecruitmentLevelTemplate recruitmentLevelTemplate = recruitmentLevelTemplateRepository.findById(employeeRequestReq.getTemplateLevel()).get();
@@ -359,6 +362,11 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(employeeRequestReq.getId()).get();
         employeeRequestForm.setStatus(EmployeeRequestFormStatus.CANCELLED.toString());
         employeeRequestFormRepository.save(employeeRequestForm);
+
+        EmployeeRequestCancel employeeRequestCancel = new EmployeeRequestCancel();
+        employeeRequestCancel.setEmployeeRequestForm(employeeRequestForm);
+        employeeRequestCancel.setReason(employeeRequestReq.getReason());
+        employeeRequestCancelRepository.save(employeeRequestCancel);
     }
 
     public void holdEmployeeRequest(EmployeeRequestReq employeeRequestReq) {
@@ -369,6 +377,9 @@ public class EmployeeRequestFormService {
         EmployeeRequestHold employeeRequestHold = new EmployeeRequestHold();
         employeeRequestHold.setEmployeeRequestForm(employeeRequestForm);
         employeeRequestHold.setStartDate(LocalDate.now());
+        employeeRequestHold.setReason(employeeRequestReq.getReason());
+        employeeRequestHold.setOldStartDate(employeeRequestForm.getStartDate());
+        employeeRequestHold.setOldExpiryDate(employeeRequestForm.getExpDate());
         employeeRequestHoldRepository.save(employeeRequestHold);
     }
 
@@ -382,7 +393,12 @@ public class EmployeeRequestFormService {
             employeeRequestHold.setEndDate(LocalDate.now());
             employeeRequestHoldRepository.save(employeeRequestHold);
 
-            employeeRequestForm.setExpDate(employeeRequestForm.getExpDate().plusDays(ChronoUnit.DAYS.between(employeeRequestHold.getStartDate(), employeeRequestHold.getEndDate())));
+            if(employeeRequestReq.getResumeType().equals(EmployeeRequestFormResumeType.EXTEND.getLabel())){
+                employeeRequestForm.setExpDate(employeeRequestForm.getExpDate().plusDays(ChronoUnit.DAYS.between(employeeRequestHold.getStartDate(), employeeRequestHold.getEndDate())));
+            } else if(employeeRequestReq.getResumeType().equals(EmployeeRequestFormResumeType.RESET.getLabel())){
+                employeeRequestForm.setStartDate(LocalDate.now());
+                employeeRequestForm.setExpDate(LocalDate.now().plusDays(employeeRequestForm.getRecruitmentLevelTemplate().getDays()));
+            }
             employeeRequestFormRepository.save(employeeRequestForm);
         }
     }
@@ -450,6 +466,12 @@ public class EmployeeRequestFormService {
         EmployeeRequestCandidateActivity employeeRequestCandidateActivity = employeeRequestCandidateActivityRepository.findById(employeeRequestReq.getId()).get();
         employeeRequestCandidateActivity.setStatus(EmployeeRequestFormActivityStatus.IN_PROGRESS.toString());
         employeeRequestCandidateActivityRepository.save(employeeRequestCandidateActivity);
+    }
+
+    public List<String> getResumeType() {
+        return Arrays.stream(EmployeeRequestFormResumeType.values())
+                .map(EmployeeRequestFormResumeType::getLabel)
+                .toList();
     }
 
     public List<String> getSLAStatus() {

@@ -32,4 +32,6 @@ public class EmployeeRequestReq {
     private String educationBackground;
     private String minimumExperience;
     private String skillRequirement;
+    private String reason;
+    private String resumeType;
 }

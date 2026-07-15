@@ -20,9 +20,18 @@ public class EmployeeRequestHold extends Auditable {
     @JoinColumn(name = "EmpReqId")
     private EmployeeRequestForm employeeRequestForm;
 
+    @Column(name = "EmpReqHoldOldStartDate")
+    private LocalDate oldStartDate;
+
+    @Column(name = "EmpReqHoldOldExpiryDate")
+    private LocalDate oldExpiryDate;
+
     @Column(name = "EmpReqHoldStartDate")
     private LocalDate startDate;
 
     @Column(name = "EmpReqHoldEndDate")
     private LocalDate endDate;
+
+    @Column(name = "EmpReqHoldReason")
+    private String reason;
 }

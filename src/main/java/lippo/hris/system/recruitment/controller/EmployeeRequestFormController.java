@@ -109,20 +109,28 @@ public class EmployeeRequestFormController {
                                              Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         employeeRequestValidation.eligibleRecruitmentHead(customUserDetails.getRoles());
+        employeeRequestValidation.employeeRequestReasonRequired(employeeRequestReq);
         employeeRequestFormService.cancelEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Cancelled");
     }
 
     @PutMapping("/erf-hold")
     public ApiResponse holdEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestValidation.employeeRequestReasonRequired(employeeRequestReq);
         employeeRequestFormService.holdEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Held");
     }
 
     @PutMapping("/erf-resume")
     public ApiResponse resumeEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
+        employeeRequestValidation.employeeRequestResumeTypeRequired(employeeRequestReq);
         employeeRequestFormService.resumeEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Resumed");
+    }
+
+    @GetMapping("/erf-resume-type")
+    public ApiResponse getResumeTypeEmployeeRequest() {
+        return ApiResponse.ok(employeeRequestFormService.getResumeType(), "Get Employee Request Resume Type Successfully");
     }
 
     @GetMapping("/erf-sla-status")

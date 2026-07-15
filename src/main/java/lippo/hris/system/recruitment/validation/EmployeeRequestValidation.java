@@ -116,4 +116,16 @@ public class EmployeeRequestValidation {
             }
         }
     }
+
+    public void employeeRequestReasonRequired(EmployeeRequestReq employeeRequestReq){
+        if(employeeRequestReq.getReason() == null || employeeRequestReq.getReason().trim().length() < 50){
+            throw new BadRequestException("Reason is Required (50 characters long)");
+        }
+    }
+
+    public void employeeRequestResumeTypeRequired(EmployeeRequestReq employeeRequestReq){
+        if(employeeRequestReq.getResumeType() == null || employeeRequestReq.getResumeType().trim().isEmpty()){
+            throw new BadRequestException("Resume Type is Required");
+        }
+    }
 }
