@@ -1,8 +1,6 @@
 package lippo.hris.system.timemanagement.service;
 
-import feign.FeignException;
 import lippo.hris.system.feign.ProIntClient;
-import lippo.hris.system.recruitment.response.BusinessUnitResp;
 import lippo.hris.system.timemanagement.entity.DayPaymentRequest;
 import lippo.hris.system.timemanagement.repository.DayPaymentRequestRepository;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
@@ -26,16 +24,19 @@ public class DayPaymentService {
     DayPaymentRequestRepository dayPaymentRequestRepository;
 
     public void addDayPayment(TMDPRightsReq tmDPRightsReq, String username){
-        tmDPRightsReq.setNikEmpCreate(username);
-        proIntClient.addDayPayment(tmDPRightsReq);
+        for(String nikEmp : tmDPRightsReq.getListNikEmp()){
+            tmDPRightsReq.setNikEmp(nikEmp);
+            tmDPRightsReq.setNikEmpCreate(username);
+            proIntClient.addDayPayment(tmDPRightsReq);
 
-        DayPaymentRequest dayPaymentRequest = new DayPaymentRequest();
-        dayPaymentRequest.setEmployee(tmDPRightsReq.getNikEmp());
-        dayPaymentRequest.setCount(tmDPRightsReq.getDpCount());
-        dayPaymentRequest.setDate(tmDPRightsReq.getDpDate());
-        dayPaymentRequest.setExpiredDate(tmDPRightsReq.getDpExpiredDate());
-        dayPaymentRequest.setDescription(tmDPRightsReq.getDescription());
-        dayPaymentRequestRepository.save(dayPaymentRequest);
+            DayPaymentRequest dayPaymentRequest = new DayPaymentRequest();
+            dayPaymentRequest.setEmployee(tmDPRightsReq.getNikEmp());
+            dayPaymentRequest.setCount(tmDPRightsReq.getDpCount());
+            dayPaymentRequest.setDate(tmDPRightsReq.getDpDate());
+            dayPaymentRequest.setExpiredDate(tmDPRightsReq.getDpExpiredDate());
+            dayPaymentRequest.setDescription(tmDPRightsReq.getDescription());
+            dayPaymentRequestRepository.save(dayPaymentRequest);
+        }
     }
 
     public Page<DayPaymentResp> getDayPayment(String empNIK, LocalDate startDate, LocalDate expiryDate, Pageable pageable){
