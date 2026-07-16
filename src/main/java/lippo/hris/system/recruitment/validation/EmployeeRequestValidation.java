@@ -4,6 +4,7 @@ import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.exception.UnauthorizedException;
 import lippo.hris.system.recruitment.entity.EmployeeRequestCandidateActivity;
 import lippo.hris.system.recruitment.repository.EmployeeRequestCandidateActivityRepository;
+import lippo.hris.system.recruitment.request.EmployeeRequestInterviewReq;
 import lippo.hris.system.recruitment.request.EmployeeRequestReq;
 import lippo.hris.system.recruitment.request.ScheduleEmployeeReq;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +127,12 @@ public class EmployeeRequestValidation {
     public void employeeRequestResumeTypeRequired(EmployeeRequestReq employeeRequestReq){
         if(employeeRequestReq.getResumeType() == null || employeeRequestReq.getResumeType().trim().isEmpty()){
             throw new BadRequestException("Resume Type is Required");
+        }
+    }
+
+    public void interviewNotesRequired(EmployeeRequestInterviewReq employeeRequestInterviewReq){
+        if(employeeRequestInterviewReq.getNotes() == null || employeeRequestInterviewReq.getNotes().trim().length() < 75){
+            throw new BadRequestException("Interview Notes Required (75 characters long)");
         }
     }
 }

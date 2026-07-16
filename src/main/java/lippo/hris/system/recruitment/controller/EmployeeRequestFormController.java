@@ -100,6 +100,7 @@ public class EmployeeRequestFormController {
 
     @PutMapping("/erf-interview")
     public ApiResponse interviewEmployeeRequest(@RequestBody EmployeeRequestInterviewReq employeeRequestInterviewReq) {
+        employeeRequestValidation.interviewNotesRequired(employeeRequestInterviewReq);
         employeeRequestFormService.interviewEmployeeRequest(employeeRequestInterviewReq);
         return ApiResponse.ok(null, "Employee Request Progressed");
     }

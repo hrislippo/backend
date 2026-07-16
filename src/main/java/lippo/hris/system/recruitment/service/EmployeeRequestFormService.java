@@ -644,13 +644,18 @@ public class EmployeeRequestFormService {
                 employeeRequestCandidateActivity.getEmployeeRequestCandidate().getCandidate().getId(),
                 candidateContactMaster.getId()).get();
 
+        UserResponsev2 userResponsev2 = userRepository.findByUsername(username);
+
         List<String> emailTos = new ArrayList<>();
         emailTos.add(candidateContact.getContact());
+        List<String> emailBccs = new ArrayList<>();
+        emailBccs.add(userResponsev2.getEmail());
 
         Map<String, Object> params = generateParam(employeeRequestCandidateActivity, username);
 
         EmployeeRequestEmailResp employeeRequestEmailResp = new EmployeeRequestEmailResp();
         employeeRequestEmailResp.setEmailTo(emailTos);
+        employeeRequestEmailResp.setEmailBcc(emailBccs);
         employeeRequestEmailResp.setSubject(emailTemplate.getSubject());
         employeeRequestEmailResp.setBody(emailService.render(emailTemplate.getContentHtml(), params));
 

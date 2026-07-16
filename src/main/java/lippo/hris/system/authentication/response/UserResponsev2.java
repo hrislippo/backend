@@ -6,4 +6,5 @@ public interface UserResponsev2 {
     String getName();
     String getUsername();
     Boolean getActive();
+    String getEmail();
 }
