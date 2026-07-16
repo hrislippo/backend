@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -50,11 +51,15 @@ public class HRBPService {
     }
 
     public List<HRBP> getHRBPList(Long BUId) {
+        List<HRBP> hrbpList = new ArrayList<>();
+        hrbpList.add(null);
         if(BUId != null){
             BusinessUnit businessUnit = businessUnitRepository.findById(BUId).get();
-            return hrbpRepository.findByBusinessUnit(businessUnit);
+            hrbpList.addAll(hrbpRepository.findByBusinessUnit(businessUnit));
+        } else{
+            hrbpList.addAll(hrbpRepository.findAll());
         }
-        return hrbpRepository.findAll();
+        return hrbpList;
     }
 
     public HRBP getHRBPDetail(Long id) {
