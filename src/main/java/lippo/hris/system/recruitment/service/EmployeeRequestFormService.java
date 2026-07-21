@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.authentication.response.UserResponsev2;
+import lippo.hris.system.emailengine.EmailType;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
 import lippo.hris.system.emailengine.repository.EmailTemplateRepository;
 import lippo.hris.system.emailengine.service.EmailService;
@@ -419,7 +420,7 @@ public class EmployeeRequestFormService {
         Map<String, Object> params = generateParam(employeeRequestCandidateActivity, username);
 
         try{
-            emailService.sendEmail(emailTo, emailCc, emailBcc, subject, body, params, file);
+            emailService.sendEmail(emailTo, emailCc, emailBcc, subject, body, params, file, EmailType.RECRUITMENT);
         }catch(IOException e){
         }catch(MessagingException m){
         }

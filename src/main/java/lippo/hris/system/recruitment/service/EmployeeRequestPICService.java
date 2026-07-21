@@ -2,6 +2,7 @@ package lippo.hris.system.recruitment.service;
 
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.UserRepository;
+import lippo.hris.system.emailengine.EmailType;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
 import lippo.hris.system.emailengine.repository.EmailTemplateRepository;
 import lippo.hris.system.emailengine.service.EmailService;
@@ -72,7 +73,7 @@ public class EmployeeRequestPICService {
 
             try{
                 emailService.sendEmail(emailTos, new ArrayList<>(), new ArrayList<>(), emailTemplate.getSubject(), emailTemplate.getContentHtml(),
-                        param, null);
+                        param, null, EmailType.HRIS);
             }catch(Exception e){
             }
         }

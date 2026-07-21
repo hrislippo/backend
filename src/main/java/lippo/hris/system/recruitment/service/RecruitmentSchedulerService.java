@@ -1,5 +1,6 @@
 package lippo.hris.system.recruitment.service;
 
+import lippo.hris.system.emailengine.EmailType;
 import lippo.hris.system.emailengine.entity.EmailTemplate;
 import lippo.hris.system.emailengine.repository.EmailTemplateRepository;
 import lippo.hris.system.emailengine.service.EmailService;
@@ -49,7 +50,7 @@ public class RecruitmentSchedulerService {
 
         try {
             emailService.sendEmail(emailTo, emailCc, new ArrayList<>(), emailTemplate.getSubject(), emailTemplate.getContentHtml(),
-                    params, null);
+                    params, null, EmailType.HRIS);
         }catch(Exception e){
         }
     }
