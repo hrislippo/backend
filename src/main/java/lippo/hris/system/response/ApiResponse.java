@@ -18,10 +18,4 @@ public class ApiResponse {
         return new ApiResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(),
                 data, message);
     }
-
-    // 401 - UNAUTHORIZED
-    public static ApiResponse unauthorized(String message){
-        return new ApiResponse(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                null, message);
-    }
 }

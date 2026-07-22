@@ -10,6 +10,7 @@ import lippo.hris.system.authentication.validation.UserValidation;
 import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -90,9 +91,19 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ApiResponse login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         User user = userValidation.userValidation(loginRequest.getUsername(), false);
         userValidation.userActiveValidation(user);
-        return ApiResponse.ok(loginService.loginUser(loginRequest, user), "Login successful");
+        return loginService.loginUser(loginRequest, user);
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse refresh(@CookieValue("refreshToken") String refreshToken){
+        return ApiResponse.ok(loginService.refresh(refreshToken), "Token Refreshed");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        return loginService.logoutUser();
     }
 }

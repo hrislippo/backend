@@ -19,11 +19,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT.value()).body(new ApiResponse(HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), null, e.getMessage()));
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiResponse> handleUnauthorizedException(UnauthorizedException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(new ApiResponse(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase(), null, e.getMessage()));
-    }
-
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null, e.getMessage()));

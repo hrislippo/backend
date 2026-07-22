@@ -2,6 +2,7 @@ package lippo.hris.system.utility;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,17 +16,31 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
+    @Value("${jwt.access.expiration}")
+    private long accessExpiration;
 
-    public String generateToken(String username, List<String> roles) {
+    @Value("${jwt.refresh.expiration}")
+    private long refreshExpiration;
+
+    public String generateAccessToken(String username, List<String> roles) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         long now = System.currentTimeMillis();
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
                 .withIssuedAt(new Date(now))
-                .withExpiresAt(new Date(now + expiration))
+                .withExpiresAt(new Date(now + accessExpiration))
+                .sign(algorithm);
+    }
+
+    public String generateRefreshToken(String username, List<String> roles) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        long now = System.currentTimeMillis();
+        return JWT.create()
+                .withSubject(username)
+                .withClaim("roles", roles)
+                .withIssuedAt(new Date(now))
+                .withExpiresAt(new Date(now + refreshExpiration))
                 .sign(algorithm);
     }
 
@@ -43,9 +58,12 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            getUsername(token);
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWT.require(algorithm)
+                    .build()
+                    .verify(token);
             return true;
-        } catch (Exception ex) {
+        } catch (JWTVerificationException e) {
             return false;
         }
     }

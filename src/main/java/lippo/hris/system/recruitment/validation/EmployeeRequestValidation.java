@@ -1,7 +1,6 @@
 package lippo.hris.system.recruitment.validation;
 
 import lippo.hris.system.exception.BadRequestException;
-import lippo.hris.system.exception.UnauthorizedException;
 import lippo.hris.system.recruitment.entity.EmployeeRequestCandidateActivity;
 import lippo.hris.system.recruitment.repository.EmployeeRequestCandidateActivityRepository;
 import lippo.hris.system.recruitment.request.EmployeeRequestInterviewReq;
@@ -81,7 +80,7 @@ public class EmployeeRequestValidation {
 
     public void eligibleRecruitmentHead(List<String> roles){
         if(!roles.contains("ROLE_TA_HEAD")){
-            throw new UnauthorizedException("Not Eligible to Apply This Action (Recruitment Head)");
+            throw new BadRequestException("Not Eligible to Apply This Action (Recruitment Head)");
         }
     }
 
