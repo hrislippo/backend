@@ -57,7 +57,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
                     "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
                     "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
-                    "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
+                    "CASE WHEN pic.EmpReqPICId IS NOT NULL AND req.EmpReqStatus = 'IN_PROGRESS' THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
                     "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS StopSLA, " +
                     "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
                     "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +
@@ -117,7 +117,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
                     "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
                     "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
-                    "CASE WHEN pic.EmpReqPICId IS NOT NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
+                    "CASE WHEN pic.EmpReqPICId IS NOT NULL AND req.EmpReqStatus = 'IN_PROGRESS' THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
                     "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS StopSLA, " +
                     "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
                     "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +

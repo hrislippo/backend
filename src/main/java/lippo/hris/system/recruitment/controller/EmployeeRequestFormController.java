@@ -7,6 +7,7 @@ import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ public class EmployeeRequestFormController {
     @Autowired
     EmployeeRequestValidation employeeRequestValidation;
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_ADD')")
     @PostMapping("/erf")
     public ApiResponse addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
@@ -31,6 +33,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Saved");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PostMapping("/erf-email")
     public ApiResponse emailEmployeeRequest(@RequestParam(value = "id") Long id,
                                             @RequestParam(value = "file", required = false) MultipartFile file,
@@ -46,6 +49,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Email Successfully");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PostMapping("/erf-action")
     public ApiResponse actionEmployeeRequest(@RequestParam(value = "file", required = false) MultipartFile file,
                                              @RequestParam("id") Long id,
@@ -55,18 +59,21 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(employeeRequestFormService.actionEmployeeRequest(id, file, result, notes), "Employee Request Progressed");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PostMapping("/erf-revert")
     public ApiResponse revertEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestFormService.revertEmployeeRequest(employeeRequestReq);
         return ApiResponse.ok(null, "Employee Request Reverted");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PostMapping("/erf-add-interview")
     public ApiResponse addInterviewEmployeeRequest(@RequestBody AddInterviewReq addInterviewReq) {
         employeeRequestFormService.addInterview(addInterviewReq);
         return ApiResponse.ok(null, "Interview Added Successfully");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_PROCESS')")
     @PostMapping("/erf-process")
     public ApiResponse processEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestValidation.employeeRequestRequired(employeeRequestReq);
@@ -76,6 +83,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Processed");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MODIFY')")
     @PutMapping("/erf")
     public ApiResponse modifyEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
                                              Authentication authentication) {
@@ -85,6 +93,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Modified");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PutMapping("/erf-schedule")
     public ApiResponse scheduleEmployeeRequest(@RequestBody ScheduleEmployeeReq scheduleEmployeeReq) {
         employeeRequestValidation.employeeRequestScheduleRequired(scheduleEmployeeReq);
@@ -98,6 +107,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Activity Scheduled");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_MANAGE')")
     @PutMapping("/erf-interview")
     public ApiResponse interviewEmployeeRequest(@RequestBody EmployeeRequestInterviewReq employeeRequestInterviewReq) {
         employeeRequestValidation.interviewNotesRequired(employeeRequestInterviewReq);
@@ -105,6 +115,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Progressed");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_CANCEL')")
     @PutMapping("/erf-cancel")
     public ApiResponse cancelEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq,
                                              Authentication authentication) {
@@ -115,6 +126,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Cancelled");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_HOLD')")
     @PutMapping("/erf-hold")
     public ApiResponse holdEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestValidation.employeeRequestReasonRequired(employeeRequestReq);
@@ -122,6 +134,7 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(null, "Employee Request Held");
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_REQUEST_RESUME')")
     @PutMapping("/erf-resume")
     public ApiResponse resumeEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         employeeRequestValidation.employeeRequestResumeTypeRequired(employeeRequestReq);

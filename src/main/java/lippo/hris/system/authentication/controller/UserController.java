@@ -28,7 +28,6 @@ public class UserController {
     @Autowired
     UserValidation userValidation;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/user")
     public ApiResponse register(@RequestBody LoginRequest loginRequest) {
         userValidation.registerUserRequired(loginRequest);
@@ -46,7 +45,6 @@ public class UserController {
         return ApiResponse.ok(null, "Password changed");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user-active")
     public ApiResponse changeActive(@RequestBody UserActiveRequest userActiveRequest) {
         User user = userValidation.userValidation(userActiveRequest.getUsername(), false);
@@ -54,7 +52,6 @@ public class UserController {
         return ApiResponse.ok(null, "Active changed");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user")
     public ApiResponse getUsers(@RequestParam(value = "usernameSearch", required = false) String usernameSearch,
                                 @RequestParam(value = "nameSearch", required = false) String nameSearch,
@@ -82,7 +79,6 @@ public class UserController {
         return ApiResponse.ok(userService.findByUsername(username), "Get User Detail Successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/user")
     public ApiResponse deleteUser(@RequestParam String username) {
         User user = userValidation.userValidation(username, false);

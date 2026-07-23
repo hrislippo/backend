@@ -17,7 +17,6 @@ public class RoleController {
     @Autowired
     RoleValidation roleValidation;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/role")
     public ApiResponse saveRole(@RequestParam(value = "roleName") String roleName) {
         roleValidation.duplicateRole(roleName);
@@ -25,7 +24,6 @@ public class RoleController {
         return ApiResponse.ok(null, "Save role successfully");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/role")
     public ApiResponse getRoles() {;
         return ApiResponse.ok(roleService.getRoles(), "Get roles successfully");

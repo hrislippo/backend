@@ -1,6 +1,7 @@
 package lippo.hris.system.recruitment.service;
 
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.authentication.repository.PermissionRoleRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.google.service.GoogleDriveService;
@@ -85,6 +86,9 @@ public class CandidateService {
 
     @Autowired
     CandidateLogSalaryRepository candidateLogSalaryRepository;
+
+    @Autowired
+    PermissionRoleRepository permissionRoleRepository;
 
     public String generateRunningNumber(){
         String prefix = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
@@ -256,6 +260,10 @@ public class CandidateService {
         if(candidate.getUser().getUsername().equals(username)){
             candidateReq.setCurrentSalary(candidate.getCurrentSalary());
             candidateReq.setExpectedSalary(candidate.getExpectedSalary());
+
+            if(permissionRoleRepository.findByUser(username).contains("CANDIDATE_MODIFY")){
+                candidateReq.setEligibleModify(true);
+            }
         }
         candidateReq.setUserId(candidate.getUser().getId());
         candidateReq.setUserName(candidate.getUser().getUsername() + " - " + candidate.getUser().getName());

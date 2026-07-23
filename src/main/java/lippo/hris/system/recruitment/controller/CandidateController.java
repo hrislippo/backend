@@ -8,6 +8,7 @@ import lippo.hris.system.recruitment.service.CandidateService;
 import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +23,14 @@ public class CandidateController {
     @Autowired
     CandidateValidation candidateValidation;
 
+    @PreAuthorize("hasAuthority('CANDIDATE_ADD')")
     @PostMapping("/candidate")
     public ApiResponse addCandidate(@RequestBody CandidateReq candidateReq){
         candidateValidation.addCandidateRequired(candidateReq);
         return ApiResponse.ok(candidateService.saveCandidate(candidateReq), "Candidate Saved");
     }
 
+    @PreAuthorize("hasAuthority('CANDIDATE_ADD')")
     @PostMapping("/candidate-document")
     public ApiResponse addCandidateDocument(@RequestParam(value = "id") Long id,
                                             @RequestParam(value = "file") MultipartFile file) {
@@ -35,6 +38,7 @@ public class CandidateController {
         return ApiResponse.ok(null, "Save Candidate Document Successfully");
     }
 
+    @PreAuthorize("hasAuthority('CANDIDATE_MODIFY')")
     @PutMapping("/candidate")
     public ApiResponse modifyCandidate(@RequestParam(value = "id") Long id,
                                        @RequestBody CandidateReq candidateReq,

@@ -1,6 +1,7 @@
 package lippo.hris.system.authentication.service;
 
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.authentication.repository.PermissionRoleRepository;
 import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.authentication.repository.UserRoleRepository;
 import lippo.hris.system.authentication.request.LoginRequest;
@@ -28,6 +29,9 @@ public class LoginService {
     UserRoleRepository userRoleRepository;
 
     @Autowired
+    PermissionRoleRepository permissionRoleRepository;
+
+    @Autowired
     JwtUtil jwtUtil;
 
     public ResponseEntity<?> loginUser(LoginRequest loginRequest, User user){
@@ -36,8 +40,9 @@ public class LoginService {
         }
 
         List<String> userRoles = userRoleRepository.findByUser(user.getUsername());
-        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), userRoles);
-        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), userRoles);
+        List<String> userPermissions = permissionRoleRepository.findByUser(user.getUsername());
+        String accessToken = jwtUtil.generateAccessToken(user.getUsername(), userRoles, userPermissions);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), userRoles, userPermissions);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                         .httpOnly(true)
@@ -50,8 +55,8 @@ public class LoginService {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(Map.of(
-                        "accessToken",
-                        accessToken
+                        "accessToken", accessToken,
+                        "permissions", userPermissions
                 ));
     }
 
@@ -62,7 +67,8 @@ public class LoginService {
 
         String username = jwtUtil.getUsername(refreshToken);
         List<String> userRoles = userRoleRepository.findByUser(username);
-        return jwtUtil.generateAccessToken(username, userRoles);
+        List<String> userPermissions = permissionRoleRepository.findByUser(username);
+        return jwtUtil.generateAccessToken(username, userRoles, userPermissions);
     }
 
     public ResponseEntity<?> logoutUser(){

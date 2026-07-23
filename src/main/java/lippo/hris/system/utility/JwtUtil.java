@@ -22,23 +22,25 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration}")
     private long refreshExpiration;
 
-    public String generateAccessToken(String username, List<String> roles) {
+    public String generateAccessToken(String username, List<String> roles, List<String> permissions) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         long now = System.currentTimeMillis();
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
+                .withClaim("permissions", permissions)
                 .withIssuedAt(new Date(now))
                 .withExpiresAt(new Date(now + accessExpiration))
                 .sign(algorithm);
     }
 
-    public String generateRefreshToken(String username, List<String> roles) {
+    public String generateRefreshToken(String username, List<String> roles, List<String> permissions) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         long now = System.currentTimeMillis();
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
+                .withClaim("permissions", permissions)
                 .withIssuedAt(new Date(now))
                 .withExpiresAt(new Date(now + refreshExpiration))
                 .sign(algorithm);
@@ -54,6 +56,12 @@ public class JwtUtil {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
         return jwt.getClaim("roles").asList(String.class);
+    }
+
+    public List<String> getPermissions(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+        return jwt.getClaim("permissions").asList(String.class);
     }
 
     public boolean validateToken(String token) {

@@ -6,17 +6,17 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "URMMenuRole", schema = "dbo")
-public class MenuRole extends Auditable {
+@Table(name = "URMPermissionRole", schema = "dbo")
+public class PermissionRole extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MenuRoleId")
+    @Column(name = "PermissionRoleId")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "MenuId")
-    private Menu menu;
+    @JoinColumn(name = "PermissionId")
+    private Permission permission;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RoleId")

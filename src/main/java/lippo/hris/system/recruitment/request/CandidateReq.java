@@ -29,4 +29,5 @@ public class CandidateReq {
     private List<CandidateLanguageReq> language;
     private List<CandidateEducationReq> education;
     private List<CandidateExperienceReq> experience;
+    private Boolean eligibleModify = false;
 }
