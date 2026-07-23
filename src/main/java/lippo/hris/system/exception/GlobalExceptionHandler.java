@@ -23,4 +23,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), null, e.getMessage()));
     }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ApiResponse> handleLockedException(LockedException e) {
+        return ResponseEntity.status(HttpStatus.LOCKED.value()).body(new ApiResponse(HttpStatus.LOCKED.value(), HttpStatus.LOCKED.getReasonPhrase(), null, e.getMessage()));
+    }
 }

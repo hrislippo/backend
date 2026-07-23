@@ -13,6 +13,7 @@ import lippo.hris.system.authentication.response.UserResponse;
 import lippo.hris.system.authentication.response.UserResponsev2;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.recruitment.repository.EmployeeRequestPICRepository;
+import lippo.hris.system.service.AuditLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,9 @@ public class UserService {
     @Autowired
     EmployeeRequestPICRepository employeeRequestPICRepository;
 
+    @Autowired
+    AuditLogService auditLogService;
+
     public void registerUser(LoginRequest loginRequest){
         loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
         User newUser = userMapper.toEntity(loginRequest);
@@ -59,6 +63,7 @@ public class UserService {
 
     public void changePassword(LoginRequest loginRequest, User user){
         user.setPassword(passwordEncoder.encode(loginRequest.getNewPassword()));
+        auditLogService.log("Change Password Successfully");
         userRepository.save(user);
     }
 

@@ -39,8 +39,8 @@ public class UserController {
     @PutMapping("/user")
     public ApiResponse changePassword(@RequestBody LoginRequest loginRequest) {
         userValidation.changePasswordRequired(loginRequest);
-        User user = userValidation.userValidation(loginRequest.getUsername(), false);
         userValidation.passwordValidation(loginRequest);
+        User user = userValidation.userValidation(loginRequest.getUsername(), false);
         userService.changePassword(loginRequest, user);
         return ApiResponse.ok(null, "Password changed");
     }
