@@ -2,11 +2,14 @@ package lippo.hris.system.authentication.controller;
 
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.request.LoginRequest;
+import lippo.hris.system.authentication.request.UnlockRequest;
 import lippo.hris.system.authentication.request.UserActiveRequest;
+import lippo.hris.system.authentication.service.LoginAttemptService;
 import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.authentication.service.LoginService;
 import lippo.hris.system.authentication.service.UserService;
 import lippo.hris.system.authentication.validation.UserValidation;
+import lippo.hris.system.service.AuditLogService;
 import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +23,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
-    LoginService loginService;
-
-    @Autowired
     UserService userService;
 
     @Autowired
@@ -34,6 +34,14 @@ public class UserController {
         userValidation.userValidation(loginRequest.getUsername(), true);
         userService.registerUser(loginRequest);
         return ApiResponse.ok(null, "User registered");
+    }
+
+    @PutMapping("/unlock")
+    public ApiResponse unlockUser(@RequestBody UnlockRequest unlockRequest) {
+        User user = userValidation.userValidation(unlockRequest.getUsername(), false);
+        userValidation.userReasonRequired(unlockRequest);
+        userService.unlockUser(user, unlockRequest.getReason());
+        return ApiResponse.ok(null, "Unlock Successful");
     }
 
     @PutMapping("/user")
@@ -84,22 +92,5 @@ public class UserController {
         User user = userValidation.userValidation(username, false);
         userService.deleteUser(user);
         return ApiResponse.ok(null, "Delete User Successfully");
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        User user = userValidation.userValidation(loginRequest.getUsername(), false);
-        userValidation.userActiveValidation(user);
-        return loginService.loginUser(loginRequest, user);
-    }
-
-    @PostMapping("/refresh")
-    public ApiResponse refresh(@CookieValue("refreshToken") String refreshToken){
-        return ApiResponse.ok(loginService.refresh(refreshToken), "Token Refreshed");
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(){
-        return loginService.logoutUser();
     }
 }

@@ -2,10 +2,12 @@ package lippo.hris.system.authentication.validation;
 
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.request.LoginRequest;
+import lippo.hris.system.authentication.request.UnlockRequest;
 import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.exception.NotFoundException;
 import lippo.hris.system.authentication.repository.UserRepository;
+import lippo.hris.system.recruitment.request.EmployeeRequestReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -68,6 +70,12 @@ public class UserValidation {
         }
         if(loginRequest.getNewPassword() == null || loginRequest.getNewPassword().trim().isEmpty()){
             throw new BadRequestException("New Password is required");
+        }
+    }
+
+    public void userReasonRequired(UnlockRequest unlockRequest){
+        if(unlockRequest.getReason() == null || unlockRequest.getReason().trim().length() < 50){
+            throw new BadRequestException("Reason is Required (50 characters long)");
         }
     }
 }

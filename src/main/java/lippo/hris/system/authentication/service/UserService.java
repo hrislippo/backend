@@ -2,9 +2,11 @@ package lippo.hris.system.authentication.service;
 
 import lippo.hris.system.authentication.entity.Role;
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.authentication.entity.UserLogUnlock;
 import lippo.hris.system.authentication.entity.UserRole;
 import lippo.hris.system.authentication.mapper.UserMapper;
 import lippo.hris.system.authentication.repository.RoleRepository;
+import lippo.hris.system.authentication.repository.UserLogUnlockRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.authentication.repository.UserRoleRepository;
 import lippo.hris.system.authentication.request.LoginRequest;
@@ -49,6 +51,12 @@ public class UserService {
     @Autowired
     AuditLogService auditLogService;
 
+    @Autowired
+    UserLogUnlockRepository userLogUnlockRepository;
+
+    @Autowired
+    LoginAttemptService loginAttemptService;
+
     public void registerUser(LoginRequest loginRequest){
         loginRequest.setPassword(passwordEncoder.encode(loginRequest.getPassword()));
         User newUser = userMapper.toEntity(loginRequest);
@@ -59,6 +67,15 @@ public class UserService {
         userRole.setUser(newUser);
         userRole.setRole(role);
         userRoleRepository.save(userRole);
+    }
+
+    public void unlockUser(User user, String reason){
+        loginAttemptService.loginSucceeded(user);
+
+        UserLogUnlock userLogUnlock = new UserLogUnlock();
+        userLogUnlock.setUser(user);
+        userLogUnlock.setReason(reason);
+        userLogUnlockRepository.save(userLogUnlock);
     }
 
     public void changePassword(LoginRequest loginRequest, User user){

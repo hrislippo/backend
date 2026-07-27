@@ -5,5 +5,6 @@ public interface UserResponse {
     String getUserName();
     String getRoles();
     Boolean getUserActive();
+    Boolean getLocked();
 }
 

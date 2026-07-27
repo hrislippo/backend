@@ -18,19 +18,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
     UserResponsev2 findByUsername(String username);
 
     @Query(nativeQuery = true,
-            value="SELECT u.UserName, u.UserRealName AS name, STRING_AGG(r.RoleName, ', ') AS roles, u.UserActive " +
+            value="SELECT u.UserName, u.UserRealName AS name, STRING_AGG(r.RoleName, ', ') AS roles, u.UserActive, " +
+                    "CASE WHEN la.LoginAttemptLockedUntil IS NULL THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS locked " +
                     "FROM URMUser u " +
                     "LEFT JOIN URMUserRole ur ON u.UserId = ur.UserId " +
                     "LEFT JOIN URMRole r ON ur.RoleId = r.RoleId " +
+                    "LEFT JOIN URMLoginAttempt la ON u.UserId = la.UserId " +
                     "WHERE (:usernameSearch IS NULL OR u.UserName LIKE CONCAT('%',:usernameSearch,'%')) " +
                     "AND (:nameSearch IS NULL OR u.UserRealName LIKE '%'+:nameSearch+'%') " +
                     "AND (:roleSearch IS NULL OR r.RoleName LIKE CONCAT('%',:roleSearch,'%')) " +
                     "AND (:activeSearch IS NULL OR u.UserActive = :activeSearch) " +
-                    "GROUP BY u.UserName, u.UserActive, u.UserRealName",
+                    "GROUP BY u.UserName, u.UserActive, u.UserRealName, la.LoginAttemptLockedUntil",
             countQuery = "SELECT COUNT(1) " +
                     "FROM URMUser u " +
                     "LEFT JOIN URMUserRole ur ON u.UserId = ur.UserId " +
                     "LEFT JOIN URMRole r ON ur.RoleId = r.RoleId " +
+                    "LEFT JOIN URMLoginAttempt la ON u.UserId = la.UserId " +
                     "WHERE (:usernameSearch IS NULL OR u.UserName LIKE CONCAT('%',:usernameSearch,'%')) " +
                     "AND (:nameSearch IS NULL OR u.UserRealName LIKE '%'+:nameSearch+'%') " +
                     "AND (:roleSearch IS NULL OR r.RoleName LIKE CONCAT('%',:roleSearch,'%')) " +
