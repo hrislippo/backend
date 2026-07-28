@@ -8,8 +8,7 @@ import java.util.List;
 @Data
 public class TMDPRightsReq {
 
-    private List<String> listNikEmp;
-    private String nikEmp;
+    private List<String> nikEmp;
     private String nikEmpCreate;
     private Integer dpCount;
     private LocalDate dpDate;
