@@ -1,11 +1,8 @@
 package lippo.hris.system.timemanagement.validation;
 
 import lippo.hris.system.exception.BadRequestException;
-import lippo.hris.system.recruitment.request.EmployeeRequestReq;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
 
 @Component
 public class DayPaymentValidation {

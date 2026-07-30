@@ -35,11 +35,6 @@ public class DayPaymentController {
         return ApiResponse.ok(null, "Day Payment Added");
     }
 
-    @PostMapping("/import-nik")
-    public ApiResponse importNik(@RequestParam("file") MultipartFile file) throws IOException {
-        return ApiResponse.ok(dayPaymentService.importNik(file), "NIK extracted from Excel");
-    }
-
     @GetMapping("/day-payment")
     public ApiResponse getDayPayment(@RequestParam(value = "empNIK", required = false) String empNIK,
                                      @RequestParam(value = "startDate", required = false) LocalDate startDate,
@@ -51,10 +46,5 @@ public class DayPaymentController {
     @GetMapping("/day-payment-detail")
     public ApiResponse getDayPaymentDetail(@RequestParam(value = "id") Long id) {
         return ApiResponse.ok(dayPaymentService.getDayPaymentDetail(id), "Get Day Payment Detail Successfully");
-    }
-
-    @GetMapping("/download-import-nik")
-    public ResponseEntity<?> downloadImportNik() throws IOException {
-        return dayPaymentService.downloadImportNik();
     }
 }
