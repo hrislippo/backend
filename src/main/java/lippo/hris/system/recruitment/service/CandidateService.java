@@ -4,6 +4,7 @@ import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.PermissionRoleRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.exception.ConflictException;
+import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.Candidate;
 import lippo.hris.system.recruitment.entity.CandidateAddress;
@@ -13,6 +14,7 @@ import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
+import lippo.hris.system.recruitment.request.RCCanPhotoReq;
 import lippo.hris.system.recruitment.response.CandidateResp;
 import lippo.hris.system.utility.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +92,9 @@ public class CandidateService {
     @Autowired
     PermissionRoleRepository permissionRoleRepository;
 
+    @Autowired
+    ProIntClient proIntClient;
+
     public String generateRunningNumber(){
         String prefix = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         Long runningNumber = candidateRepository.countByCandidateNumberStartingWith(prefix);
@@ -137,6 +142,15 @@ public class CandidateService {
         }
         candidate.setFileId(fileId);
         candidateRepository.save(candidate);
+    }
+
+    public void insertCandidatePhoto(String canCode, MultipartFile file, String username) throws IOException{
+
+        RCCanPhotoReq rcCanPhotoReq = new RCCanPhotoReq();
+        rcCanPhotoReq.setCanCode(canCode);
+        rcCanPhotoReq.setPhoto(file.getBytes());
+        rcCanPhotoReq.setCreatedBy(username);
+        proIntClient.insertCandidatePhoto(rcCanPhotoReq);
     }
 
     public void modifyCandidate(Long id, CandidateReq candidateReq){

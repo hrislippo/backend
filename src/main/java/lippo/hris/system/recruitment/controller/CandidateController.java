@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/recruitment")
 public class CandidateController {
@@ -36,6 +38,15 @@ public class CandidateController {
                                             @RequestParam(value = "file") MultipartFile file) {
         candidateService.saveCandidateDocument(id, file);
         return ApiResponse.ok(null, "Save Candidate Document Successfully");
+    }
+
+    @PostMapping("/candidate-image")
+    public ApiResponse addCandidateImage(@RequestParam(value = "canCode") String canCode,
+                                         @RequestParam(value = "file") MultipartFile file,
+                                         Authentication authentication) throws IOException {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        candidateService.insertCandidatePhoto(canCode, file, customUserDetails.getUsername());
+        return ApiResponse.ok(null, "Upload Candidate Image Successfully");
     }
 
     @PreAuthorize("hasAuthority('CANDIDATE_MODIFY')")
