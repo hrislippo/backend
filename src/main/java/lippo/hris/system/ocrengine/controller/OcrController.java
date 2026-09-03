@@ -1,6 +1,5 @@
 package lippo.hris.system.ocrengine.controller;
 
-import lippo.hris.system.ocrengine.service.LinkedinOcrService;
 import lippo.hris.system.ocrengine.service.OcrService;
 import lippo.hris.system.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;

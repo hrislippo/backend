@@ -14,11 +14,15 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GoogleDriveService {
@@ -67,6 +71,52 @@ public class GoogleDriveService {
         )
                 .setApplicationName("My App")
                 .build();
+    }
+
+    public MultipartFile downloadFile(String url) throws Exception {
+        String fileId = extractDriveFileId(url);
+        byte[] file = downloadDriveFile(fileId);
+        return new MockMultipartFile("file", "ktp.jpg", "image/jpeg", file);
+    }
+
+    private byte[] downloadDriveFile(String fileId) throws Exception {
+
+        Drive drive = getDrive();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        drive.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+
+        return outputStream.toByteArray();
+    }
+
+    private String extractDriveFileId(String url) {
+
+        if (url == null || url.isBlank()) {
+            return null;
+        }
+
+        // /file/d/{ID}/...
+        Pattern pattern = Pattern.compile(
+                "/file/d/([a-zA-Z0-9_-]+)"
+        );
+
+        Matcher matcher = pattern.matcher(url);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        // ?id={ID}
+        pattern = Pattern.compile(
+                "[?&]id=([a-zA-Z0-9_-]+)"
+        );
+
+        matcher = pattern.matcher(url);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return null;
     }
 
     public String upload(

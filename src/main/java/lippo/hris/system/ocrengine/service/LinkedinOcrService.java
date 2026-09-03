@@ -2,7 +2,7 @@ package lippo.hris.system.ocrengine.service;
 
 import lippo.hris.system.ocrengine.response.Education;
 import lippo.hris.system.ocrengine.response.Experience;
-import lippo.hris.system.ocrengine.response.OcrResponse;
+import lippo.hris.system.ocrengine.response.CVResponse;
 import org.apache.pdfbox.text.TextPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,33 +20,33 @@ public class LinkedinOcrService {
     @Autowired
     LinkedinExtractService linkedinExtractService;
 
-    public OcrResponse readText(MultipartFile file) throws Exception {
-        OcrResponse ocrResponse = extractTextFromPdfLayout(file);
-        return postProcess(ocrResponse);
+    public CVResponse readText(MultipartFile file) throws Exception {
+        CVResponse CVResponse = extractTextFromPdfLayout(file);
+        return postProcess(CVResponse);
     }
 
-    public OcrResponse extractTextFromPdfLayout(MultipartFile file) throws Exception {
+    public CVResponse extractTextFromPdfLayout(MultipartFile file) throws Exception {
         List<List<TextPosition>> positionsList = pdfLayoutService.extract(file);
 //        linkedinExtractService.rightTest(positionsList);
 
-        OcrResponse ocrResponse = new OcrResponse();
-        ocrResponse.setName(linkedinExtractService.getLinkedInName(positionsList));
-        ocrResponse.setAddress(linkedinExtractService.getLinkedInAddress(positionsList));
-        ocrResponse.setMobilePhone(linkedinExtractService.getLinkedInMobilePhone(positionsList));
-        ocrResponse.setEmail(linkedinExtractService.getLinkedInEmail(positionsList));
-        ocrResponse.setLinkedInLink(linkedinExtractService.getLinkedInLink(positionsList));
-        ocrResponse.setTopSkills(linkedinExtractService.getLinkedInTopSkills(positionsList));
-        ocrResponse.setLanguages(linkedinExtractService.getLinkedInLanguages(positionsList));
-        ocrResponse.setCertifications(linkedinExtractService.getLinkedInCertifications(positionsList));
-        ocrResponse.setAchievements(linkedinExtractService.getLinkedInAchievements(positionsList));
-        ocrResponse.setPublications(linkedinExtractService.getLinkedInPublications(positionsList));
-        ocrResponse.setExperience(linkedinExtractService.getLinkedInExperience(positionsList));
-        ocrResponse.setEducation(linkedinExtractService.getLinkedInEducation(positionsList));
-        return ocrResponse;
+        CVResponse CVResponse = new CVResponse();
+        CVResponse.setName(linkedinExtractService.getLinkedInName(positionsList));
+        CVResponse.setAddress(linkedinExtractService.getLinkedInAddress(positionsList));
+        CVResponse.setMobilePhone(linkedinExtractService.getLinkedInMobilePhone(positionsList));
+        CVResponse.setEmail(linkedinExtractService.getLinkedInEmail(positionsList));
+        CVResponse.setLinkedInLink(linkedinExtractService.getLinkedInLink(positionsList));
+        CVResponse.setTopSkills(linkedinExtractService.getLinkedInTopSkills(positionsList));
+        CVResponse.setLanguages(linkedinExtractService.getLinkedInLanguages(positionsList));
+        CVResponse.setCertifications(linkedinExtractService.getLinkedInCertifications(positionsList));
+        CVResponse.setAchievements(linkedinExtractService.getLinkedInAchievements(positionsList));
+        CVResponse.setPublications(linkedinExtractService.getLinkedInPublications(positionsList));
+        CVResponse.setExperience(linkedinExtractService.getLinkedInExperience(positionsList));
+        CVResponse.setEducation(linkedinExtractService.getLinkedInEducation(positionsList));
+        return CVResponse;
     }
 
-    public OcrResponse postProcess(OcrResponse ocrResponse) {
-        for(Education education : ocrResponse.getEducation()) {
+    public CVResponse postProcess(CVResponse CVResponse) {
+        for(Education education : CVResponse.getEducation()) {
             if(education.getDuration() != null){
                 String durationEducation = education.getDuration().replace("(", "")
                         .replace(")", "");
@@ -61,7 +61,7 @@ public class LinkedinOcrService {
             }
         }
 
-        for(Experience experience : ocrResponse.getExperience()) {
+        for(Experience experience : CVResponse.getExperience()) {
             String durationExperience = experience.getDuration().substring(0, experience.getDuration().indexOf("(")).trim();
 
             if(!durationExperience.isEmpty()) {
@@ -74,7 +74,7 @@ public class LinkedinOcrService {
                 experience.setEndMonth(durationEnd.contains("-") ? durationEnd.substring(durationEnd.indexOf("-") + 1).trim() : null);
             }
         }
-        return ocrResponse;
+        return CVResponse;
     }
 
     public String parseMonths(String duration){

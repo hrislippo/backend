@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class OcrResponse {
+public class CVResponse {
     private String name;
     private String address;
     private String mobilePhone;
