@@ -6,6 +6,7 @@ import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,12 @@ public interface ProIntClient {
 
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
+
+    @GetMapping(value = "/api-proint/PMEmployeePos")
+    ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
+
+    @GetMapping(value = "/api-proint/PMEmployeeStr")
+    ApiResponse getEmployeeStructure(@RequestParam String empNIK);
 
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);
