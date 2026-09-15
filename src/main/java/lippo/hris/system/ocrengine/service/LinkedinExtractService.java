@@ -193,8 +193,12 @@ public class LinkedinExtractService {
                 languageProficiency = languageProficiency + " " + word;
                 if(nextY != null && nextY - y > 15){
                     Language language = new Language();
-                    language.setLanguageName(languageProficiency.substring(0, languageProficiency.indexOf('(')).trim());
-                    language.setProficiency(languageProficiency.substring(languageProficiency.indexOf('(')).trim());
+                    if(languageProficiency.contains("(")){
+                        language.setLanguageName(languageProficiency.substring(0, languageProficiency.indexOf('(')).trim());
+                        language.setProficiency(languageProficiency.substring(languageProficiency.indexOf('(')).trim());
+                    } else {
+                        language.setLanguageName(languageProficiency.trim());
+                    }
                     result.add(language);
                     languageProficiency = "";
                 }
