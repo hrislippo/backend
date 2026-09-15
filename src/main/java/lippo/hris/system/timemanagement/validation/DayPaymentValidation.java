@@ -4,6 +4,8 @@ import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class DayPaymentValidation {
 
@@ -32,6 +34,12 @@ public class DayPaymentValidation {
 
         if(tmDPRightsReq.getDescription() == null || tmDPRightsReq.getDescription().trim().isEmpty()){
             throw new BadRequestException("DP description cannot be empty");
+        }
+    }
+
+    public void nikRequired(List<String> nikList){
+        if(nikList == null || nikList.size() <= 0){
+            throw new BadRequestException("NIK cannot be empty");
         }
     }
 }

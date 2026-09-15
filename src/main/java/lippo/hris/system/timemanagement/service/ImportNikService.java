@@ -51,7 +51,11 @@ public class ImportNikService {
                 }
             }
         }
-        return proIntClient.getEmployeeInfo(employeeNiks).getData();
+        return checkNik(employeeNiks);
+    }
+
+    public Object checkNik(List<String> nikList){
+        return proIntClient.getEmployeeInfo(nikList).getData();
     }
 
     public ResponseEntity<?> downloadImportNik() throws IOException {
