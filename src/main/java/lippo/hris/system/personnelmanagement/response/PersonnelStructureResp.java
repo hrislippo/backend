@@ -10,4 +10,6 @@ public class PersonnelStructureResp {
     private String employeeName;
     private String organizationUnit;
     private Integer reportsToPositionId;
+    private byte[] employeePhoto;
+    private String base64EmployeePhoto;
 }

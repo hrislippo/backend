@@ -30,4 +30,7 @@ public class DayPaymentRequest extends Auditable {
 
     @Column(name = "TmDayPaymentReqDesc")
     private String description;
+
+    @Column(name = "DpRightsId")
+    private Long dpRightsId;
 }

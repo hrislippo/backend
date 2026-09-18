@@ -47,4 +47,10 @@ public class DayPaymentController {
     public ApiResponse getDayPaymentDetail(@RequestParam(value = "id") Long id) {
         return ApiResponse.ok(dayPaymentService.getDayPaymentDetail(id), "Get Day Payment Detail Successfully");
     }
+
+    @DeleteMapping("/day-payment")
+    public ApiResponse deleteDayPayment(@RequestParam(value = "id") Long id) {
+        dayPaymentService.deleteDayPayment(id);
+        return ApiResponse.ok(null, "Day Payment Deleted");
+    }
 }

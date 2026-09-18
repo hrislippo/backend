@@ -17,7 +17,7 @@ import java.util.List;
 public interface ProIntClient {
 
     @PostMapping(value = "/api-proint/TMDPRights", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void addDayPayment(@RequestBody TMDPRightsReq tmDPRightsReq);
+    ApiResponse addDayPayment(@RequestBody TMDPRightsReq tmDPRightsReq);
 
     @PostMapping(value = "/api-proint/MOTMAtdTempMbr", consumes = MediaType.APPLICATION_JSON_VALUE)
     void addMobileAttendanceTemplateMember(@RequestBody MOTMAtdTempMbrReq motmAtdTempMbrReq);
@@ -28,6 +28,9 @@ public interface ProIntClient {
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
 
+    @GetMapping(value = "/api-proint/PMEmployeeFile")
+    ApiResponse getEmployeeFile(@RequestParam String empNIK);
+
     @GetMapping(value = "/api-proint/PMEmployeePos")
     ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
 
@@ -37,7 +40,12 @@ public interface ProIntClient {
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);
 
+    @GetMapping(value = "/api-proint/TMDPRights")
+    ApiResponse getTMDPRights(@RequestParam Integer id);
+
     @DeleteMapping(value = "/api-proint/MOTMAtdTempMbr", consumes = MediaType.APPLICATION_JSON_VALUE)
     void deleteMobileAttendanceTemplateMember(@RequestBody MOTMAtdTempMbrReq motmAtdTempMbrReq);
 
+    @DeleteMapping(value = "/api-proint/TMDPRights")
+    void deleteTMDPRights(@RequestParam Integer id);
 }

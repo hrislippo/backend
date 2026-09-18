@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -33,6 +34,13 @@ public class PersonnelStructureService {
     public List<PersonnelStructureResp> getEmployeeStructure(String empNIK){
         Object employeeData = proIntClient.getEmployeeStructure(empNIK).getData();
         List<PersonnelStructureResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
+
+        for(PersonnelStructureResp employee : employees){
+            if(employee.getEmployeePhoto() != null){
+                employee.setBase64EmployeePhoto(Base64.getEncoder().encodeToString(employee.getEmployeePhoto()));
+                employee.setEmployeePhoto(null);
+            }
+        }
         return employees;
     }
 }
