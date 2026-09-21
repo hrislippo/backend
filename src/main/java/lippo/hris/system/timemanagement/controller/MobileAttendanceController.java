@@ -45,4 +45,9 @@ public class MobileAttendanceController {
     public ApiResponse getMobileAttendanceDetail(@RequestParam(value = "id") Long id) {
         return ApiResponse.ok(mobileAttendanceService.getMobileAttendanceDetail(id), "Get Mobile Attendance Detail Successfully");
     }
+
+    @GetMapping("/mobile-attendance-list")
+    public ApiResponse getMobileAttendanceAll() {
+        return ApiResponse.ok(mobileAttendanceService.getAllMobileTemplate(), "Get Mobile Attendance All Successfully");
+    }
 }

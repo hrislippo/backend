@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lippo.hris.system.exception.NotFoundException;
 import lippo.hris.system.feign.ProIntClient;
+import lippo.hris.system.personnelmanagement.response.PersonnelFileResp;
 import lippo.hris.system.timemanagement.entity.MobileAttendanceRequest;
 import lippo.hris.system.timemanagement.repository.MobileAttendanceRequestRepository;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
 import lippo.hris.system.timemanagement.response.EmployeeResp;
 import lippo.hris.system.timemanagement.response.MobileAttendanceResp;
+import lippo.hris.system.timemanagement.response.MobileTemplateResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,5 +77,11 @@ public class MobileAttendanceService {
 
     public MobileAttendanceRequest getMobileAttendanceDetail(Long id){
         return mobileAttendanceRequestRepository.findById(id).get();
+    }
+
+    public List<MobileTemplateResp> getAllMobileTemplate(){
+        Object result = proIntClient.getMOTMAtdTemplateAll().getData();
+        List<MobileTemplateResp> mobileTemplate = objectMapper.convertValue(result, new TypeReference<>(){});
+        return mobileTemplate;
     }
 }

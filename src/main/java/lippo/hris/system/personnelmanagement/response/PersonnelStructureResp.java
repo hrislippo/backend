@@ -10,6 +10,7 @@ public class PersonnelStructureResp {
     private String employeeName;
     private String organizationUnit;
     private Integer reportsToPositionId;
+    private Integer hierarchyLevel;
     private byte[] employeePhoto;
     private String base64EmployeePhoto;
 }

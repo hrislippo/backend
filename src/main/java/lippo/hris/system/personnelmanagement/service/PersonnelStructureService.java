@@ -31,9 +31,11 @@ public class PersonnelStructureService {
         return employees;
     }
 
-    public List<PersonnelStructureResp> getEmployeeStructure(String empNIK){
-        Object employeeData = proIntClient.getEmployeeStructure(empNIK).getData();
+    public List<PersonnelStructureResp> getEmployeeStructure(String empNIK, String posName, Integer subordinateDepth, Integer superiorDepth){
+        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName).getData();
         List<PersonnelStructureResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
+        employees = employees.stream().filter(e -> e.getHierarchyLevel() >= subordinateDepth
+                && e.getHierarchyLevel() <= superiorDepth).toList();
 
         for(PersonnelStructureResp employee : employees){
             if(employee.getEmployeePhoto() != null){
