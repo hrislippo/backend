@@ -6,6 +6,7 @@ import lombok.Data;
 public class PersonnelStructureResp {
 
     private Integer id;
+    private String employeeNIK;
     private String positionName;
     private String employeeName;
     private String organizationUnit;

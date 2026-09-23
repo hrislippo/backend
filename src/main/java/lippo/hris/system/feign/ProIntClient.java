@@ -25,8 +25,14 @@ public interface ProIntClient {
     @PostMapping(value = "/api-proint/RCCanPhoto", consumes = MediaType.APPLICATION_JSON_VALUE)
     void insertCandidatePhoto(@RequestBody RCCanPhotoReq rcCanPhotoReq);
 
+    @GetMapping(value = "/api-proint/ODPosition")
+    ApiResponse getActivePosition();
+
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
+
+    @GetMapping(value = "/api-proint/PMEmployeeDt")
+    ApiResponse getEmployeeDetail(@RequestParam String empNIK);
 
     @GetMapping(value = "/api-proint/PMEmployeeFile")
     ApiResponse getEmployeeFile(@RequestParam String empNIK);
