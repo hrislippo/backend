@@ -6,7 +6,8 @@ import java.util.List;
 public enum MajorMDP {
     FINANCE_ACCOUNTING_ECONOMICS(List.of("FINANCE", "KEUANGAN", "ACCOUNT", "AKUNTAN", "ECONOMIC", "EKONOMI")),
     BUSINESS_MANAGEMENT_MARKETING_HR(List.of("BUSINESS", "BISNIS", "MANAGEMENT", "MANAJEMEN", "MARKETING", "HUMAN RESOURCE", "HR", "SUMBER DAYA MANUSIA", "SDM")),
-    ENGINEERING(List.of("TEKNIK", "ENGINEER"));
+    ENGINEERING(List.of("TEKNIK", "ENGINEER")),
+    LAW(List.of("LAW", "HUKUM"));
 
     private final List<String> values;
 

@@ -7,4 +7,6 @@ public class PositionResp {
     private Integer positionId;
     private String posCode;
     private String posName;
+    private String pilarName;
+    private String buName;
 }

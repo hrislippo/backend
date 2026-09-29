@@ -84,20 +84,20 @@ public class GoogleSheetsService {
 
         ValueRange body = new ValueRange().setValues(Collections.singletonList(row));
 
-//        sheets.spreadsheets()
-//                .values()
-//                .update(
-//                        spreadsheetId,
-//                        sheetName + "!S" + rowNumber + ":T" + rowNumber,
-//                        body
-//                )
-//                .setValueInputOption("USER_ENTERED")
-//                .execute();
         sheets.spreadsheets()
                 .values()
-                .append(spreadsheetId, sheetName + "!F:G", body)
+                .update(
+                        spreadsheetId,
+                        sheetName + "!T" + rowNumber + ":U" + rowNumber,
+                        body
+                )
                 .setValueInputOption("USER_ENTERED")
-                .setInsertDataOption("INSERT_ROWS")
                 .execute();
+//        sheets.spreadsheets()
+//                .values()
+//                .append(spreadsheetId, sheetName + "!F:G", body)
+//                .setValueInputOption("USER_ENTERED")
+//                .setInsertDataOption("INSERT_ROWS")
+//                .execute();
     }
 }

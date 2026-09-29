@@ -3,15 +3,11 @@ package lippo.hris.system.talentmanagement.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lippo.hris.system.feign.ProIntClient;
-import lippo.hris.system.talentmanagement.entity.TalentPool;
-import lippo.hris.system.talentmanagement.repository.TalentPoolReadinessRepository;
-import lippo.hris.system.talentmanagement.repository.TalentPoolRepository;
-import lippo.hris.system.talentmanagement.request.TalentPoolDetailReq;
-import lippo.hris.system.talentmanagement.request.TalentPoolEmployeeReq;
+import lippo.hris.system.personnelmanagement.response.PersonnelStructureNIKResp;
+import lippo.hris.system.talentmanagement.entity.*;
+import lippo.hris.system.talentmanagement.repository.*;
 import lippo.hris.system.talentmanagement.request.TalentPoolReq;
 import lippo.hris.system.talentmanagement.response.PositionResp;
-import lippo.hris.system.talentmanagement.response.TalentPoolDetailResp;
-import lippo.hris.system.talentmanagement.response.TalentPoolEmployeeResp;
 import lippo.hris.system.talentmanagement.response.TalentPoolResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,78 +32,65 @@ public class TalentPoolService {
     TalentPoolRepository talentPoolRepository;
 
     @Autowired
-    TalentPoolReadinessRepository talentPoolReadinessRepository;
+    TalentPoolLogRepository talentPoolLogRepository;
 
-    public void saveTalentPool(TalentPoolReq talentPoolReq) {
-        for(String employeeNIK : talentPoolReq.getEmployeeNIK()) {
+    @Autowired
+    TalentPoolPerformanceRepository talentPoolPerformanceRepository;
+
+    @Autowired
+    TalentPoolPotentialRepository talentPoolPotentialRepository;
+
+    public void saveTalentPool(List<TalentPoolReq> talentPoolReq) {
+        for(TalentPoolReq talentPoolReqItem : talentPoolReq) {
             TalentPool talentPool = new TalentPool();
-            talentPool.setPositionCode(talentPoolReq.getPositionCode());
-            talentPool.setPositionName(talentPoolReq.getPositionName());
-            talentPool.setEmployeeNIK(employeeNIK);
+            talentPool.setEmployeeNIK(talentPoolReqItem.getEmployeeNIK());
+            talentPool.setEmployeeName(talentPoolReqItem.getEmployeeName());
+            talentPool.setPotential(talentPoolReqItem.getPotential() == null ? null : talentPoolPotentialRepository.findById(talentPoolReqItem.getPotential()).orElse(null));
+            talentPool.setPerformance(talentPoolReqItem.getPerformance() == null ? null : talentPoolPerformanceRepository.findById(talentPoolReqItem.getPerformance()).orElse(null));
             talentPoolRepository.save(talentPool);
         }
     }
 
-    public void modifyTalentPool(TalentPoolDetailReq request) {
-        List<TalentPool> talentPools = talentPoolRepository.findByPositionCode(request.getPositionCode());
-        List<String> added = new ArrayList<>(request.getEmployeeList().stream().map(TalentPoolEmployeeReq::getEmployeeNIK).toList());
-        added.removeAll(talentPools.stream().map(TalentPool::getEmployeeNIK).toList());
-        List<String> removed = new ArrayList<>(talentPools.stream().map(TalentPool::getEmployeeNIK).toList());
-        removed.removeAll(request.getEmployeeList().stream().map(TalentPoolEmployeeReq::getEmployeeNIK).toList());
-        List<String> modified = new ArrayList<>(talentPools.stream().map(TalentPool::getEmployeeNIK).toList());
-        modified.removeAll(removed);
+    public void modifyTalentPool(TalentPoolReq talentPoolReq) {
+        TalentPool talentPool = talentPoolRepository.findByEmployeeNIK(talentPoolReq.getEmployeeNIK());
+        TalentPoolPotential talentPoolPotential = talentPoolReq.getPotential() == null ? null : talentPoolPotentialRepository.findById(talentPoolReq.getPotential()).orElse(null);
+        TalentPoolPerformance talentPoolPerformance = talentPoolReq.getPerformance() == null ? null : talentPoolPerformanceRepository.findById(talentPoolReq.getPerformance()).orElse(null);
 
-        for(String addNIK : added){
-            TalentPoolEmployeeReq employee = request.getEmployeeList().stream().filter(e -> e.getEmployeeNIK().equals(addNIK)).toList().getFirst();
-            TalentPool talentPool = new TalentPool();
-            talentPool.setPositionCode(request.getPositionCode());
-            talentPool.setPositionName(request.getPositionName());
-            talentPool.setEmployeeNIK(employee.getEmployeeNIK());
-            talentPool.setPerformance(employee.getPerformance());
-            talentPool.setPotential(employee.getPotential());
-            talentPool.setReadiness(employee.getReadiness() == null ? null : talentPoolReadinessRepository.findByName(employee.getReadiness()));
-            talentPoolRepository.save(talentPool);
-        }
+        TalentPoolLog talentPoolLog = new TalentPoolLog();
+        talentPoolLog.setTalentPool(talentPool);
+        talentPoolLog.setOldPotential(talentPool.getPotential());
+        talentPoolLog.setOldPerformance(talentPool.getPerformance());
+        talentPoolLog.setNewPotential(talentPoolPotential);
+        talentPoolLog.setNewPerformance(talentPoolPerformance);
+        talentPoolLog.setReason(talentPoolReq.getReason());
+        talentPoolLogRepository.save(talentPoolLog);
 
-        for(String removeNIK : removed){
-            talentPoolRepository.deleteByPositionCodeAndEmployeeNIK(request.getPositionCode(), removeNIK);
-        }
-
-        for(String modifyNIK : modified){
-            TalentPoolEmployeeReq employee = request.getEmployeeList().stream().filter(e -> e.getEmployeeNIK().equals(modifyNIK)).toList().getFirst();
-            TalentPool talentPool = talentPools.stream().filter(e -> e.getEmployeeNIK().equals(modifyNIK)).toList().getFirst();
-            talentPool.setPerformance(employee.getPerformance());
-            talentPool.setPotential(employee.getPotential());
-            talentPool.setReadiness(employee.getReadiness() == null ? null : talentPoolReadinessRepository.findByName(employee.getReadiness()));
-        }
+        talentPool.setPotential(talentPoolPotential);
+        talentPool.setPerformance(talentPoolPerformance);
+        talentPoolRepository.save(talentPool);
     }
 
-    public Page<TalentPoolResp> getAllTalentPool(String positionCode, String positionName, Pageable pageable) {
-        return talentPoolRepository.findAllByPosition(positionCode, positionName, pageable);
+    public List<TalentPool> getAllTalentPool() {
+        return talentPoolRepository.findAll();
     }
 
-    public TalentPoolDetailResp getTalentPoolDetail(String positionCode){
-        List<TalentPool> talentPoolList = talentPoolRepository.findByPositionCode(positionCode);
-        List<TalentPoolEmployeeResp> detailEmployee = new ArrayList<>();
-        for(TalentPool talentPool : talentPoolList){
-            TalentPoolEmployeeResp talentPoolEmployeeResp = new TalentPoolEmployeeResp();
-            talentPoolEmployeeResp.setEmployeeNIK(talentPool.getEmployeeNIK());
-            talentPoolEmployeeResp.setPerformance(talentPool.getPerformance());
-            talentPoolEmployeeResp.setPotential(talentPool.getPotential());
-            talentPoolEmployeeResp.setReadiness(talentPool.getReadiness() == null ? null : talentPool.getReadiness().getName());
-            detailEmployee.add(talentPoolEmployeeResp);
-        }
+    public Page<TalentPoolResp> getAllTalentPool(String employeeNIK, String employeeName, Pageable pageable) {
+        return talentPoolRepository.findAllByNIKAndName(employeeNIK, employeeName, pageable);
+    }
 
-        TalentPoolDetailResp detail = new TalentPoolDetailResp();
-        detail.setPositionCode(talentPoolList.get(0).getPositionCode());
-        detail.setPositionName(talentPoolList.get(0).getPositionName());
-        detail.setTalentPoolEmployee(detailEmployee);
-        return detail;
+    public TalentPool getTalentPoolDetail(String employeeNIK){
+        return talentPoolRepository.findByEmployeeNIK(employeeNIK);
     }
 
     public List<PositionResp> getAllActivePosition(){
         Object positionData = proIntClient.getActivePosition().getData();
         List<PositionResp> positions = objectMapper.convertValue(positionData, new TypeReference<>(){});
         return positions;
+    }
+
+    public List<PersonnelStructureNIKResp> getAllActiveEmployee(){
+        Object employeeData = proIntClient.getActiveEmployee().getData();
+        List<PersonnelStructureNIKResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
+        return employees;
     }
  }

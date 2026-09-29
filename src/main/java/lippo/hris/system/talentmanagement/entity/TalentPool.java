@@ -14,23 +14,17 @@ public class TalentPool extends Auditable {
     @Column(name = "TlTalentPoolId")
     private Long id;
 
-    @Column(name = "TlTalentPoolPosCode")
-    private String positionCode;
-
-    @Column(name = "TlTalentPoolPosName")
-    private String positionName;
-
     @Column(name = "TlTalentPoolEmpNIK")
     private String employeeNIK;
 
-    @Column(name = "TlTalentPoolPotential")
-    private Integer potential;
-
-    @Column(name = "TlTalentPoolPerformance")
-    private Integer performance;
+    @Column(name = "TlTalentPoolEmpName")
+    private String employeeName;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "TlTalentPoolReadinessMsId")
-    private TalentPoolReadiness readiness;
-}
+    @JoinColumn(name = "TlTalentPoolPerfId")
+    private TalentPoolPerformance performance;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "TlTalentPoolPotentId")
+    private TalentPoolPotential potential;
+}

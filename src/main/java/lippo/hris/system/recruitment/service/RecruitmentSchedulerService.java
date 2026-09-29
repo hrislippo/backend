@@ -103,7 +103,7 @@ public class RecruitmentSchedulerService {
                     MultipartFile fileKtp = googleDriveService.downloadFile(ktpValue.toString());
                     ktpData = ktpService.processKTP(fileKtp, ktpValue.toString());
                 }
-                googleSheetsService.appendKTP(spreadsheetId, "KTP Responses 1", ktpData, result, i);
+                googleSheetsService.appendKTP(spreadsheetId, "Form Responses 1", ktpData, result, i + 1);
             }
             systemParameter.setValue(String.valueOf(i));
             systemParameterRepository.save(systemParameter);
