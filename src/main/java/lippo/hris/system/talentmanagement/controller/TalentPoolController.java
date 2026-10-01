@@ -23,7 +23,7 @@ public class TalentPoolController {
 
     @PostMapping("/talentpool")
     public ApiResponse saveTalentPool(@RequestBody List<TalentPoolReq> talentPoolReq) {
-        talentPoolValidation.nikRequired(talentPoolReq);
+        talentPoolValidation.nikAndNameRequired(talentPoolReq);
         talentPoolValidation.nikDuplicate(talentPoolReq);
         talentPoolService.saveTalentPool(talentPoolReq);
         return ApiResponse.ok(null, "Save Talent Pool Successfully");
@@ -38,8 +38,8 @@ public class TalentPoolController {
 
 
     @GetMapping("/employees")
-    public ApiResponse getActiveEmployees() {
-        return ApiResponse.ok(talentPoolService.getAllActiveEmployee(), "Get Active Employee Successfully");
+    public ApiResponse getActiveEmployees(@RequestParam(value = "posCode", required = false) String posCode) {
+        return ApiResponse.ok(talentPoolService.getAllActiveEmployee(posCode), "Get Active Employee Successfully");
     }
 
     @GetMapping("/talentpool")
@@ -52,6 +52,11 @@ public class TalentPoolController {
     @GetMapping("/talentpool-list")
     public ApiResponse getTalentPoolList() {
         return ApiResponse.ok(talentPoolService.getAllTalentPool(), "Get Talent Pool List Successfully");
+    }
+
+    @GetMapping("/talentpool-profile")
+    public ApiResponse getTalentPoolProfile(@RequestParam(value = "empNIK") String empNIK) {
+        return ApiResponse.ok(talentPoolService.getTalentProfile(empNIK), "Get Talent Pool Profile Successfully");
     }
 
     @GetMapping("/talentpool-detail")

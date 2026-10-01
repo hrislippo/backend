@@ -14,10 +14,13 @@ public class TalentPoolValidation {
     @Autowired
     private TalentPoolRepository talentPoolRepository;
 
-    public void nikRequired(List<TalentPoolReq> talentPoolReq){
+    public void nikAndNameRequired(List<TalentPoolReq> talentPoolReq){
         for(TalentPoolReq talentPool : talentPoolReq){
             if(talentPool.getEmployeeNIK() == null || talentPool.getEmployeeNIK().isEmpty()){
                 throw new BadRequestException("NIK cannot be empty");
+            }
+            if(talentPool.getEmployeeName() == null || talentPool.getEmployeeName().isEmpty()){
+                throw new BadRequestException("Name cannot be empty");
             }
         }
     }

@@ -10,5 +10,7 @@ public class TalentPoolRequestReq {
     private String positionName;
     private String pilarName;
     private String buName;
+    private String employeeNIK;
+    private String employeeName;
     private List<TalentPoolRequestDetailReq> talents;
 }

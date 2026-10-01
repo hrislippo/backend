@@ -49,8 +49,12 @@ public class GoogleSheetsService {
                         )
                 );
 
-        HttpRequestInitializer requestInitializer =
-                new HttpCredentialsAdapter(credentials);
+        HttpRequestInitializer requestInitializer = request -> {
+            new HttpCredentialsAdapter(credentials).initialize(request);
+
+            request.setConnectTimeout(86400000);
+            request.setReadTimeout(86400000);
+        };
 
         return new Sheets.Builder(
                 new NetHttpTransport(),

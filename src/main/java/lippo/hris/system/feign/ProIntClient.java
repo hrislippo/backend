@@ -32,7 +32,7 @@ public interface ProIntClient {
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
 
     @GetMapping(value = "/api-proint/PMEmployeeActive")
-    ApiResponse getActiveEmployee();
+    ApiResponse getActiveEmployee(@RequestParam String posCode);
 
     @GetMapping(value = "/api-proint/PMEmployeeDt")
     ApiResponse getEmployeeDetail(@RequestParam String empNIK);

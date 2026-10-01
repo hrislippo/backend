@@ -20,6 +20,18 @@ public class TalentPool extends Auditable {
     @Column(name = "TlTalentPoolEmpName")
     private String employeeName;
 
+    @Column(name = "TlTalentPoolPosName")
+    private String positionName;
+
+    @Column(name = "TlTalentPoolOrgName")
+    private String organizationName;
+
+    @Column(name = "TlTalentPoolLocName")
+    private String locationName;
+
+    @Column(name = "TlTalentPoolCompName")
+    private String companyName;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "TlTalentPoolPerfId")
     private TalentPoolPerformance performance;

@@ -14,6 +14,10 @@ public class TalentPoolRequest extends Auditable {
     @Column(name = "TlTalentPoolReqHdId")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "TlTalentPoolReqHdTalent")
+    private TalentPool talent;
+
     @Column(name = "TlTalentPoolReqHdPosCode")
     private String positionCode;
 

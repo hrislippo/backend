@@ -57,4 +57,9 @@ public class TalentPoolRequestController {
     public ApiResponse getTalentPoolRequestNineBox(@RequestParam(value = "positionCode", required = false) String positionCode){
         return ApiResponse.ok(talentPoolRequestService.findTalentPoolRequestNineBox(positionCode), "Get Talent Pool Request Nine Box Successfully");
     }
+
+    @GetMapping("/talentpoolrequest-readiness")
+    public ApiResponse getTalentPoolRequestReadiness(@RequestParam(value = "positionCode") String positionCode){
+        return ApiResponse.ok(talentPoolRequestService.findTalentPoolRequestReadiness(positionCode), "Get Talent Pool Request Readiness Successfully");
+    }
 }

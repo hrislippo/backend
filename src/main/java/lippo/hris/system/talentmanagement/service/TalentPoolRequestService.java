@@ -9,10 +9,7 @@ import lippo.hris.system.talentmanagement.repository.TalentPoolRequestDetailRepo
 import lippo.hris.system.talentmanagement.repository.TalentPoolRequestRepository;
 import lippo.hris.system.talentmanagement.request.TalentPoolRequestDetailReq;
 import lippo.hris.system.talentmanagement.request.TalentPoolRequestReq;
-import lippo.hris.system.talentmanagement.response.TalentPoolRequestDetailResp;
-import lippo.hris.system.talentmanagement.response.TalentPoolRequestEmployeeResp;
-import lippo.hris.system.talentmanagement.response.TalentPoolRequestNineBoxResp;
-import lippo.hris.system.talentmanagement.response.TalentPoolRequestResp;
+import lippo.hris.system.talentmanagement.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +42,18 @@ public class TalentPoolRequestService {
         talentPoolRequest.setPositionCode(talentPoolRequestReq.getPositionCode());
         talentPoolRequest.setPilarName(talentPoolRequestReq.getPilarName());
         talentPoolRequest.setBuName(talentPoolRequestReq.getBuName());
+
+        if(talentPoolRequestReq.getEmployeeNIK() != null) {
+            TalentPool talentPool = talentPoolRepository.findByEmployeeNIK(talentPoolRequestReq.getEmployeeNIK());
+            if(talentPool == null) {
+                talentPool = new TalentPool();
+                talentPool.setEmployeeNIK(talentPoolRequestReq.getEmployeeNIK());
+                talentPool.setEmployeeName(talentPoolRequestReq.getEmployeeName());
+                talentPool = talentPoolRepository.save(talentPool);
+            }
+            talentPoolRequest.setTalent(talentPool);
+        }
+
         talentPoolRequest = talentPoolRequestRepository.save(talentPoolRequest);
 
         for(TalentPoolRequestDetailReq talent : talentPoolRequestReq.getTalents()){
@@ -58,6 +67,18 @@ public class TalentPoolRequestService {
 
     public void modifyTalentPoolRequest(TalentPoolRequestReq request) {
         TalentPoolRequest talentPoolRequest = talentPoolRequestRepository.findByPositionCode(request.getPositionCode());
+        if(request.getEmployeeNIK() != null) {
+            TalentPool talentPool = talentPoolRepository.findByEmployeeNIK(request.getEmployeeNIK());
+            if(talentPool == null) {
+                talentPool = new TalentPool();
+                talentPool.setEmployeeNIK(request.getEmployeeNIK());
+                talentPool.setEmployeeName(request.getEmployeeName());
+                talentPool = talentPoolRepository.save(talentPool);
+            }
+            talentPoolRequest.setTalent(talentPool);
+            talentPoolRequest = talentPoolRequestRepository.save(talentPoolRequest);
+        }
+
         List<TalentPoolRequestDetail> talentPoolRequestDetailList = talentPoolRequestDetailRepository.findByHeader(talentPoolRequest);
         List<TalentPool> talentPoolList = talentPoolRequestDetailList.stream().map(TalentPoolRequestDetail::getTalent).toList();
 
@@ -101,6 +122,8 @@ public class TalentPoolRequestService {
         talentPoolRequestDetailResp.setPositionName(talentPoolRequest.getPositionName());
         talentPoolRequestDetailResp.setPilarName(talentPoolRequest.getPilarName());
         talentPoolRequestDetailResp.setBuName(talentPoolRequest.getBuName());
+        talentPoolRequestDetailResp.setEmployeeNik(talentPoolRequest.getTalent() == null ? null : talentPoolRequest.getTalent().getEmployeeNIK());
+        talentPoolRequestDetailResp.setEmployeeName(talentPoolRequest.getTalent() == null ? null : talentPoolRequest.getTalent().getEmployeeName());
         List<TalentPoolRequestEmployeeResp> talentPoolRequestEmployeeResps = new ArrayList<>();
 
         for(TalentPoolRequestDetail talent : talentPoolRequestDetails){
@@ -115,5 +138,9 @@ public class TalentPoolRequestService {
 
     public List<TalentPoolRequestNineBoxResp> findTalentPoolRequestNineBox(String posCode) {
         return talentPoolRequestRepository.findTalentPoolRequestNineBox(posCode);
+    }
+
+    public List<TalentPoolEmployeeReadinessResp> findTalentPoolRequestReadiness(String posCode) {
+        return talentPoolRequestRepository.findTalentPoolRequestReadiness(posCode);
     }
 }
