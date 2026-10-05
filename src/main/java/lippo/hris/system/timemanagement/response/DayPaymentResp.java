@@ -6,6 +6,7 @@ public interface DayPaymentResp {
 
     Long getId();
     String getEmpNIK();
+    String getEmpName();
     LocalDate getStartDate();
     LocalDate getExpiryDate();
     Integer getDpCount();

@@ -6,6 +6,7 @@ public interface MobileAttendanceResp {
 
     Long getId();
     String getEmpNIK();
+    String getEmpName();
     String getTempCode();
     LocalDate getStartDate();
     LocalDate getEndDate();

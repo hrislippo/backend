@@ -14,11 +14,11 @@ import java.util.List;
 public interface MobileAttendanceRequestRepository extends JpaRepository<MobileAttendanceRequest, Long> {
 
     @Query(nativeQuery = true,
-            value = "SELECT ma.TmMobileAttendReqId AS id, " +
-                    "ma.TmMobileAttendReqEmp AS empNIK, ma.TmMobileAttendReqTempCode AS tempCode, " +
-                    "ma.TmMobileAttendReqStartDate AS startDate, ma.TmMobileAttendReqEndDate AS endDate " +
+            value = "SELECT ma.TmMobileAttendReqId AS id, ma.TmMobileAttendReqEmp AS empNIK, ma.TmMobileAttendReqEmpName AS empName, " +
+                    "ma.TmMobileAttendReqTempCode AS tempCode, ma.TmMobileAttendReqStartDate AS startDate, ma.TmMobileAttendReqEndDate AS endDate " +
                     "FROM TMMobileAttendReq ma " +
                     "WHERE (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
+                    "AND (:empName IS NULL OR ma.TmMobileAttendReqEmpName LIKE '%'+:empName+'%') " +
                     "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
                     "AND (:startDate IS NULL OR ma.TmMobileAttendReqStartDate = :startDate) " +
                     "AND (:endDate IS NULL OR ma.TmMobileAttendReqEndDate = :endDate) " +
@@ -26,10 +26,12 @@ public interface MobileAttendanceRequestRepository extends JpaRepository<MobileA
             countQuery = "SELECT COUNT(1) " +
                     "FROM TMMobileAttendReq ma " +
                     "WHERE (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
+                    "AND (:empName IS NULL OR ma.TmMobileAttendReqEmpName LIKE '%'+:empName+'%') " +
                     "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
                     "AND (:startDate IS NULL OR ma.TmMobileAttendReqStartDate = :startDate) " +
                     "AND (:endDate IS NULL OR ma.TmMobileAttendReqEndDate = :endDate)")
     Page<MobileAttendanceResp> getMobileAttendance(@Param("empNIK") String empNIK,
+                                                        @Param("empName") String empName,
                                                         @Param("tempCode") String tempCode,
                                                         @Param("startDate") LocalDate startDate,
                                                         @Param("endDate") LocalDate endDate,

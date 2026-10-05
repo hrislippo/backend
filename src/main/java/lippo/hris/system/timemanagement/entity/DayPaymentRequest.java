@@ -19,6 +19,9 @@ public class DayPaymentRequest extends Auditable {
     @Column(name = "TmDayPaymentReqEmp")
     private String employee;
 
+    @Column(name = "TmDayPaymentReqEmpName")
+    private String employeeName;
+
     @Column(name = "TmDayPaymentReqCount")
     private Integer count;
 

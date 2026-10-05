@@ -8,6 +8,7 @@ public class PersonnelStructureResp {
     private Integer id;
     private String employeeNIK;
     private String positionName;
+    private String positionStatus;
     private String employeeName;
     private String organizationUnit;
     private Integer reportsToPositionId;

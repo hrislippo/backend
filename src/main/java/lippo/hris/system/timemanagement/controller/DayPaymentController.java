@@ -37,10 +37,11 @@ public class DayPaymentController {
 
     @GetMapping("/day-payment")
     public ApiResponse getDayPayment(@RequestParam(value = "empNIK", required = false) String empNIK,
+                                     @RequestParam(value = "empName", required = false) String empName,
                                      @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                      @RequestParam(value = "expiryDate", required = false) LocalDate expiryDate,
                                      Pageable pageable) {
-        return ApiResponse.ok(dayPaymentService.getDayPayment(empNIK, startDate, expiryDate, pageable), "Get Day Payment Successfully");
+        return ApiResponse.ok(dayPaymentService.getDayPayment(empNIK, empName, startDate, expiryDate, pageable), "Get Day Payment Successfully");
     }
 
     @GetMapping("/day-payment-detail")

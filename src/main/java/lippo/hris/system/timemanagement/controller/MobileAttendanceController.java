@@ -34,11 +34,12 @@ public class MobileAttendanceController {
 
     @GetMapping("/mobile-attendance")
     public ApiResponse getMobileAttendance(@RequestParam(value = "empNIK", required = false) String empNIK,
+                                           @RequestParam(value = "empName", required = false) String empName,
                                      @RequestParam(value = "tempCode", required = false) String tempCode,
                                      @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                      @RequestParam(value = "endDate", required = false) LocalDate endDate,
                                      Pageable pageable) {
-        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, tempCode, startDate, endDate, pageable), "Get Mobile Attendance Successfully");
+        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable), "Get Mobile Attendance Successfully");
     }
 
     @GetMapping("/mobile-attendance-detail")

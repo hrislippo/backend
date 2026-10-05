@@ -9,6 +9,7 @@ public class TalentStructureResp {
     private String employeeNIK;
     private String positionName;
     private String positionCode;
+    private String positionStatus;
     private String employeeName;
     private String organizationUnit;
     private Integer reportsToPositionId;

@@ -7,6 +7,7 @@ import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.personnelmanagement.response.PersonnelStructureResp;
 import lippo.hris.system.timemanagement.entity.DayPaymentRequest;
 import lippo.hris.system.timemanagement.repository.DayPaymentRequestRepository;
+import lippo.hris.system.timemanagement.request.TMDPRightsEmployeeReq;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
 import lippo.hris.system.timemanagement.response.DayPaymentResp;
 import lippo.hris.system.timemanagement.response.TMDayPayment;
@@ -46,20 +47,21 @@ public class DayPaymentService {
                         entry -> ((Number) entry.getValue()).longValue()
                 ));
 
-        for(String nikEmp : tmDPRightsReq.getNikEmp()){
+        for(TMDPRightsEmployeeReq employeeReq : tmDPRightsReq.getEmployee()){
             DayPaymentRequest dayPaymentRequest = new DayPaymentRequest();
-            dayPaymentRequest.setEmployee(nikEmp);
+            dayPaymentRequest.setEmployee(employeeReq.getEmployeeNIK());
+            dayPaymentRequest.setEmployeeName(employeeReq.getEmployeeName());
             dayPaymentRequest.setCount(tmDPRightsReq.getDpCount());
             dayPaymentRequest.setDate(tmDPRightsReq.getDpDate());
             dayPaymentRequest.setExpiredDate(tmDPRightsReq.getDpExpiredDate());
             dayPaymentRequest.setDescription(tmDPRightsReq.getDescription());
-            dayPaymentRequest.setDpRightsId(mapResult.get(nikEmp));
+            dayPaymentRequest.setDpRightsId(mapResult.get(employeeReq.getEmployeeNIK()));
             dayPaymentRequestRepository.save(dayPaymentRequest);
         }
     }
 
-    public Page<DayPaymentResp> getDayPayment(String empNIK, LocalDate startDate, LocalDate expiryDate, Pageable pageable){
-        return dayPaymentRequestRepository.getDayPayment(empNIK, startDate, expiryDate, pageable);
+    public Page<DayPaymentResp> getDayPayment(String empNIK, String empName, LocalDate startDate, LocalDate expiryDate, Pageable pageable){
+        return dayPaymentRequestRepository.getDayPayment(empNIK, empName, startDate, expiryDate, pageable);
     }
 
     public DayPaymentRequest getDayPaymentDetail(Long id){

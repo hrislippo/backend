@@ -7,6 +7,7 @@ import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.personnelmanagement.response.PersonnelFileResp;
 import lippo.hris.system.timemanagement.entity.MobileAttendanceRequest;
 import lippo.hris.system.timemanagement.repository.MobileAttendanceRequestRepository;
+import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrEmpReq;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
 import lippo.hris.system.timemanagement.response.EmployeeResp;
 import lippo.hris.system.timemanagement.response.MobileAttendanceResp;
@@ -36,7 +37,7 @@ public class MobileAttendanceService {
     public void addMobileAttendance(MOTMAtdTempMbrReq motmAtdTempMbrReq, String username) {
 
         motmAtdTempMbrReq.setCreatedBy(username);
-        Object employeeData = proIntClient.getEmployeeInfo(motmAtdTempMbrReq.getNikList()).getData();
+        Object employeeData = proIntClient.getEmployeeInfo(motmAtdTempMbrReq.getEmployee().stream().map(MOTMAtdTempMbrEmpReq::getEmployeeNIK).toList()).getData();
         List<EmployeeResp> employees = objectMapper.convertValue(employeeData, new TypeReference<List<EmployeeResp>>(){});
         List<String> missingNiks = employees.stream().filter(emp -> "Employee not found".equals(emp.getEmpName()))
                 .map(EmployeeResp::getEmpNik).toList();
@@ -49,9 +50,10 @@ public class MobileAttendanceService {
             throw new NotFoundException("Attendance template not found");
         }
 
-        for(String nik : motmAtdTempMbrReq.getNikList()){
+        for(MOTMAtdTempMbrEmpReq employee : motmAtdTempMbrReq.getEmployee()){
             MobileAttendanceRequest mobileAttendanceRequest = new MobileAttendanceRequest();
-            mobileAttendanceRequest.setEmployee(nik);
+            mobileAttendanceRequest.setEmployee(employee.getEmployeeNIK());
+            mobileAttendanceRequest.setEmployeeName(employee.getEmployeeName());
             mobileAttendanceRequest.setTemplateCode(motmAtdTempMbrReq.getTempCode());
             mobileAttendanceRequest.setStartDate(motmAtdTempMbrReq.getStartDate());
             mobileAttendanceRequest.setEndDate(motmAtdTempMbrReq.getEndDate());
@@ -62,7 +64,7 @@ public class MobileAttendanceService {
                     LocalDate.now().isBefore(motmAtdTempMbrReq.getEndDate())) ||
             LocalDate.now().isEqual(motmAtdTempMbrReq.getStartDate()) ||
             LocalDate.now().isEqual(motmAtdTempMbrReq.getEndDate()))){
-                motmAtdTempMbrReq.setNik(nik);
+                motmAtdTempMbrReq.setNik(employee.getEmployeeNIK());
                 proIntClient.addMobileAttendanceTemplateMember(motmAtdTempMbrReq);
 
                 mobileAttendanceRequest.setExist(true);
@@ -71,8 +73,8 @@ public class MobileAttendanceService {
         }
     }
 
-    public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String tempCode, LocalDate startDate, LocalDate endDate, Pageable pageable){
-        return mobileAttendanceRequestRepository.getMobileAttendance(empNIK, tempCode, startDate, endDate, pageable);
+    public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String empName, String tempCode, LocalDate startDate, LocalDate endDate, Pageable pageable){
+        return mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable);
     }
 
     public MobileAttendanceRequest getMobileAttendanceDetail(Long id){

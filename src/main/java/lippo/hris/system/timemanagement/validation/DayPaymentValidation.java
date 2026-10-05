@@ -16,8 +16,8 @@ public class DayPaymentValidation {
     }
 
     public void inputDayPaymentRequired(TMDPRightsReq tmDPRightsReq) {
-        if(tmDPRightsReq.getNikEmp() == null || tmDPRightsReq.getNikEmp().size() <= 0){
-            throw new BadRequestException("Employee NIK cannot be empty");
+        if(tmDPRightsReq.getEmployee() == null || tmDPRightsReq.getEmployee().size() <= 0){
+            throw new BadRequestException("Employee cannot be empty");
         }
 
         if(tmDPRightsReq.getDpCount() == null ||tmDPRightsReq.getDpCount() < 0){

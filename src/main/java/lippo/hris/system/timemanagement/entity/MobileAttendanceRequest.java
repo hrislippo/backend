@@ -19,6 +19,9 @@ public class MobileAttendanceRequest extends Auditable {
     @Column(name = "TmMobileAttendReqEmp")
     private String employee;
 
+    @Column(name = "TmMobileAttendReqEmpName")
+    private String employeeName;
+
     @Column(name = "TmMobileAttendReqTempCode")
     private String templateCode;
 

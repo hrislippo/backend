@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class TMDPRightsReq {
 
-    private List<String> nikEmp;
+    private List<TMDPRightsEmployeeReq> employee;
     private String nikEmpCreate;
     private Integer dpCount;
     private LocalDate dpDate;

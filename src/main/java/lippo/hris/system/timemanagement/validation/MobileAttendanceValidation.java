@@ -23,7 +23,7 @@ public class MobileAttendanceValidation {
     }
 
     public void inputMobileAttendanceRequired(MOTMAtdTempMbrReq motmAtdTempMbrReq) {
-        if(motmAtdTempMbrReq.getNikList() == null || motmAtdTempMbrReq.getNikList().size() <= 0){
+        if(motmAtdTempMbrReq.getEmployee() == null || motmAtdTempMbrReq.getEmployee().size() <= 0){
             throw new BadRequestException("Employee NIK List cannot be empty");
         }
 
