@@ -35,10 +35,8 @@ public class TalentPoolStructureService {
     }
 
     public List<TalentStructureResp> getTalentStructure(String empNIK, String posName, Integer subordinateDepth, Integer superiorDepth){
-        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName).getData();
+        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName, subordinateDepth, superiorDepth).getData();
         List<TalentStructureResp> talents = objectMapper.convertValue(employeeData, new TypeReference<>(){});
-        talents = talents.stream().filter(e -> e.getHierarchyLevel() >= subordinateDepth
-                && e.getHierarchyLevel() <= superiorDepth).toList();
 
         for(TalentStructureResp talent : talents){
             if(talent.getEmployeePhoto() != null){

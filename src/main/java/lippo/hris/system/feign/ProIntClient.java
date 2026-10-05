@@ -44,7 +44,7 @@ public interface ProIntClient {
     ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
 
     @GetMapping(value = "/api-proint/PMEmployeeStr")
-    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName);
+    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth);
 
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);
