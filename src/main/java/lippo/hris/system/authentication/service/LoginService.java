@@ -2,6 +2,8 @@ package lippo.hris.system.authentication.service;
 
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.repository.PermissionRoleRepository;
+import lippo.hris.system.authentication.repository.UserRepository;
+import lippo.hris.system.authentication.repository.UserTemplateAuthRepository;
 import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.authentication.repository.UserRoleRepository;
 import lippo.hris.system.authentication.request.LoginRequest;
@@ -30,6 +32,12 @@ public class LoginService {
     UserRoleRepository userRoleRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserTemplateAuthRepository userTemplateAuthRepository;
+
+    @Autowired
     PermissionRoleRepository permissionRoleRepository;
 
     @Autowired
@@ -53,9 +61,10 @@ public class LoginService {
         try{
             List<String> userRoles = userRoleRepository.findByUser(user.getUsername());
             List<String> userPermissions = permissionRoleRepository.findByUser(user.getUsername());
+            List<String> userAuthorizations = userTemplateAuthRepository.findByUser(user).stream().map(e -> e.getTemplateAuth().getName()).toList();
 
-            String accessToken = jwtUtil.generateAccessToken(user.getUsername(), userRoles, userPermissions);
-            String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), userRoles, userPermissions);
+            String accessToken = jwtUtil.generateAccessToken(user.getUsername(), userRoles, userPermissions, userAuthorizations);
+            String refreshToken = jwtUtil.generateRefreshToken(user.getUsername(), userRoles, userPermissions, userAuthorizations);
             loginAttemptService.loginSucceeded(user);
             auditLogService.log("("+user.getUsername()+") Login Successfully");
 
@@ -86,9 +95,11 @@ public class LoginService {
         }
 
         String username = jwtUtil.getUsername(refreshToken);
+        User user = userRepository.findByusername(username).get();
         List<String> userRoles = userRoleRepository.findByUser(username);
         List<String> userPermissions = permissionRoleRepository.findByUser(username);
-        return jwtUtil.generateAccessToken(username, userRoles, userPermissions);
+        List<String> userAuthorizations = userTemplateAuthRepository.findByUser(user).stream().map(e -> e.getTemplateAuth().getName()).toList();
+        return jwtUtil.generateAccessToken(username, userRoles, userPermissions, userAuthorizations);
     }
 
     public ResponseEntity<?> logoutUser(){

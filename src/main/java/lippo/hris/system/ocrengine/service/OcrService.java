@@ -109,7 +109,7 @@ public class OcrService {
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDFRenderer renderer = new PDFRenderer(document);
-            BufferedImage image = renderer.renderImageWithDPI(0, 300);
+            BufferedImage image = renderer.renderImageWithDPI(0, 200);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             ImageIO.write(image, "jpg", output);
             return output.toByteArray();

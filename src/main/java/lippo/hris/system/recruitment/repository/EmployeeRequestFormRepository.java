@@ -27,69 +27,99 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
     value = "SELECT TOP 1 REPLACE(EmpReqCode, :prefix, '') FROM RCMEmpRequest ORDER BY EmpReqCode DESC")
     Long countByEmpReqCodeStartingWith(@Param("prefix") String prefix);
 
-    @Query(nativeQuery = true,
-            value = "WITH StageOrder AS (SELECT * FROM (VALUES " +
-                    "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding')) v(StageOrder, StageName)), " +
-                    "StageAgg AS (SELECT req.EmpReqId, so.StageOrder, so.StageName, " +
-                    "ROW_NUMBER() OVER (PARTITION BY req.EmpReqId ORDER BY so.StageOrder DESC) AS rn " +
-                    "FROM RCMEmpReqCanActivity ca " +
-                    "JOIN RCMEmpReqCandidate rc ON rc.EmpReqCanId = ca.EmpReqCanId " +
-                    "JOIN RCMEmpRequest req ON req.EmpReqId = rc.EmpReqId " +
-                    "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
-                    "JOIN StageOrder so ON so.StageName = act.RcmActGrp " +
-                    "WHERE req.EmpReqStatus = 'IN_PROGRESS' AND ca.EmpReqCanActStatus IN ('IN_PROGRESS', 'COMPLETED') " +
-                    "GROUP BY req.EmpReqId, so.StageOrder, so.StageName), " +
-                    "OfferingCompleted AS(SELECT rc.EmpReqId, COUNT(DISTINCT rc.EmpReqCanId) AS CompletedOfferingCandidate " +
-                    "FROM RCMEmpReqCandidate rc " +
-                    "JOIN RCMEmpReqCanActivity ca ON rc.EmpReqCanId = ca.EmpReqCanId " +
-                    "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
-                    "WHERE act.RcmActGrp = 'Offering' AND ca.EmpReqCanActStatus = 'COMPLETED' " +
-                    "AND NOT EXISTS (SELECT 1 FROM RCMEmpReqCanActivity ca2 " +
-                    "JOIN RCMACTActivity act2 ON act2.RcmActId = ca2.RcmActId " +
-                    "WHERE ca2.EmpReqCanId = rc.EmpReqCanId " +
-                    "AND act2.RcmActGrp IN ('Background Check', 'Sign Agreement', 'Onboarding') " +
-                    "AND ca2.EmpReqCanActStatus = 'FAILED') GROUP BY rc.EmpReqId) " +
-                    "SELECT * FROM ( " +
-                    "SELECT COUNT(DISTINCT res.EmpReqResId) AS recruitNumber, " +
-                    "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
-                    "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
-                    "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
-                    "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
-                    "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
-                    "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
-                    "CASE WHEN pic.EmpReqPICId IS NOT NULL AND req.EmpReqStatus = 'IN_PROGRESS' THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
-                    "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS StopSLA, " +
-                    "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Warning' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 61 THEN 'Moderate' " +
-                    "ELSE 'Safe' END AS deadlineStatus " +
-                    "FROM RCMEmpRequest req " +
-                    "LEFT JOIN OfferingCompleted oc ON oc.EmpReqId = req.EmpReqId " +
-                    "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
-                    "LEFT JOIN RCMEmpReqPIC pic ON pic.EmpReqId = req.EmpReqId " +
-                    "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
-                    "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
-                    "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
-                    "LEFT JOIN RCMEmpReqPIC pic2 ON pic2.EmpReqId = req.EmpReqId " +
-                    "LEFT JOIN URMUser usr ON pic2.UserId = usr.UserId " +
-                    "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
-                    "ON agg.EmpReqId = req.EmpReqId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
-                    "AND (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
-                    "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
-                    "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
-                    "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
-                    "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p JOIN URMUser u ON u.UserId = p.UserId " +
-                    "WHERE p.EmpReqId = req.EmpReqId AND u.UserRealName LIKE '%' + :pic + '%')) " +
-                    "GROUP BY req.EmpReqId, req.EmpReqCode, req.EmpReqName, " +
-                    "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqStartDate, req.EmpReqNum, " +
-                    "req.EmpReqStatus, pic.EmpReqPICId, agg.StageName) a " +
-                    "WHERE (:sla IS NULL OR a.deadlineStatus = :sla) " +
-                    "AND (:status IS NULL OR COALESCE(a.stage, a.status) = :status) " +
-                    "ORDER BY CASE WHEN a.status = 'IN_PROGRESS' THEN 0 WHEN a.status = 'OPEN' THEN 1 ELSE 2 END, a.businessUnitName, a.expDate",
+    @Query(value = "WITH StageOrder AS (SELECT * FROM (VALUES " +
+            "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), " +
+            "(4, 'Sign Agreement'), (5, 'Onboarding')) v(StageOrder, StageName)), " +
+
+            "StageAgg AS (SELECT req.EmpReqId, so.StageOrder, so.StageName, " +
+            "ROW_NUMBER() OVER (PARTITION BY req.EmpReqId ORDER BY so.StageOrder DESC) AS rn " +
+            "FROM RCMEmpReqCanActivity ca " +
+            "JOIN RCMEmpReqCandidate rc ON rc.EmpReqCanId = ca.EmpReqCanId " +
+            "JOIN RCMEmpRequest req ON req.EmpReqId = rc.EmpReqId " +
+            "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
+            "JOIN StageOrder so ON so.StageName = act.RcmActGrp " +
+            "WHERE req.EmpReqStatus = 'IN_PROGRESS' " +
+            "AND ca.EmpReqCanActStatus IN ('IN_PROGRESS', 'COMPLETED') " +
+            "GROUP BY req.EmpReqId, so.StageOrder, so.StageName), " +
+
+            "OfferingCompleted AS (SELECT rc.EmpReqId, COUNT(DISTINCT rc.EmpReqCanId) AS CompletedOfferingCandidate " +
+            "FROM RCMEmpReqCandidate rc " +
+            "JOIN RCMEmpReqCanActivity ca ON rc.EmpReqCanId = ca.EmpReqCanId " +
+            "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
+            "WHERE act.RcmActGrp = 'Offering' AND ca.EmpReqCanActStatus = 'COMPLETED' " +
+            "AND NOT EXISTS (SELECT 1 FROM RCMEmpReqCanActivity ca2 " +
+            "JOIN RCMACTActivity act2 ON act2.RcmActId = ca2.RcmActId " +
+            "WHERE ca2.EmpReqCanId = rc.EmpReqCanId " +
+            "AND act2.RcmActGrp IN ('Background Check', 'Sign Agreement', 'Onboarding') " +
+            "AND ca2.EmpReqCanActStatus = 'FAILED') " +
+            "GROUP BY rc.EmpReqId), " +
+
+            "ResultAgg AS (SELECT EmpReqId, COUNT(DISTINCT EmpReqResId) AS recruitNumber " +
+            "FROM RCMEmpReqResult GROUP BY EmpReqId), " +
+
+            "PICAgg AS (SELECT x.EmpReqId, STRING_AGG(x.UserRealName, ', ') AS PIC " +
+            "FROM (SELECT DISTINCT pic.EmpReqId, usr.UserRealName " +
+            "FROM RCMEmpReqPIC pic JOIN URMUser usr ON usr.UserId = pic.UserId " +
+            "WHERE usr.UserRealName IS NOT NULL) x GROUP BY x.EmpReqId) " +
+
+            "SELECT * FROM (SELECT ISNULL(ra.recruitNumber, 0) AS recruitNumber, " +
+            "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
+            "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
+            "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
+            "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
+            "pica.PIC AS pic, " +
+
+            "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL " +
+            "THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
+
+            "CASE WHEN pic.EmpReqPICId IS NOT NULL AND req.EmpReqStatus = 'IN_PROGRESS' " +
+            "THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
+
+            "CASE WHEN ISNULL(oc.CompletedOfferingCandidate, 0) >= req.EmpReqNum " +
+            "THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS StopSLA, " +
+
+            "CASE " +
+            "WHEN ISNULL(oc.CompletedOfferingCandidate, 0) >= req.EmpReqNum " +
+            "OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Warning' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 61 THEN 'Moderate' " +
+            "ELSE 'Safe' END AS deadlineStatus " +
+
+            "FROM RCMEmpRequest req " +
+            "LEFT JOIN ResultAgg ra ON ra.EmpReqId = req.EmpReqId " +
+            "LEFT JOIN OfferingCompleted oc ON oc.EmpReqId = req.EmpReqId " +
+            "LEFT JOIN PICAgg pica ON pica.EmpReqId = req.EmpReqId " +
+            "LEFT JOIN RCMEmpReqPIC pic ON pic.EmpReqId = req.EmpReqId " +
+            "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
+            "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
+            "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
+            "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
+            "ON agg.EmpReqId = req.EmpReqId " +
+
+            "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN " +
+            "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = " +
+            "(SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
+            "AND (:code IS NULL OR req.EmpReqCode LIKE '%' + :code + '%') " +
+            "AND (:name IS NULL OR req.EmpReqName LIKE '%' + :name + '%') " +
+            "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%' + :buName + '%') " +
+            "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%' + :hrbpName + '%') " +
+            "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p " +
+            "JOIN URMUser u ON u.UserId = p.UserId WHERE p.EmpReqId = req.EmpReqId " +
+            "AND u.UserRealName LIKE '%' + :pic + '%')) " +
+
+            ") a WHERE (:sla IS NULL OR a.deadlineStatus = :sla) " +
+            "AND (:status IS NULL OR COALESCE(a.stage, a.status) = :status) " +
+            "ORDER BY CASE WHEN a.status = 'IN_PROGRESS' THEN 0 " +
+            "WHEN a.status = 'OPEN' THEN 1 ELSE 2 END, a.businessUnitName, a.expDate",
+
             countQuery = "WITH StageOrder AS (SELECT * FROM (VALUES " +
-                    "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding')) v(StageOrder, StageName)), " +
+                    "(1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), " +
+                    "(4, 'Sign Agreement'), (5, 'Onboarding')) v(StageOrder, StageName)), " +
+
                     "StageAgg AS (SELECT req.EmpReqId, so.StageOrder, so.StageName, " +
                     "ROW_NUMBER() OVER (PARTITION BY req.EmpReqId ORDER BY so.StageOrder DESC) AS rn " +
                     "FROM RCMEmpReqCanActivity ca " +
@@ -97,9 +127,11 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "JOIN RCMEmpRequest req ON req.EmpReqId = rc.EmpReqId " +
                     "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
                     "JOIN StageOrder so ON so.StageName = act.RcmActGrp " +
-                    "WHERE req.EmpReqStatus = 'IN_PROGRESS' AND ca.EmpReqCanActStatus IN ('IN_PROGRESS', 'COMPLETED') " +
+                    "WHERE req.EmpReqStatus = 'IN_PROGRESS' " +
+                    "AND ca.EmpReqCanActStatus IN ('IN_PROGRESS', 'COMPLETED') " +
                     "GROUP BY req.EmpReqId, so.StageOrder, so.StageName), " +
-                    "OfferingCompleted AS(SELECT rc.EmpReqId, COUNT(DISTINCT rc.EmpReqCanId) AS CompletedOfferingCandidate " +
+
+                    "OfferingCompleted AS (SELECT rc.EmpReqId, COUNT(DISTINCT rc.EmpReqCanId) AS CompletedOfferingCandidate " +
                     "FROM RCMEmpReqCandidate rc " +
                     "JOIN RCMEmpReqCanActivity ca ON rc.EmpReqCanId = ca.EmpReqCanId " +
                     "JOIN RCMACTActivity act ON act.RcmActId = ca.RcmActId " +
@@ -108,45 +140,50 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                     "JOIN RCMACTActivity act2 ON act2.RcmActId = ca2.RcmActId " +
                     "WHERE ca2.EmpReqCanId = rc.EmpReqCanId " +
                     "AND act2.RcmActGrp IN ('Background Check', 'Sign Agreement', 'Onboarding') " +
-                    "AND ca2.EmpReqCanActStatus = 'FAILED') GROUP BY rc.EmpReqId) " +
-                    "SELECT COUNT(1) FROM ( " +
-                    "SELECT COUNT(res.EmpReqResId) AS recruitNumber, " +
-                    "req.EmpReqId AS id, req.EmpReqCode AS code, req.EmpReqName AS name, " +
-                    "bu.RcmBsUnitName AS businessUnitName, hrbp.RcmHRBPName AS hrbpName, " +
-                    "req.EmpReqExpDate AS expDate, req.EmpReqNum AS requestNumber, " +
-                    "req.EmpReqStatus AS status, req.EmpReqStartDate AS startDate, " +
-                    "STRING_AGG(usr.UserRealName, ', ') AS pic, " +
-                    "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
-                    "CASE WHEN pic.EmpReqPICId IS NOT NULL AND req.EmpReqStatus = 'IN_PROGRESS' THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS eligible, " +
-                    "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS StopSLA, " +
-                    "CASE WHEN MAX(ISNULL(oc.CompletedOfferingCandidate, 0)) >= req.EmpReqNum OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Warning' " +
-                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 61 THEN 'Moderate' " +
+                    "AND ca2.EmpReqCanActStatus = 'FAILED') " +
+                    "GROUP BY rc.EmpReqId) " +
+
+                    "SELECT COUNT(*) FROM (SELECT req.EmpReqId, " +
+
+                    "CASE WHEN req.EmpReqStatus = 'IN_PROGRESS' AND agg.StageName IS NULL " +
+                    "THEN 'Sourcing' ELSE agg.StageName END AS stage, " +
+
+                    "req.EmpReqStatus AS status, " +
+
+                    "CASE " +
+                    "WHEN ISNULL(oc.CompletedOfferingCandidate, 0) >= req.EmpReqNum " +
+                    "OR req.EmpReqStatus IN ('ON_HOLD', 'CANCELLED', 'COMPLETED') THEN 'No SLA' " +
+                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+                    "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Expired' " +
+                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+                    "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Warning' " +
+                    "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
+                    "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 61 THEN 'Moderate' " +
                     "ELSE 'Safe' END AS deadlineStatus " +
+
                     "FROM RCMEmpRequest req " +
                     "LEFT JOIN OfferingCompleted oc ON oc.EmpReqId = req.EmpReqId " +
-                    "LEFT JOIN RCMEmpReqResult res ON req.EmpReqId = res.EmpReqId " +
                     "LEFT JOIN RCMEmpReqPIC pic ON pic.EmpReqId = req.EmpReqId " +
                     "AND pic.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName) " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
                     "INNER JOIN RCMHRBP hrbp ON req.RcmHRBPId = hrbp.RcmHRBPId " +
-                    "LEFT JOIN RCMEmpReqPIC pic2 ON pic2.EmpReqId = req.EmpReqId " +
-                    "LEFT JOIN URMUser usr ON pic2.UserId = usr.UserId " +
                     "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
                     "ON agg.EmpReqId = req.EmpReqId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
-                    "AND (:code IS NULL OR req.EmpReqCode LIKE '%'+:code+'%') " +
-                    "AND (:name IS NULL OR req.EmpReqName LIKE '%'+:name+'%') " +
-                    "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +
-                    "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%'+:hrbpName+'%') " +
-                    "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p JOIN URMUser u ON u.UserId = p.UserId " +
-                    "WHERE p.EmpReqId = req.EmpReqId AND u.UserRealName LIKE '%' + :pic + '%')) " +
-                    "GROUP BY req.EmpReqId, req.EmpReqCode, req.EmpReqName, " +
-                    "bu.RcmBsUnitName, hrbp.RcmHRBPName, req.EmpReqExpDate, req.EmpReqStartDate, req.EmpReqNum, " +
-                    "req.EmpReqStatus, pic.EmpReqPICId, agg.StageName) a " +
-                    "WHERE (:sla IS NULL OR a.deadlineStatus = :sla) " +
-                    "AND (:status IS NULL OR COALESCE(a.stage, a.status) = :status) ")
+
+                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN " +
+                    "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = " +
+                    "(SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
+                    "AND (:code IS NULL OR req.EmpReqCode LIKE '%' + :code + '%') " +
+                    "AND (:name IS NULL OR req.EmpReqName LIKE '%' + :name + '%') " +
+                    "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%' + :buName + '%') " +
+                    "AND (:hrbpName IS NULL OR hrbp.RcmHRBPName LIKE '%' + :hrbpName + '%') " +
+                    "AND (:pic IS NULL OR EXISTS (SELECT 1 FROM RCMEmpReqPIC p " +
+                    "JOIN URMUser u ON u.UserId = p.UserId WHERE p.EmpReqId = req.EmpReqId " +
+                    "AND u.UserRealName LIKE '%' + :pic + '%'))" +
+
+                    ") a WHERE (:sla IS NULL OR a.deadlineStatus = :sla) " +
+                    "AND (:status IS NULL OR COALESCE(a.stage, a.status) = :status)", nativeQuery = true
+    )
     Page<EmployeeRequestResp> getEmployeeRequest(@Param("code") String code,
                                                  @Param("name") String name,
                                                  @Param("buName") String buName,

@@ -22,25 +22,27 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration}")
     private long refreshExpiration;
 
-    public String generateAccessToken(String username, List<String> roles, List<String> permissions) {
+    public String generateAccessToken(String username, List<String> roles, List<String> permissions, List<String> authorizations) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         long now = System.currentTimeMillis();
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
                 .withClaim("permissions", permissions)
+                .withClaim("authorizations", authorizations)
                 .withIssuedAt(new Date(now))
                 .withExpiresAt(new Date(now + accessExpiration))
                 .sign(algorithm);
     }
 
-    public String generateRefreshToken(String username, List<String> roles, List<String> permissions) {
+    public String generateRefreshToken(String username, List<String> roles, List<String> permissions, List<String> authorizations) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         long now = System.currentTimeMillis();
         return JWT.create()
                 .withSubject(username)
                 .withClaim("roles", roles)
                 .withClaim("permissions", permissions)
+                .withClaim("authorizations", authorizations)
                 .withIssuedAt(new Date(now))
                 .withExpiresAt(new Date(now + refreshExpiration))
                 .sign(algorithm);
@@ -62,6 +64,12 @@ public class JwtUtil {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
         return jwt.getClaim("permissions").asList(String.class);
+    }
+
+    public List<String> getAuthorizations(String token) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+        return jwt.getClaim("authorizations").asList(String.class);
     }
 
     public boolean validateToken(String token) {
