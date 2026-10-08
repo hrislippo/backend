@@ -9,5 +9,5 @@ public class TempAuthRequest {
     private Long id;
     private String tempAuthCode;
     private String tempAuthName;
-    private List<TempAuthOrgRequest> organizationList;
+    private List<TempAuthDtRequest> detailList;
 }

@@ -21,8 +21,8 @@ public class TemplateAuthController {
     @PostMapping("/tempauth")
     public ApiResponse addTemplateAuth(@RequestBody TempAuthRequest tempAuthRequest) {
         tempAuthValidation.codeNameRequired(tempAuthRequest);
-        tempAuthValidation.organizationRequired(tempAuthRequest);
-        tempAuthValidation.organizationDuplicate(tempAuthRequest);
+        tempAuthValidation.detailRequired(tempAuthRequest);
+        tempAuthValidation.detailDuplicate(tempAuthRequest);
         templateAuthService.addTemplateAuth(tempAuthRequest);
         return ApiResponse.ok(null, "Add Authorization Template Successfully");
     }
@@ -30,8 +30,8 @@ public class TemplateAuthController {
     @PutMapping("/tempauth")
     public ApiResponse modifyTemplateAuth(@RequestBody TempAuthRequest tempAuthRequest) {
         tempAuthValidation.codeNameRequired(tempAuthRequest);
-        tempAuthValidation.organizationRequired(tempAuthRequest);
-        tempAuthValidation.organizationDuplicate(tempAuthRequest);
+        tempAuthValidation.detailRequired(tempAuthRequest);
+        tempAuthValidation.detailDuplicate(tempAuthRequest);
         templateAuthService.modifyTemplateAuth(tempAuthRequest);
         return ApiResponse.ok(null, "Add Authorization Template Successfully");
     }
@@ -56,6 +56,11 @@ public class TemplateAuthController {
     @GetMapping("/org-active")
     public ApiResponse getActiveOrganization() {
         return ApiResponse.ok(templateAuthService.getActiveOrganization(), "Get Active Organization Successfully");
+    }
+
+    @GetMapping("/joblevel-active")
+    public ApiResponse getActiveJobLevel() {
+        return ApiResponse.ok(templateAuthService.getActiveJobLevel(), "Get Active Job Level Successfully");
     }
 
     @DeleteMapping("/tempauth")

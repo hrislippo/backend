@@ -23,4 +23,10 @@ public class TemplateAuthDetail extends Auditable {
 
     @Column(name = "TempAuthDtOrgName")
     private String organizationName;
+
+    @Column(name = "TempAuthDtJobLvlCode")
+    private String jobLevelCode;
+
+    @Column(name = "TempAuthDtJobLvlName")
+    private String jobLevelName;
 }

@@ -31,6 +31,9 @@ public interface ProIntClient {
     @GetMapping(value = "api-proint/ODOrgActive")
     ApiResponse getActiveOrganization();
 
+    @GetMapping(value = "api-proint/ODJobLevelActive")
+    ApiResponse getActiveJobLevel();
+
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
 
@@ -47,7 +50,8 @@ public interface ProIntClient {
     ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
 
     @GetMapping(value = "/api-proint/PMEmployeeStr")
-    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth, @RequestParam List<String> organizationCodes);
+    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth,
+                                     @RequestParam List<String> organizationCodes, @RequestParam List<String> jobLevelCodes);
 
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);

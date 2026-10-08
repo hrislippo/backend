@@ -22,6 +22,12 @@ public interface TemplateAuthRepository extends JpaRepository<TemplateAuth, Long
     @Query(nativeQuery = true,
             value="SELECT DISTINCT tad.TempAuthDtOrgCode FROM URMTempAuth ta " +
                     "INNER JOIN URMTempAuthDt tad ON ta.TempAuthId = tad.TempAuthId " +
-                    "WHERE ta.TempAuthName IN (:tempAuthName)")
+                    "WHERE ta.TempAuthName IN (:tempAuthName) AND tad.TempAuthDtOrgCode IS NOT NULL")
     List<String> findOrgCodeByTempName(@Param("tempAuthName") List<String> tempAuthName);
+
+    @Query(nativeQuery = true,
+            value="SELECT DISTINCT tad.TempAuthDtJobLvlCode FROM URMTempAuth ta " +
+                    "INNER JOIN URMTempAuthDt tad ON ta.TempAuthId = tad.TempAuthId " +
+                    "WHERE ta.TempAuthName IN (:tempAuthName) AND tad.TempAuthDtJobLvlCode IS NOT NULL")
+    List<String> findJobLevelByTempName(@Param("tempAuthName") List<String> tempAuthName);
 }

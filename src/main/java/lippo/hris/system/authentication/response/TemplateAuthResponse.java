@@ -8,5 +8,5 @@ import java.util.List;
 public class TemplateAuthResponse {
     private String templateCode;
     private String templateName;
-    private List<TemplateAuthOrgResponse> organization;
+    private List<TemplateAuthDtResponse> detail;
 }

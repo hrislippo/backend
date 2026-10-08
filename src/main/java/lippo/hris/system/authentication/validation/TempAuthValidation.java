@@ -2,11 +2,10 @@ package lippo.hris.system.authentication.validation;
 
 import lippo.hris.system.authentication.repository.TemplateAuthRepository;
 import lippo.hris.system.authentication.repository.UserTemplateAuthRepository;
-import lippo.hris.system.authentication.request.TempAuthOrgRequest;
+import lippo.hris.system.authentication.request.TempAuthDtRequest;
 import lippo.hris.system.authentication.request.TempAuthRequest;
 import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.exception.ConflictException;
-import lippo.hris.system.talentmanagement.request.TalentPoolReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,20 +30,19 @@ public class TempAuthValidation {
         }
     }
 
-    public void organizationRequired(TempAuthRequest tempAuthRequest) {
-        if(tempAuthRequest.getOrganizationList() == null || tempAuthRequest.getOrganizationList().isEmpty()) {
-            throw new BadRequestException("Organization is required");
+    public void detailRequired(TempAuthRequest tempAuthRequest) {
+        if(tempAuthRequest.getDetailList() == null || tempAuthRequest.getDetailList().isEmpty()) {
+            throw new BadRequestException("Detail is required");
         }
     }
 
-    public void organizationDuplicate(TempAuthRequest tempAuthRequest) {
-        List<String> orgCodeList = tempAuthRequest.getOrganizationList().stream().map(TempAuthOrgRequest::getOrganizationCode).toList();
-        boolean hasDuplicate = orgCodeList.stream()
+    public void detailDuplicate(TempAuthRequest tempAuthRequest) {
+        boolean hasDuplicate = tempAuthRequest.getDetailList().stream()
                 .distinct()
-                .count() != orgCodeList.size();
+                .count() != tempAuthRequest.getDetailList().size();
 
         if(hasDuplicate){
-            throw new BadRequestException("Organization cannot duplicate");
+            throw new BadRequestException("Detail cannot duplicate");
         }
     }
 

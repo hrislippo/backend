@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface TemplateAuthDetailRepository extends JpaRepository<TemplateAuthDetail, Long> {
     List<TemplateAuthDetail> findByTemplateAuth(TemplateAuth templateAuth);
-    TemplateAuthDetail findByTemplateAuthAndOrganizationCode(TemplateAuth templateAuth, String organizationCode);
+    TemplateAuthDetail findByTemplateAuthAndOrganizationCodeAndJobLevelCode(TemplateAuth templateAuth, String organizationCode, String jobLevelCode);
 }
