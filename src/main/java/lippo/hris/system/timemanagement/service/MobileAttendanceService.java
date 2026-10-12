@@ -2,6 +2,7 @@ package lippo.hris.system.timemanagement.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.exception.NotFoundException;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.personnelmanagement.response.PersonnelFileResp;
@@ -9,16 +10,19 @@ import lippo.hris.system.timemanagement.entity.MobileAttendanceRequest;
 import lippo.hris.system.timemanagement.repository.MobileAttendanceRequestRepository;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrEmpReq;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
+import lippo.hris.system.timemanagement.response.DayPaymentResp;
 import lippo.hris.system.timemanagement.response.EmployeeResp;
 import lippo.hris.system.timemanagement.response.MobileAttendanceResp;
 import lippo.hris.system.timemanagement.response.MobileTemplateResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -33,6 +37,9 @@ public class MobileAttendanceService {
 
     @Autowired
     MobileAttendanceRequestRepository mobileAttendanceRequestRepository;
+
+    @Autowired
+    TemplateAuthService templateAuthService;
 
     public void addMobileAttendance(MOTMAtdTempMbrReq motmAtdTempMbrReq, String username) {
 
@@ -73,8 +80,19 @@ public class MobileAttendanceService {
         }
     }
 
-    public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String empName, String tempCode, LocalDate startDate, LocalDate endDate, Pageable pageable){
-        return mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable);
+    public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String empName, String tempCode, LocalDate startDate, LocalDate endDate,
+                                                          Pageable pageable, List<String> authorizations){
+        List<String> authNIKList = templateAuthService.getAuthEmployees(authorizations);
+        List<MobileAttendanceResp> mobileAttendanceList = mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate);
+        mobileAttendanceList = mobileAttendanceList.stream().filter(e -> authNIKList.contains(e.getEmpNIK())).toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), mobileAttendanceList.size());
+        if (start > mobileAttendanceList.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, mobileAttendanceList.size());
+        }
+        List<MobileAttendanceResp> pageContent = mobileAttendanceList.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, mobileAttendanceList.size());
     }
 
     public MobileAttendanceRequest getMobileAttendanceDetail(Long id){

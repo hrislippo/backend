@@ -22,20 +22,12 @@ public interface MobileAttendanceRequestRepository extends JpaRepository<MobileA
                     "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
                     "AND (:startDate IS NULL OR ma.TmMobileAttendReqStartDate = :startDate) " +
                     "AND (:endDate IS NULL OR ma.TmMobileAttendReqEndDate = :endDate) " +
-                    "ORDER BY ma.TmMobileAttendReqStartDate DESC",
-            countQuery = "SELECT COUNT(1) " +
-                    "FROM TMMobileAttendReq ma " +
-                    "WHERE (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
-                    "AND (:empName IS NULL OR ma.TmMobileAttendReqEmpName LIKE '%'+:empName+'%') " +
-                    "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
-                    "AND (:startDate IS NULL OR ma.TmMobileAttendReqStartDate = :startDate) " +
-                    "AND (:endDate IS NULL OR ma.TmMobileAttendReqEndDate = :endDate)")
-    Page<MobileAttendanceResp> getMobileAttendance(@Param("empNIK") String empNIK,
+                    "ORDER BY ma.TmMobileAttendReqStartDate DESC")
+    List<MobileAttendanceResp> getMobileAttendance(@Param("empNIK") String empNIK,
                                                         @Param("empName") String empName,
                                                         @Param("tempCode") String tempCode,
                                                         @Param("startDate") LocalDate startDate,
-                                                        @Param("endDate") LocalDate endDate,
-                                                        Pageable pageable);
+                                                        @Param("endDate") LocalDate endDate);
 
     @Query(nativeQuery = true,
             value = "SELECT * " +

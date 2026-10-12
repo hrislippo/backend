@@ -2,6 +2,7 @@ package lippo.hris.system.talentmanagement.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.personnelmanagement.response.PersonnelDetailResp;
 import lippo.hris.system.personnelmanagement.response.PersonnelStructureNIKResp;
@@ -30,6 +31,9 @@ public class TalentPoolService {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    TemplateAuthService templateAuthService;
 
     @Autowired
     TalentPoolRepository talentPoolRepository;
@@ -119,9 +123,10 @@ public class TalentPoolService {
         return positions;
     }
 
-    public List<PersonnelStructureNIKResp> getAllActiveEmployee(String posCode){
+    public List<PersonnelStructureNIKResp> getAllActiveEmployee(String posCode, List<String> authorizations){
+        List<String> authNIKList = templateAuthService.getAuthEmployees(authorizations);
         Object employeeData = proIntClient.getActiveEmployee(posCode).getData();
         List<PersonnelStructureNIKResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
-        return employees;
+        return employees.stream().filter(e -> authNIKList.contains(e.getEmpNik())).toList();
     }
  }

@@ -1,6 +1,11 @@
 package lippo.hris.system.timemanagement.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.feign.ProIntClient;
+import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrEmpReq;
+import lippo.hris.system.timemanagement.response.EmployeeResp;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -22,7 +27,13 @@ public class ImportNikService {
     @Autowired
     ProIntClient proIntClient;
 
-    public Object importNik(MultipartFile file) throws IOException {
+    @Autowired
+    TemplateAuthService templateAuthService;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    public Object importNik(MultipartFile file, List<String> authorizations) throws IOException {
         List<String> employeeNiks = new ArrayList<>();
         DataFormatter formatter = new DataFormatter();
 
@@ -51,11 +62,20 @@ public class ImportNikService {
                 }
             }
         }
-        return checkNik(employeeNiks);
+        return checkNik(employeeNiks, authorizations);
     }
 
-    public Object checkNik(List<String> nikList){
-        return proIntClient.getEmployeeInfo(nikList).getData();
+    public Object checkNik(List<String> nikList, List<String> authorizations){
+        List<String> nikAuthList = templateAuthService.getAuthEmployees(authorizations);
+        Object employeeData = proIntClient.getEmployeeInfo(nikList).getData();
+        List<EmployeeResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
+
+        for(EmployeeResp employee : employees){
+            if(!nikAuthList.contains(employee.getEmpNik()) && !employee.getEmpName().contains("not found")){
+                employee.setEmpName("Employee not authorized");
+            }
+        }
+        return employees;
     }
 
     public ResponseEntity<?> downloadImportNik() throws IOException {

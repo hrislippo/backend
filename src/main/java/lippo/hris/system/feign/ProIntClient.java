@@ -25,20 +25,37 @@ public interface ProIntClient {
     @PostMapping(value = "/api-proint/RCCanPhoto", consumes = MediaType.APPLICATION_JSON_VALUE)
     void insertCandidatePhoto(@RequestBody RCCanPhotoReq rcCanPhotoReq);
 
-    @GetMapping(value = "/api-proint/ODPosition")
+    @GetMapping(value = "/api-proint/ODPositionActive")
     ApiResponse getActivePosition();
 
-    @GetMapping(value = "api-proint/ODOrgActive")
+    @GetMapping(value = "/api-proint/ODOrgActive")
     ApiResponse getActiveOrganization();
 
-    @GetMapping(value = "api-proint/ODJobLevelActive")
+    @GetMapping(value = "/api-proint/ODJobLevelActive")
     ApiResponse getActiveJobLevel();
+
+    @GetMapping(value = "/api-proint/ODJobTitleActive")
+    ApiResponse getActiveJobTitle();
+
+    @GetMapping(value = "/api-proint/ODCompanyActive")
+    ApiResponse getActiveCompany();
+
+    @GetMapping(value = "/api-proint/ODLocationActive")
+    ApiResponse getActiveLocation();
 
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);
 
     @GetMapping(value = "/api-proint/PMEmployeeActive")
     ApiResponse getActiveEmployee(@RequestParam String posCode);
+
+    @GetMapping(value = "/api-proint/PMEmployeeAuth")
+    ApiResponse getEmployeeAuth(@RequestParam(required = false) List<String> compCodes,
+                                @RequestParam(required = false) List<String> orgCodes,
+                                @RequestParam(required = false) List<String> jobLevelCodes,
+                                @RequestParam(required = false) List<String> jobTitleCodes,
+                                @RequestParam(required = false) List<String> positionCodes,
+                                @RequestParam(required = false) List<String> locationCodes);
 
     @GetMapping(value = "/api-proint/PMEmployeeDt")
     ApiResponse getEmployeeDetail(@RequestParam String empNIK);
@@ -50,8 +67,7 @@ public interface ProIntClient {
     ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
 
     @GetMapping(value = "/api-proint/PMEmployeeStr")
-    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth,
-                                     @RequestParam List<String> organizationCodes, @RequestParam List<String> jobLevelCodes);
+    ApiResponse getEmployeeStructure(@RequestParam String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth);
 
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);

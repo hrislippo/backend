@@ -63,6 +63,21 @@ public class TemplateAuthController {
         return ApiResponse.ok(templateAuthService.getActiveJobLevel(), "Get Active Job Level Successfully");
     }
 
+    @GetMapping("/company-active")
+    public ApiResponse getActiveCompany() {
+        return ApiResponse.ok(templateAuthService.getActiveCompany(), "Get Active Company Successfully");
+    }
+
+    @GetMapping("/location-active")
+    public ApiResponse getActiveLocation() {
+        return ApiResponse.ok(templateAuthService.getActiveLocation(), "Get Active Location Successfully");
+    }
+
+    @GetMapping("/jobtitle-active")
+    public ApiResponse getActiveJobTitle() {
+        return ApiResponse.ok(templateAuthService.getActiveJobTitle(), "Get Active Job Title Successfully");
+    }
+
     @DeleteMapping("/tempauth")
     public ApiResponse deleteTemplateAuth(@RequestParam("templateId") Long templateId) {
         tempAuthValidation.templateUsed(templateId);

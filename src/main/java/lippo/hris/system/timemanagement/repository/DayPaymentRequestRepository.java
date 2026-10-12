@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface DayPaymentRequestRepository extends JpaRepository<DayPaymentRequest, Long> {
 
@@ -21,16 +22,9 @@ public interface DayPaymentRequestRepository extends JpaRepository<DayPaymentReq
                     "AND (:empName IS NULL OR dp.TmDayPaymentReqEmpName LIKE '%'+:empName+'%') " +
                     "AND (:startDate IS NULL OR dp.TmDayPaymentReqDate = :startDate) " +
                     "AND (:expiryDate IS NULL OR dp.TmDayPaymentReqExpDate = :expiryDate) " +
-                    "ORDER BY dp.TmDayPaymentReqDate DESC",
-            countQuery = "SELECT COUNT(1) " +
-                    "FROM TMDayPaymentReq dp " +
-                    "WHERE (:empNIK IS NULL OR dp.TmDayPaymentReqEmp LIKE '%'+:empNIK+'%') " +
-                    "AND (:empName IS NULL OR dp.TmDayPaymentReqEmpName LIKE '%'+:empName+'%') " +
-                    "AND (:startDate IS NULL OR dp.TmDayPaymentReqDate = :startDate) " +
-                    "AND (:expiryDate IS NULL OR dp.TmDayPaymentReqExpDate = :expiryDate)")
-    Page<DayPaymentResp> getDayPayment(@Param("empNIK") String empNIK,
-                                        @Param("empName") String empName,
-                                        @Param("startDate") LocalDate startDate,
-                                        @Param("expiryDate") LocalDate expiryDate,
-                                        Pageable pageable);
+                    "ORDER BY dp.TmDayPaymentReqDate DESC")
+    List<DayPaymentResp> getDayPayment(@Param("empNIK") String empNIK,
+                                       @Param("empName") String empName,
+                                       @Param("startDate") LocalDate startDate,
+                                       @Param("expiryDate") LocalDate expiryDate);
 }

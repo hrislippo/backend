@@ -2,6 +2,8 @@ package lippo.hris.system.timemanagement.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lippo.hris.system.authentication.repository.TemplateAuthRepository;
+import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.personnelmanagement.response.PersonnelStructureResp;
@@ -14,11 +16,13 @@ import lippo.hris.system.timemanagement.response.TMDayPayment;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,6 +36,9 @@ public class DayPaymentService {
 
     @Autowired
     DayPaymentRequestRepository dayPaymentRequestRepository;
+
+    @Autowired
+    TemplateAuthService templateAuthService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -60,8 +67,18 @@ public class DayPaymentService {
         }
     }
 
-    public Page<DayPaymentResp> getDayPayment(String empNIK, String empName, LocalDate startDate, LocalDate expiryDate, Pageable pageable){
-        return dayPaymentRequestRepository.getDayPayment(empNIK, empName, startDate, expiryDate, pageable);
+    public Page<DayPaymentResp> getDayPayment(String empNIK, String empName, LocalDate startDate, LocalDate expiryDate, Pageable pageable, List<String> authorizations){
+        List<String> authNIKList = templateAuthService.getAuthEmployees(authorizations);
+        List<DayPaymentResp> dayPaymentList = dayPaymentRequestRepository.getDayPayment(empNIK, empName, startDate, expiryDate);
+        dayPaymentList = dayPaymentList.stream().filter(e -> authNIKList.contains(e.getEmpNIK())).toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), dayPaymentList.size());
+        if (start > dayPaymentList.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, dayPaymentList.size());
+        }
+        List<DayPaymentResp> pageContent = dayPaymentList.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, dayPaymentList.size());
     }
 
     public DayPaymentRequest getDayPaymentDetail(Long id){

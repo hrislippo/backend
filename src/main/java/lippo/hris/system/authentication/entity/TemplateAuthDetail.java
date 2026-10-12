@@ -18,15 +18,39 @@ public class TemplateAuthDetail extends Auditable {
     @JoinColumn(name = "TempAuthId")
     private TemplateAuth templateAuth;
 
+    @Column(name = "TempAuthDtCompCode")
+    private String companyCode;
+
+    @Column(name = "TempAuthDtCompName")
+    private String companyName;
+
     @Column(name = "TempAuthDtOrgCode")
     private String organizationCode;
 
     @Column(name = "TempAuthDtOrgName")
     private String organizationName;
 
+    @Column(name = "TempAuthDtLocCode")
+    private String locationCode;
+
+    @Column(name = "TempAuthDtLocName")
+    private String locationName;
+
+    @Column(name = "TempAuthDtPosCode")
+    private String positionCode;
+
+    @Column(name = "TempAuthDtPosName")
+    private String positionName;
+
     @Column(name = "TempAuthDtJobLvlCode")
     private String jobLevelCode;
 
     @Column(name = "TempAuthDtJobLvlName")
     private String jobLevelName;
+
+    @Column(name = "TempAuthDtJobTtlCode")
+    private String jobTitleCode;
+
+    @Column(name = "TempAuthDtJobTtlName")
+    private String jobTitleName;
 }

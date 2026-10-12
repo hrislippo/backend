@@ -38,8 +38,9 @@ public class MobileAttendanceController {
                                      @RequestParam(value = "tempCode", required = false) String tempCode,
                                      @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                      @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                     Pageable pageable) {
-        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable), "Get Mobile Attendance Successfully");
+                                     Pageable pageable, Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable, customUserDetails.getAuthorizations()), "Get Mobile Attendance Successfully");
     }
 
     @GetMapping("/mobile-attendance-detail")

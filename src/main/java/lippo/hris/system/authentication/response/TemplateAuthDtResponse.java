@@ -8,4 +8,12 @@ public class TemplateAuthDtResponse {
     private String orgName;
     private String jobLvlCode;
     private String jobLvlName;
+    private String compCode;
+    private String compName;
+    private String locCode;
+    private String locName;
+    private String posCode;
+    private String posName;
+    private String jobTtlCode;
+    private String jobTtlName;
 }

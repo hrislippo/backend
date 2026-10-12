@@ -34,6 +34,17 @@ public class TempAuthValidation {
         if(tempAuthRequest.getDetailList() == null || tempAuthRequest.getDetailList().isEmpty()) {
             throw new BadRequestException("Detail is required");
         }
+
+        for(TempAuthDtRequest tempAuthDtRequest : tempAuthRequest.getDetailList()) {
+            if(tempAuthDtRequest.getOrganizationCode() == null &&
+            tempAuthDtRequest.getCompanyCode() == null &&
+            tempAuthDtRequest.getJobLevelCode() == null &&
+            tempAuthDtRequest.getJobTitleCode() == null &&
+            tempAuthDtRequest.getPositionCode() == null &&
+            tempAuthDtRequest.getLocationCode() == null){
+                throw new BadRequestException("Detail value is required");
+            }
+        }
     }
 
     public void detailDuplicate(TempAuthRequest tempAuthRequest) {

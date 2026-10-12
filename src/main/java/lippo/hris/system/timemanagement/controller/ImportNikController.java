@@ -3,8 +3,10 @@ package lippo.hris.system.timemanagement.controller;
 import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.timemanagement.service.ImportNikService;
 import lippo.hris.system.timemanagement.validation.DayPaymentValidation;
+import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +24,10 @@ public class ImportNikController {
     DayPaymentValidation dayPaymentValidation;
 
     @PostMapping("/import-nik")
-    public ApiResponse importNik(@RequestParam("file") MultipartFile file) throws IOException {
-        return ApiResponse.ok(importNikService.importNik(file), "NIK extracted from Excel");
+    public ApiResponse importNik(@RequestParam("file") MultipartFile file,
+                                 Authentication authentication) throws IOException {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(importNikService.importNik(file, userDetails.getAuthorizations()), "NIK extracted from Excel");
     }
 
     @GetMapping("/download-import-nik")
@@ -32,8 +36,10 @@ public class ImportNikController {
     }
 
     @GetMapping("/check-nik")
-    public ApiResponse checkNik(@RequestParam(value = "nikList", required = false) List<String> nikList) throws IOException {
+    public ApiResponse checkNik(@RequestParam(value = "nikList", required = false) List<String> nikList,
+                                Authentication authentication){
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         dayPaymentValidation.nikRequired(nikList);
-        return ApiResponse.ok(importNikService.checkNik(nikList), "NIK checked successfully");
+        return ApiResponse.ok(importNikService.checkNik(nikList, userDetails.getAuthorizations()), "NIK checked successfully");
     }
 }

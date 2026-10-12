@@ -40,8 +40,9 @@ public class DayPaymentController {
                                      @RequestParam(value = "empName", required = false) String empName,
                                      @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                      @RequestParam(value = "expiryDate", required = false) LocalDate expiryDate,
-                                     Pageable pageable) {
-        return ApiResponse.ok(dayPaymentService.getDayPayment(empNIK, empName, startDate, expiryDate, pageable), "Get Day Payment Successfully");
+                                     Authentication authentication, Pageable pageable) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(dayPaymentService.getDayPayment(empNIK, empName, startDate, expiryDate, pageable, customUserDetails.getAuthorizations()), "Get Day Payment Successfully");
     }
 
     @GetMapping("/day-payment-detail")

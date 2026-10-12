@@ -36,10 +36,8 @@ public class PersonnelStructureService {
         return employees;
     }
 
-    public List<PersonnelStructureResp> getEmployeeStructure(String empNIK, String posName, Integer subordinateDepth, Integer superiorDepth, List<String> authorizations){
-        List<String> organizationCodes = templateAuthRepository.findOrgCodeByTempName(authorizations);
-        List<String> jobLevelCodes = templateAuthRepository.findJobLevelByTempName(authorizations);
-        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName, subordinateDepth, superiorDepth, organizationCodes, jobLevelCodes).getData();
+    public List<PersonnelStructureResp> getEmployeeStructure(String empNIK, String posName, Integer subordinateDepth, Integer superiorDepth){
+        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName, subordinateDepth, superiorDepth).getData();
         List<PersonnelStructureResp> employees = objectMapper.convertValue(employeeData, new TypeReference<>(){});
 
         for(PersonnelStructureResp employee : employees){

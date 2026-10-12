@@ -5,8 +5,10 @@ import lippo.hris.system.talentmanagement.request.TalentPoolDetailReq;
 import lippo.hris.system.talentmanagement.request.TalentPoolReq;
 import lippo.hris.system.talentmanagement.service.TalentPoolService;
 import lippo.hris.system.talentmanagement.validation.TalentPoolValidation;
+import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,8 +40,10 @@ public class TalentPoolController {
 
 
     @GetMapping("/employees")
-    public ApiResponse getActiveEmployees(@RequestParam(value = "posCode", required = false) String posCode) {
-        return ApiResponse.ok(talentPoolService.getAllActiveEmployee(posCode), "Get Active Employee Successfully");
+    public ApiResponse getActiveEmployees(@RequestParam(value = "posCode", required = false) String posCode,
+                                          Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(talentPoolService.getAllActiveEmployee(posCode, customUserDetails.getAuthorizations()), "Get Active Employee Successfully");
     }
 
     @GetMapping("/talentpool")

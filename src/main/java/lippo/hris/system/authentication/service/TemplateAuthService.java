@@ -8,10 +8,7 @@ import lippo.hris.system.authentication.repository.TemplateAuthDetailRepository;
 import lippo.hris.system.authentication.repository.TemplateAuthRepository;
 import lippo.hris.system.authentication.request.TempAuthDtRequest;
 import lippo.hris.system.authentication.request.TempAuthRequest;
-import lippo.hris.system.authentication.response.JobLevelResponse;
-import lippo.hris.system.authentication.response.OrgResponse;
-import lippo.hris.system.authentication.response.TemplateAuthDtResponse;
-import lippo.hris.system.authentication.response.TemplateAuthResponse;
+import lippo.hris.system.authentication.response.*;
 import lippo.hris.system.feign.ProIntClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,6 +48,14 @@ public class TemplateAuthService {
             templateAuthDetail.setOrganizationName(detail.getOrganizationName());
             templateAuthDetail.setJobLevelCode(detail.getJobLevelCode());
             templateAuthDetail.setJobLevelName(detail.getJobLevelName());
+            templateAuthDetail.setCompanyCode(detail.getCompanyCode());
+            templateAuthDetail.setCompanyName(detail.getCompanyName());
+            templateAuthDetail.setLocationCode(detail.getLocationCode());
+            templateAuthDetail.setLocationName(detail.getLocationName());
+            templateAuthDetail.setPositionCode(detail.getPositionCode());
+            templateAuthDetail.setPositionName(detail.getPositionName());
+            templateAuthDetail.setJobTitleCode(detail.getJobTitleCode());
+            templateAuthDetail.setJobTitleName(detail.getJobTitleName());
             templateAuthDetailRepository.save(templateAuthDetail);
         }
     }
@@ -70,6 +75,14 @@ public class TemplateAuthService {
             detailRequest.setOrganizationName(detail.getOrganizationName());
             detailRequest.setJobLevelCode(detail.getJobLevelCode());
             detailRequest.setJobLevelName(detail.getJobLevelName());
+            detailRequest.setCompanyCode(detail.getCompanyCode());
+            detailRequest.setCompanyName(detail.getCompanyName());
+            detailRequest.setLocationCode(detail.getLocationCode());
+            detailRequest.setLocationName(detail.getLocationName());
+            detailRequest.setPositionCode(detail.getPositionCode());
+            detailRequest.setPositionName(detail.getPositionName());
+            detailRequest.setJobTitleCode(detail.getJobTitleCode());
+            detailRequest.setJobTitleName(detail.getJobTitleName());
             existingDetail.add(detailRequest);
         }
 
@@ -85,11 +98,21 @@ public class TemplateAuthService {
             templateAuthDetail.setOrganizationName(detail.getOrganizationName());
             templateAuthDetail.setJobLevelCode(detail.getJobLevelCode());
             templateAuthDetail.setJobLevelName(detail.getJobLevelName());
+            templateAuthDetail.setCompanyCode(detail.getCompanyCode());
+            templateAuthDetail.setCompanyName(detail.getCompanyName());
+            templateAuthDetail.setLocationCode(detail.getLocationCode());
+            templateAuthDetail.setLocationName(detail.getLocationName());
+            templateAuthDetail.setPositionCode(detail.getPositionCode());
+            templateAuthDetail.setPositionName(detail.getPositionName());
+            templateAuthDetail.setJobTitleCode(detail.getJobTitleCode());
+            templateAuthDetail.setJobTitleName(detail.getJobTitleName());
             templateAuthDetailRepository.save(templateAuthDetail);
         }
 
         for(TempAuthDtRequest detail : removeDetail){
-            TemplateAuthDetail templateAuthDetail = templateAuthDetailRepository.findByTemplateAuthAndOrganizationCodeAndJobLevelCode(templateAuth, detail.getOrganizationCode(), detail.getJobLevelCode());
+            TemplateAuthDetail templateAuthDetail = templateAuthDetailRepository.findByTemplateAuthAndCriteria(templateAuth.getId(),
+                    detail.getOrganizationCode(), detail.getJobLevelCode(), detail.getCompanyCode(), detail.getLocationCode(),
+                    detail.getPositionCode(), detail.getJobTitleCode());
             templateAuthDetailRepository.delete(templateAuthDetail);
         }
     }
@@ -116,10 +139,33 @@ public class TemplateAuthService {
             templateAuthDtResponse.setOrgName(templateAuthDetail.getOrganizationName());
             templateAuthDtResponse.setJobLvlCode(templateAuthDetail.getJobLevelCode());
             templateAuthDtResponse.setJobLvlName(templateAuthDetail.getJobLevelName());
+            templateAuthDtResponse.setCompCode(templateAuthDetail.getCompanyCode());
+            templateAuthDtResponse.setCompName(templateAuthDetail.getCompanyName());
+            templateAuthDtResponse.setLocCode(templateAuthDetail.getLocationCode());
+            templateAuthDtResponse.setLocName(templateAuthDetail.getLocationName());
+            templateAuthDtResponse.setPosCode(templateAuthDetail.getPositionCode());
+            templateAuthDtResponse.setPosName(templateAuthDetail.getPositionName());
+            templateAuthDtResponse.setJobTtlCode(templateAuthDetail.getJobTitleCode());
+            templateAuthDtResponse.setJobTtlName(templateAuthDetail.getJobTitleName());
             templateAuthDtResponseList.add(templateAuthDtResponse);
         }
         templateAuthResponse.setDetail(templateAuthDtResponseList);
         return templateAuthResponse;
+    }
+
+    public List<String> getAuthEmployees(List<String> tempAuthList){
+        List<String> compCodes = templateAuthRepository.findCompCodeByTempName(tempAuthList);
+        List<String> orgCodes = templateAuthRepository.findOrgCodeByTempName(tempAuthList);
+        List<String> jobLevelCodes = templateAuthRepository.findJobLevelByTempName(tempAuthList);
+        List<String> jobTitleCodes = templateAuthRepository.findJobTitleByTempName(tempAuthList);
+        List<String> positionCodes = templateAuthRepository.findPosCodeByTempName(tempAuthList);
+        List<String> locationCodes = templateAuthRepository.findLocCodeByTempName(tempAuthList);
+        Object employeeNIKData = proIntClient.getEmployeeAuth(compCodes, orgCodes, jobLevelCodes, jobTitleCodes, positionCodes, locationCodes).getData();
+        if(employeeNIKData == null){
+            return null;
+        }
+        List<String> employeeNIKList = objectMapper.convertValue(employeeNIKData, new TypeReference<>(){});
+        return employeeNIKList;
     }
 
     public List<OrgResponse> getActiveOrganization() {
@@ -132,6 +178,24 @@ public class TemplateAuthService {
         Object jobLevelData = proIntClient.getActiveJobLevel().getData();
         List<JobLevelResponse> jobLevels = objectMapper.convertValue(jobLevelData, new TypeReference<>(){});
         return jobLevels;
+    }
+
+    public List<CompanyResponse> getActiveCompany() {
+        Object companyData = proIntClient.getActiveCompany().getData();
+        List<CompanyResponse> companies = objectMapper.convertValue(companyData, new TypeReference<>(){});
+        return companies;
+    }
+
+    public List<JobTitleResponse> getActiveJobTitle() {
+        Object jobTitleData = proIntClient.getActiveJobTitle().getData();
+        List<JobTitleResponse> jobTitles = objectMapper.convertValue(jobTitleData, new TypeReference<>(){});
+        return jobTitles;
+    }
+
+    public List<LocationResponse> getActiveLocation() {
+        Object locationData = proIntClient.getActiveLocation().getData();
+        List<LocationResponse> locations = objectMapper.convertValue(locationData, new TypeReference<>(){});
+        return locations;
     }
 
     public void deleteTemplateAuth(Long id){
