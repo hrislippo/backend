@@ -29,4 +29,25 @@ public class WorkflowGroupTemp extends Auditable {
 
     @Column(name = "WmGroupTempActive")
     private Boolean active;
+
+    @Column(name = "WmGroupTempFgComp")
+    private Boolean flagCompany;
+
+    @Column(name = "WmGroupTempFgOrg")
+    private Boolean flagOrganization;
+
+    @Column(name = "WmGroupTempFgJobLvl")
+    private Boolean flagJobLevel;
+
+    @Column(name = "WmGroupTempFgJobTtl")
+    private Boolean flagJobTitle;
+
+    @Column(name = "WmGroupTempFgLoc")
+    private Boolean flagLocation;
+
+    @Column(name = "WmGroupTempFgPos")
+    private Boolean flagPosition;
+
+    @Column(name = "WmGroupTempFgEmp")
+    private Boolean flagEmployee;
 }

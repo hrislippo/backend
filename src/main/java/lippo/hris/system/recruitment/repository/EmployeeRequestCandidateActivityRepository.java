@@ -23,7 +23,7 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
     @Query(nativeQuery = true,
             value = "WITH StageOrder AS ( " +
                     "    SELECT * FROM (VALUES " +
-                    "    (1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
+                    "    (1, 'Evaluation'), (2, 'Offering'), (3, 'Pre-employment Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
                     "    ) v(StageOrder, StageName) " +
                     "), " +
                     "StageAgg AS ( " +
@@ -52,9 +52,9 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "    WHERE rn = 1 " +
                     ") " +
                     "SELECT " +
-                    "    SUM(CASE WHEN cs.StageName = 'Assessment' THEN 1 ELSE 0 END) AS totalAssessment, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Evaluation' THEN 1 ELSE 0 END) AS totalAssessment, " +
                     "    SUM(CASE WHEN cs.StageName = 'Offering' THEN 1 ELSE 0 END) AS totalOffering, " +
-                    "    SUM(CASE WHEN cs.StageName = 'Background Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Pre-employment Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
                     "    SUM(CASE WHEN cs.StageName = 'Sign Agreement' THEN 1 ELSE 0 END) AS totalSignAgreement, " +
                     "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
                     "FROM CurrentStage cs " +
@@ -65,7 +65,7 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
     @Query(nativeQuery = true,
             value = "WITH StageOrder AS ( " +
                     "    SELECT * FROM (VALUES " +
-                    "    (1, 'Assessment'), (2, 'Offering'), (3, 'Background Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
+                    "    (1, 'Evaluation'), (2, 'Offering'), (3, 'Pre-employment Check'), (4, 'Sign Agreement'), (5, 'Onboarding') " +
                     "    ) v(StageOrder, StageName) " +
                     "), " +
                     "StageAgg AS ( " +
@@ -94,9 +94,9 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "    WHERE rn = 1 " +
                     ") " +
                     "SELECT " +
-                    "    SUM(CASE WHEN cs.StageName = 'Assessment' THEN 1 ELSE 0 END) AS totalAssessment, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Evaluation' THEN 1 ELSE 0 END) AS totalAssessment, " +
                     "    SUM(CASE WHEN cs.StageName = 'Offering' THEN 1 ELSE 0 END) AS totalOffering, " +
-                    "    SUM(CASE WHEN cs.StageName = 'Background Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
+                    "    SUM(CASE WHEN cs.StageName = 'Pre-employment Check' THEN 1 ELSE 0 END) AS totalBackgroundCheck, " +
                     "    SUM(CASE WHEN cs.StageName = 'Sign Agreement' THEN 1 ELSE 0 END) AS totalSignAgreement, " +
                     "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
                     "FROM CurrentStage cs")

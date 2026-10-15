@@ -1,11 +1,9 @@
 package lippo.hris.system.recruitment.enumeration;
 
 public enum EmployeeRequestFormSLAStatus {
-    NO_SLA("No SLA"),
-    EXPIRED("Expired"),
-    WARNING("Warning"),
-    MODERATE("Moderate"),
-    SAFE("Safe");
+    WITHIN("Within"),
+    APPROACHING("Approaching"),
+    OVERDUE("Overdue");
 
     private final String label;
 

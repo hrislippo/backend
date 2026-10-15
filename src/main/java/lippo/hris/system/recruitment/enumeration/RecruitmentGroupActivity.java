@@ -1,9 +1,9 @@
 package lippo.hris.system.recruitment.enumeration;
 
 public enum RecruitmentGroupActivity {
-    ASSESSMENT("Assessment", 1),
+    EVALUATION("Evaluation", 1),
     OFFERING("Offering", 2),
-    BACKGROUND_CHECK("Background Check", 3),
+    PRE_EMPLOYMENT_CHECK("Pre-employment Check", 3),
     SIGN_AGREEMENT("Sign Agreement", 4),
     ONBOARDING("Onboarding", 5);
 

@@ -16,8 +16,10 @@ import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.*;
 import lippo.hris.system.recruitment.response.*;
 import lippo.hris.system.repository.SystemParameterRepository;
+import lippo.hris.system.timemanagement.response.DayPaymentResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -455,7 +457,7 @@ public class EmployeeRequestFormService {
             employeeRequestResultRepository.save(employeeRequestResult);
 
             if(checkERFCompleted(employeeRequestForm)){
-                employeeRequestForm.setStatus(EmployeeRequestFormStatus.COMPLETED.toString());
+                employeeRequestForm.setStatus(EmployeeRequestFormStatus.HIRED.toString());
                 employeeRequestFormRepository.save(employeeRequestForm);
                 return true;
             }
@@ -505,7 +507,15 @@ public class EmployeeRequestFormService {
         if(roles.contains("ROLE_HRBP")){
             flagHRBP = true;
         }
-        return employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, sla, status, flagHRBP, pageable);
+
+        List<EmployeeRequestResp> employeeRequestList = employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, sla, status, flagHRBP);
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), employeeRequestList.size());
+        if (start > employeeRequestList.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, employeeRequestList.size());
+        }
+        List<EmployeeRequestResp> pageContent = employeeRequestList.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, employeeRequestList.size());
     }
 
     public List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(Long candidateId) {

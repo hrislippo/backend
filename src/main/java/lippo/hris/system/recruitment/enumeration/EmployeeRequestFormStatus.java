@@ -3,7 +3,7 @@ package lippo.hris.system.recruitment.enumeration;
 public enum EmployeeRequestFormStatus {
     OPEN,
     IN_PROGRESS,
-    COMPLETED,
+    HIRED,
     CANCELLED,
     ON_HOLD
 }

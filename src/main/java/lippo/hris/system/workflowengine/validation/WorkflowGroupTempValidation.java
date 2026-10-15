@@ -22,10 +22,10 @@ public class WorkflowGroupTempValidation {
             throw new BadRequestException("Name is required");
         }
 
-        if(workflowGroupTempRepository.findByCode(groupTempRequest.getGroupTempCode()) != null) {
+        if(groupTempRequest.getId() == null && workflowGroupTempRepository.findByCode(groupTempRequest.getGroupTempCode()) != null) {
             throw new ConflictException("Code already exists");
         }
-        if(workflowGroupTempRepository.findByName(groupTempRequest.getGroupTempName()) != null) {
+        if(groupTempRequest.getId() == null && workflowGroupTempRepository.findByName(groupTempRequest.getGroupTempName()) != null) {
             throw new ConflictException("Name already exists");
         }
     }
@@ -33,6 +33,16 @@ public class WorkflowGroupTempValidation {
     public void documentTypeRequired(@RequestBody GroupTempRequest groupTempRequest) {
         if(groupTempRequest.getDocTypeCode() == null) {
             throw new BadRequestException("Document Type is required");
+        }
+    }
+
+    public void detailRequired(@RequestBody GroupTempRequest groupTempRequest) {
+        if(groupTempRequest.getTemplateList() != null){
+            for(Long tempId : groupTempRequest.getTemplateList()){
+                if(tempId == null){
+                    throw new BadRequestException("Template Detail cannot be blank");
+                }
+            }
         }
     }
 }
