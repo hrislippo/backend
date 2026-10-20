@@ -81,22 +81,22 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
 
             "CASE " +
             "WHEN ISNULL(oc.CompletedOfferingCandidate, 0) >= req.EmpReqNum " +
-            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, oc.CompletedTime), 0)) >= 100 THEN 'Overdue' " +
-            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, oc.CompletedTime), 0)) >= 81 THEN 'Approaching' " +
+            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, oc.CompletedTime) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Overdue' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, oc.CompletedTime) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Approaching' " +
             "ELSE 'Within' END " +
             "WHEN req.EmpReqStatus = 'ON_HOLD' " +
-            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqHold WHERE EmpReqId = req.EmpReqId)), 0)) >= 100 THEN 'Overdue' " +
-            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqHold WHERE EmpReqId = req.EmpReqId)), 0)) >= 81 THEN 'Approaching' " +
+            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqHold WHERE EmpReqId = req.EmpReqId)) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Overdue' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqHold WHERE EmpReqId = req.EmpReqId)) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Approaching' " +
             "ELSE 'Within' END " +
             "WHEN req.EmpReqStatus = 'CANCELLED' " +
-            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqCancel WHERE EmpReqId = req.EmpReqId)), 0)) >= 100 THEN 'Overdue' " +
-            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
-            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqCancel WHERE EmpReqId = req.EmpReqId)), 0)) >= 81 THEN 'Approaching' " +
+            "THEN CASE WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqCancel WHERE EmpReqId = req.EmpReqId)) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Overdue' " +
+            "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, (SELECT MAX(createdDate) FROM RCMEmpReqCancel WHERE EmpReqId = req.EmpReqId)) * 100.0) / " +
+            "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 81 THEN 'Approaching' " +
             "ELSE 'Within' END " +
             "WHEN ((DATEDIFF(SECOND, req.EmpReqStartDate, GETDATE()) * 100.0) / " +
             "NULLIF(DATEDIFF(SECOND, req.EmpReqStartDate, req.EmpReqExpDate), 0)) >= 100 THEN 'Overdue' " +
