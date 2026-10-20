@@ -22,7 +22,7 @@ public class WorkflowGroupTempController {
     public ApiResponse addGroupTemplate(@RequestBody GroupTempRequest groupTempRequest) {
         workflowGroupTempValidation.codeNameRequiredAndExists(groupTempRequest);
         workflowGroupTempValidation.documentTypeRequired(groupTempRequest);
-        workflowGroupTempValidation.detailRequired(groupTempRequest);
+        workflowGroupTempValidation.duplicateWorkflowGroup(groupTempRequest);
         workflowGroupTempService.addGroupTemplate(groupTempRequest);
         return ApiResponse.ok(null, "Add Workflow Group Template Successfully");
     }
@@ -31,7 +31,7 @@ public class WorkflowGroupTempController {
     public ApiResponse modifyGroupTemplate(@RequestBody GroupTempRequest groupTempRequest) {
         workflowGroupTempValidation.codeNameRequiredAndExists(groupTempRequest);
         workflowGroupTempValidation.documentTypeRequired(groupTempRequest);
-        workflowGroupTempValidation.detailRequired(groupTempRequest);
+        workflowGroupTempValidation.duplicateWorkflowGroup(groupTempRequest);
         workflowGroupTempService.modifyGroupTemplate(groupTempRequest);
         return ApiResponse.ok(null, "Modify Workflow Group Template Successfully");
     }

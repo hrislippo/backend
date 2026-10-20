@@ -11,5 +11,12 @@ public class GroupTempResponse {
     private String code;
     private String name;
     private WorkflowDocType workflowDocType;
+    private Boolean flagCompany;
+    private Boolean flagOrganization;
+    private Boolean flagJobLevel;
+    private Boolean flagJobTitle;
+    private Boolean flagLocation;
+    private Boolean flagPosition;
+    private Boolean flagEmployee;
     private List<WorkflowTemp> workflowTempList;
 }

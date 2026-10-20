@@ -56,47 +56,29 @@ public class WorkflowGroupTempService {
         workflowGroupTemp.setFlagLocation(groupTempRequest.getFlagLocation());
         workflowGroupTemp.setFlagPosition(groupTempRequest.getFlagPosition());
         workflowGroupTemp.setFlagEmployee(groupTempRequest.getFlagEmployee());
-
         workflowGroupTemp = workflowGroupTempRepository.save(workflowGroupTemp);
 
-        for(Long tempId : groupTempRequest.getTemplateList()){
-            WorkflowGroupTempDt workflowGroupTempDt = new WorkflowGroupTempDt();
-            workflowGroupTempDt.setWorkflowGroupTemp(workflowGroupTemp);
-            workflowGroupTempDt.setWorkflowTemp(workflowTempRepository.findById(tempId).get());
-            workflowGroupTempDtRepository.save(workflowGroupTempDt);
+        if(groupTempRequest.getTemplateList() != null && !groupTempRequest.getTemplateList().isEmpty()) {
+            for(Long templateId : groupTempRequest.getTemplateList()) {
+                WorkflowGroupTempDt workflowGroupTempDt = new WorkflowGroupTempDt();
+                workflowGroupTempDt.setWorkflowGroupTemp(workflowGroupTemp);
+                workflowGroupTempDt.setWorkflowTemp(workflowTempRepository.findById(templateId).get());
+                workflowGroupTempDtRepository.save(workflowGroupTempDt);
+            }
         }
     }
 
     public void modifyGroupTemplate(GroupTempRequest groupTempRequest) {
         WorkflowGroupTemp workflowGroupTemp = workflowGroupTempRepository.findById(groupTempRequest.getId()).get();
-
-        if(groupTempRequest.getGroupTempCode() != null){
-            workflowGroupTemp.setCode(groupTempRequest.getGroupTempCode());
-        }
-        if(groupTempRequest.getGroupTempName() != null){
-            workflowGroupTemp.setName(groupTempRequest.getGroupTempName());
-        }
-        if(groupTempRequest.getFlagCompany() != null){
-            workflowGroupTemp.setFlagCompany(groupTempRequest.getFlagCompany());
-        }
-        if(groupTempRequest.getFlagOrganization() != null){
-            workflowGroupTemp.setFlagOrganization(groupTempRequest.getFlagOrganization());
-        }
-        if(groupTempRequest.getFlagJobLevel() != null){
-            workflowGroupTemp.setFlagJobLevel(groupTempRequest.getFlagJobLevel());
-        }
-        if(groupTempRequest.getFlagJobTitle() != null){
-            workflowGroupTemp.setFlagJobTitle(groupTempRequest.getFlagJobTitle());
-        }
-        if(groupTempRequest.getFlagLocation() != null){
-            workflowGroupTemp.setFlagLocation(groupTempRequest.getFlagLocation());
-        }
-        if(groupTempRequest.getFlagPosition() != null){
-            workflowGroupTemp.setFlagPosition(groupTempRequest.getFlagPosition());
-        }
-        if(groupTempRequest.getFlagEmployee() != null){
-            workflowGroupTemp.setFlagEmployee(groupTempRequest.getFlagEmployee());
-        }
+        workflowGroupTemp.setCode(groupTempRequest.getGroupTempCode());
+        workflowGroupTemp.setName(groupTempRequest.getGroupTempName());
+        workflowGroupTemp.setFlagCompany(groupTempRequest.getFlagCompany());
+        workflowGroupTemp.setFlagOrganization(groupTempRequest.getFlagOrganization());
+        workflowGroupTemp.setFlagJobLevel(groupTempRequest.getFlagJobLevel());
+        workflowGroupTemp.setFlagJobTitle(groupTempRequest.getFlagJobTitle());
+        workflowGroupTemp.setFlagLocation(groupTempRequest.getFlagLocation());
+        workflowGroupTemp.setFlagPosition(groupTempRequest.getFlagPosition());
+        workflowGroupTemp.setFlagEmployee(groupTempRequest.getFlagEmployee());
 
         if(groupTempRequest.getDocTypeCode() != null){
             WorkflowDocType workflowDocType = workflowDocTypeRepository.findByCode(groupTempRequest.getDocTypeCode());
@@ -140,6 +122,7 @@ public class WorkflowGroupTempService {
                 workflowGroupTempDtRepository.delete(workflowGroupTempDt);
             }
         }
+        workflowGroupTempRepository.save(workflowGroupTemp);
     }
 
     public Page<WorkflowGroupTemp> getGroupTemplate(String codeSearch, String nameSearch, String docTypeSearch,
@@ -153,9 +136,16 @@ public class WorkflowGroupTempService {
         groupTempResponse.setCode(workflowGroupTemp.getCode());
         groupTempResponse.setName(workflowGroupTemp.getName());
         groupTempResponse.setWorkflowDocType(workflowGroupTemp.getWorkflowDocType());
+        groupTempResponse.setFlagCompany(workflowGroupTemp.getFlagCompany());
+        groupTempResponse.setFlagOrganization(workflowGroupTemp.getFlagOrganization());
+        groupTempResponse.setFlagJobLevel(workflowGroupTemp.getFlagJobLevel());
+        groupTempResponse.setFlagJobTitle(workflowGroupTemp.getFlagJobTitle());
+        groupTempResponse.setFlagLocation(workflowGroupTemp.getFlagLocation());
+        groupTempResponse.setFlagPosition(workflowGroupTemp.getFlagPosition());
+        groupTempResponse.setFlagEmployee(workflowGroupTemp.getFlagEmployee());
 
         List<WorkflowTemp> workflowTempList = workflowTempRepository.getWorkflowTempList(workflowGroupTemp.getId());
-        groupTempResponse.setWorkflowTempList(workflowTempList == null ? new ArrayList<>() : workflowTempList);
+        groupTempResponse.setWorkflowTempList(workflowTempList);
         return groupTempResponse;
     }
 }

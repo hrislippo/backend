@@ -42,8 +42,15 @@ public class WorkflowTempController {
     }
 
     @GetMapping("/temp-list")
-    public ApiResponse getTemplateList(){
-        return ApiResponse.ok(workflowTempService.getTemplateList(), "Get Workflow Template List Successfully");
+    public ApiResponse getTemplateList(@RequestParam(value = "flagCompany") Boolean flagCompany,
+                                       @RequestParam(value = "flagOrganization") Boolean flagOrganization,
+                                       @RequestParam(value = "flagJobLevel") Boolean flagJobLevel,
+                                       @RequestParam(value = "flagJobTitle") Boolean flagJobTitle,
+                                       @RequestParam(value = "flagLocation") Boolean flagLocation,
+                                       @RequestParam(value = "flagPosition") Boolean flagPosition,
+                                       @RequestParam(value = "flagEmployee") Boolean flagEmployee){
+        return ApiResponse.ok(workflowTempService.getTemplateList(flagCompany, flagOrganization, flagJobLevel, flagJobTitle,
+                flagLocation, flagPosition, flagEmployee), "Get Workflow Template List Successfully");
     }
 
     @GetMapping("/temp-detail")

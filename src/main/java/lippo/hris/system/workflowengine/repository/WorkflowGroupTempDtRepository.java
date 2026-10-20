@@ -16,7 +16,6 @@ public interface WorkflowGroupTempDtRepository extends JpaRepository<WorkflowGro
     WorkflowGroupTempDt findByWorkflowGroupTempAndWorkflowTemp(WorkflowGroupTemp workflowGroupTemp, WorkflowTemp workflowTemp);
 
     @Query(nativeQuery = true, value = "SELECT * FROM WMGroupTempDt " +
-            "WHERE WmGroupTempId = :groupTempId " +
-            "ORDER BY WmGroupTempDtSeq")
+            "WHERE WmGroupTempId = :groupTempId")
     List<WorkflowGroupTempDt> findByWorkflowGroupTemp(@Param("groupTempId") Long groupTempId);
 }

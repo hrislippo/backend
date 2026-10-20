@@ -12,7 +12,6 @@ public class GroupTempRequest {
     private String docTypeCode;
     private Boolean active;
     private Integer sequence;
-    private List<Long> templateList;
     private Boolean flagCompany;
     private Boolean flagOrganization;
     private Boolean flagJobLevel;
@@ -20,4 +19,5 @@ public class GroupTempRequest {
     private Boolean flagLocation;
     private Boolean flagPosition;
     private Boolean flagEmployee;
+    private List<Long> templateList;
 }

@@ -13,7 +13,6 @@ public interface WorkflowTempRepository extends JpaRepository<WorkflowTemp, Long
 
     WorkflowTemp findByCode(String code);
     WorkflowTemp findByName(String name);
-    List<WorkflowTemp> findAllByActiveTrue();
 
     @Query(nativeQuery = true, value = "SELECT * FROM WmTemplate " +
             "WHERE (:codeSearch IS NULL OR WmTemplateCode LIKE '%'+:codeSearch+'%') " +
@@ -30,7 +29,23 @@ public interface WorkflowTempRepository extends JpaRepository<WorkflowTemp, Long
 
     @Query(nativeQuery = true, value = "SELECT temp.* FROM WMGroupTempDt dt " +
             "INNER JOIN WMTemplate temp ON dt.WmTemplateId = temp.WmTemplateId " +
-            "WHERE (:groupTempId IS NULL OR dt.WmGroupTempId = :groupTempId) " +
-            "ORDER BY dt.WmGroupTempDtSeq")
+            "WHERE (:groupTempId IS NULL OR dt.WmGroupTempId = :groupTempId)")
     List<WorkflowTemp> getWorkflowTempList(@Param("groupTempId") Long groupTempId);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM WMTemplate temp " +
+            "WHERE WmTemplateActive = 1 " +
+            "AND WmTemplateFgComp = :flagCompany " +
+            "AND WmTemplateFgOrg = :flagOrganization " +
+            "AND WmTemplateFgJobLvl = :flagJobLevel " +
+            "AND WmTemplateFgJobTtl = :flagJobTitle " +
+            "AND WmTemplateFgLoc = :flagLocation " +
+            "AND WmTemplateFgPos = :flagPosition " +
+            "AND WmTemplateFgEmp = :flagEmployee")
+    List<WorkflowTemp> findByCriteriaAndActiveTrue(@Param("flagCompany") Boolean flagCompany,
+                                           @Param("flagOrganization") Boolean flagOrganization,
+                                           @Param("flagJobLevel") Boolean flagJobLevel,
+                                           @Param("flagJobTitle") Boolean flagJobTitle,
+                                           @Param("flagLocation") Boolean flagLocation,
+                                           @Param("flagPosition") Boolean flagPosition,
+                                           @Param("flagEmployee") Boolean flagEmployee);
 }

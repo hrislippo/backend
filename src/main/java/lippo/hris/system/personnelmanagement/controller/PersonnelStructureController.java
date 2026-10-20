@@ -23,7 +23,7 @@ public class PersonnelStructureController {
     }
 
     @GetMapping("/structure")
-    public ApiResponse getStructure(@RequestParam(value = "empNIK") String empNIK,
+    public ApiResponse getStructure(@RequestParam(value = "empNIK", required = false) String empNIK,
                                     @RequestParam(value = "posName") String posName,
                                     @RequestParam(value = "subordinateDepth") Integer subordinateDepth,
                                     @RequestParam(value = "superiorDepth") Integer superiorDepth) {

@@ -38,4 +38,24 @@ public interface WorkflowGroupTempRepository extends JpaRepository<WorkflowGroup
                                              @Param("docTypeSearch") String docTypeSearch,
                                              @Param("activeSearch") Boolean activeSearch,
                                              Pageable pageable);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM WmGroupTemp " +
+            "WHERE WmDocTypeId = :docTypeId " +
+            "AND WmGroupTempFgComp = :flagCompany " +
+            "AND WmGroupTempFgOrg = :flagOrganization " +
+            "AND WmGroupTempFgJobLvl = :flagJobLevel " +
+            "AND WmGroupTempFgJobTtl = :flagJobTitle " +
+            "AND WmGroupTempFgLoc = :flagLocation " +
+            "AND WmGroupTempFgPos = :flagPosition " +
+            "AND WmGroupTempFgEmp = :flagEmployee " +
+            "AND (:groupTempId IS NULL OR WmGroupTempId != :groupTempId)")
+    WorkflowGroupTemp findByDocTypeAndCriteria(@Param("docTypeId") Long docTypeId,
+                                               @Param("flagCompany") Boolean flagCompany,
+                                               @Param("flagOrganization") Boolean flagOrganization,
+                                               @Param("flagJobLevel") Boolean flagJobLevel,
+                                               @Param("flagJobTitle") Boolean flagJobTitle,
+                                               @Param("flagLocation") Boolean flagLocation,
+                                               @Param("flagPosition") Boolean flagPosition,
+                                               @Param("flagEmployee") Boolean flagEmployee,
+                                               @Param("groupTempId") Long groupTempId);
 }
