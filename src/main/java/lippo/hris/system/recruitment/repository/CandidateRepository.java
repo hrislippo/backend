@@ -24,11 +24,14 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     Page<CandidateResp> getCandidate(@Param("keyword") String keyword, Pageable pageable, @Param("username") String username);
 
     @Query(nativeQuery = true,
-            value="SELECT * " +
+            value="SELECT DISTINCT rd.* " +
                     "FROM RCMCANCanData rd " +
-                    "WHERE CanFgShortlist = 'true' " +
-                    "ORDER BY CanName")
-    List<Candidate> getCandidateList();
+                    "INNER JOIN RCMCanPoolMbr mbr ON rd.CanId = mbr.CanId " +
+                    "INNER JOIN URMUser usr ON usr.UserName = :username " +
+                    "LEFT JOIN URMUserCanPool pool ON usr.UserId = pool.UserId " +
+                    "WHERE rd.CanFgShortlist = 'true' AND pool.RcmCanPoolId IN (mbr.RcmCanPoolId) " +
+                    "ORDER BY rd.CanName")
+    List<Candidate> getCandidateList(@Param("username") String username);
 
 
     @Query(nativeQuery = true, value = "SELECT TOP 1 rd.CanNum " +

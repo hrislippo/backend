@@ -76,8 +76,9 @@ public class CandidateController {
     }
 
     @GetMapping("/candidate-list")
-    public ApiResponse getCandidateList(){
-        return ApiResponse.ok(candidateService.getCandidateList(), "Get candidate list successfully");
+    public ApiResponse getCandidateList(Authentication authentication){
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(candidateService.getCandidateList(customUserDetails.getUsername()), "Get candidate list successfully");
     }
 
     @GetMapping("/candidate-detail")

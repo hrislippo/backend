@@ -1,15 +1,15 @@
 package lippo.hris.system.recruitment.service;
 
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.authentication.entity.UserCandidatePool;
 import lippo.hris.system.authentication.repository.PermissionRoleRepository;
+import lippo.hris.system.authentication.repository.UserCandidatePoolRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
+import lippo.hris.system.exception.BadRequestException;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.google.service.GoogleDriveService;
-import lippo.hris.system.recruitment.entity.Candidate;
-import lippo.hris.system.recruitment.entity.CandidateAddress;
-import lippo.hris.system.recruitment.entity.CandidateLogSalary;
-import lippo.hris.system.recruitment.entity.Interview;
+import lippo.hris.system.recruitment.entity.*;
 import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
 import lippo.hris.system.recruitment.request.CandidateReq;
@@ -40,6 +40,12 @@ public class CandidateService {
 
     @Autowired
     CandidateRepository candidateRepository;
+
+    @Autowired
+    CandidatePoolRepository candidatePoolRepository;
+
+    @Autowired
+    CandidatePoolMemberRepository candidatePoolMemberRepository;
 
     @Autowired
     CandidateSkillService candidateSkillService;
@@ -108,6 +114,7 @@ public class CandidateService {
     public Long saveCandidate(CandidateReq candidateReq){
         Candidate candidate = new Candidate();
         User user = userRepository.findById(candidateReq.getUserId()).get();
+
         candidate.setName(StringUtil.properCase(candidateReq.getName()));
         candidate.setCanNumber(generateRunningNumber());
         candidate.setBirthDate(candidateReq.getBirthDate());
@@ -117,6 +124,12 @@ public class CandidateService {
         candidate.setExpectedSalary(candidateReq.getExpectedSalary());
         candidate.setUser(user);
         candidate = candidateRepository.save(candidate);
+
+        CandidatePoolMember candidatePoolMember = new CandidatePoolMember();
+        candidatePoolMember.setCandidate(candidate);
+        candidatePoolMember.setCandidatePool(candidatePoolRepository.findById(candidateReq.getCandidatePoolId()).get());
+        candidatePoolMember.setMain(true);
+        candidatePoolMemberRepository.save(candidatePoolMember);
 
         candidateAddressService.save(candidate, candidateReq.getAddress());
         candidateContactService.saveMobilePhone(candidate, candidateReq.getMobilePhone());
@@ -185,6 +198,10 @@ public class CandidateService {
         candidate.setUser(user);
         candidate.setNotes(candidateReq.getNotes());
         candidate = candidateRepository.save(candidate);
+
+        CandidatePoolMember candidatePoolMember = candidatePoolMemberRepository.findByCandidateAndMainTrue(candidate);
+        candidatePoolMember.setCandidatePool(candidatePoolRepository.findById(candidateReq.getCandidatePoolId()).get());
+        candidatePoolMemberRepository.save(candidatePoolMember);
 
         candidateAddressService.modifyAddress(candidate, candidateReq.getAddress());
         candidateContactService.modifyMobilePhone(candidate, candidateReq.getMobilePhone());
@@ -255,8 +272,8 @@ public class CandidateService {
         return candidateRepository.getCandidate(keywords, pageable, username);
     }
 
-    public List<Candidate> getCandidateList(){
-        return candidateRepository.getCandidateList();
+    public List<Candidate> getCandidateList(String username){
+        return candidateRepository.getCandidateList(username);
     }
 
     public CandidateReq getCandidateDetail(Long id, String username){
@@ -288,6 +305,9 @@ public class CandidateService {
                 .filter(hashtag -> !hashtag.isEmpty())
                 .collect(Collectors.toList());
         candidateReq.setHashtags(hashtags);
+
+        CandidatePoolMember candidatePoolMember = candidatePoolMemberRepository.findByCandidateAndMainTrue(candidate);
+        candidateReq.setCandidatePool(candidatePoolMember.getCandidatePool());
 
         candidateAddressService.setAddress(candidate, candidateReq);
         candidateContactService.setMobilePhone(candidate, candidateReq);

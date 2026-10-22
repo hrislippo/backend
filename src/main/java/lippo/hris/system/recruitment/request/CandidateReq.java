@@ -1,5 +1,6 @@
 package lippo.hris.system.recruitment.request;
 
+import lippo.hris.system.recruitment.entity.CandidatePool;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -10,6 +11,8 @@ public class CandidateReq {
     private Long id;
     private Long userId;
     private String userName;
+    private Long candidatePoolId;
+    private CandidatePool candidatePool;
     private String name;
     private String canNumber;
     private String address;

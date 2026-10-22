@@ -30,6 +30,10 @@ public class CandidateValidation {
         if(candidateReq.getUserId() == null){
             throw new BadRequestException("PIC cannot be empty");
         }
+
+        if(candidateReq.getCandidatePoolId() == null){
+            throw new BadRequestException("Candidate Pool cannot be empty");
+        }
     }
 
     public void modifyValidatePic(Long candidateId, String username){
