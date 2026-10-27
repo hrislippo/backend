@@ -3,7 +3,8 @@ package lippo.hris.system.workflowengine.request;
 import lombok.Data;
 
 @Data
-public class WorkflowApproverTempRequestDt {
+public class TempApproverRequestDt {
+    private Integer level;
     private String organizationCode;
     private String organizationName;
     private String jobLevelCode;
@@ -18,4 +19,6 @@ public class WorkflowApproverTempRequestDt {
     private String jobTitleName;
     private String employeeNik;
     private String employeeName;
+    private String orgChartCode;
+    private String orgChartName;
 }

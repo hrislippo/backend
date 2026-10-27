@@ -23,24 +23,7 @@ public class WorkflowTemp extends Auditable {
     @Column(name = "WmTemplateActive")
     private Boolean active;
 
-    @Column(name = "WmTemplateFgComp")
-    private Boolean flagCompany;
-
-    @Column(name = "WmTemplateFgOrg")
-    private Boolean flagOrganization;
-
-    @Column(name = "WmTemplateFgJobLvl")
-    private Boolean flagJobLevel;
-
-    @Column(name = "WmTemplateFgJobTtl")
-    private Boolean flagJobTitle;
-
-    @Column(name = "WmTemplateFgLoc")
-    private Boolean flagLocation;
-
-    @Column(name = "WmTemplateFgPos")
-    private Boolean flagPosition;
-
-    @Column(name = "WmTemplateFgEmp")
-    private Boolean flagEmployee;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "WmGroupTempId")
+    private WorkflowGroupTemp workflowGroupTemp;
 }

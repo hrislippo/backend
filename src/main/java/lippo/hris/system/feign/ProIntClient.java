@@ -69,6 +69,9 @@ public interface ProIntClient {
     @GetMapping(value = "/api-proint/PMEmployeeStr")
     ApiResponse getEmployeeStructure(@RequestParam(required = false) String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth);
 
+    @GetMapping(value = "/api-proint/PMEmployeeData")
+    ApiResponse getEmployeeData(@RequestParam String empNIK);
+
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);
 

@@ -21,6 +21,7 @@ public class WorkflowTempController {
     @PostMapping("/temp")
     public ApiResponse addTemplate(@RequestBody WorkflowTempRequest workflowTempRequest) {
         workflowTempValidation.codeNameRequiredAndExists(workflowTempRequest);
+        workflowTempValidation.duplicateApprovee(workflowTempRequest);
         workflowTempService.addWorkflowTemplate(workflowTempRequest);
         return ApiResponse.ok(null, "Add Workflow Template Successfully");
     }
@@ -28,16 +29,18 @@ public class WorkflowTempController {
     @PutMapping("/temp")
     public ApiResponse modifyTemplate(@RequestBody WorkflowTempRequest workflowTempRequest) {
         workflowTempValidation.codeNameRequiredAndExists(workflowTempRequest);
+        workflowTempValidation.duplicateApprovee(workflowTempRequest);
         workflowTempService.modifyWorkflowTemplate(workflowTempRequest);
         return ApiResponse.ok(null, "Modify Workflow Template Successfully");
     }
 
     @GetMapping("/temp")
-    public ApiResponse getTemplate(@RequestParam(value = "codeSearch", required = false) String codeSearch,
-                                        @RequestParam(value = "nameSearch", required = false) String nameSearch,
-                                        @RequestParam(value = "activeSearch", required = false) Boolean activeSearch,
-                                        Pageable pageable) {
-        return ApiResponse.ok(workflowTempService.getTemplate(codeSearch, nameSearch, activeSearch, pageable),
+    public ApiResponse getTemplate(@RequestParam("groupTempId") Long groupTempId,
+                                   @RequestParam(value = "codeSearch", required = false) String codeSearch,
+                                   @RequestParam(value = "nameSearch", required = false) String nameSearch,
+                                   @RequestParam(value = "activeSearch", required = false) Boolean activeSearch,
+                                   Pageable pageable) {
+        return ApiResponse.ok(workflowTempService.getTemplate(groupTempId, codeSearch, nameSearch, activeSearch, pageable),
                 "Get Workflow Template Successfully");
     }
 

@@ -3,10 +3,8 @@ package lippo.hris.system.workflowengine.service;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.workflowengine.entity.WorkflowDocType;
 import lippo.hris.system.workflowengine.entity.WorkflowGroupTemp;
-import lippo.hris.system.workflowengine.entity.WorkflowGroupTempDt;
 import lippo.hris.system.workflowengine.entity.WorkflowTemp;
 import lippo.hris.system.workflowengine.repository.WorkflowDocTypeRepository;
-import lippo.hris.system.workflowengine.repository.WorkflowGroupTempDtRepository;
 import lippo.hris.system.workflowengine.repository.WorkflowGroupTempRepository;
 import lippo.hris.system.workflowengine.repository.WorkflowTempRepository;
 import lippo.hris.system.workflowengine.request.GroupTempRequest;
@@ -17,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -27,9 +23,6 @@ public class WorkflowGroupTempService {
 
     @Autowired
     WorkflowDocTypeRepository workflowDocTypeRepository;
-
-    @Autowired
-    WorkflowGroupTempDtRepository workflowGroupTempDtRepository;
 
     @Autowired
     WorkflowGroupTempRepository workflowGroupTempRepository;
@@ -56,34 +49,13 @@ public class WorkflowGroupTempService {
         workflowGroupTemp.setFlagLocation(groupTempRequest.getFlagLocation());
         workflowGroupTemp.setFlagPosition(groupTempRequest.getFlagPosition());
         workflowGroupTemp.setFlagEmployee(groupTempRequest.getFlagEmployee());
-        workflowGroupTemp = workflowGroupTempRepository.save(workflowGroupTemp);
-
-        if(groupTempRequest.getTemplateList() != null && !groupTempRequest.getTemplateList().isEmpty()) {
-            for(Long templateId : groupTempRequest.getTemplateList()) {
-                WorkflowGroupTempDt workflowGroupTempDt = new WorkflowGroupTempDt();
-                workflowGroupTempDt.setWorkflowGroupTemp(workflowGroupTemp);
-                workflowGroupTempDt.setWorkflowTemp(workflowTempRepository.findById(templateId).get());
-                workflowGroupTempDtRepository.save(workflowGroupTempDt);
-            }
-        }
+        workflowGroupTempRepository.save(workflowGroupTemp);
     }
 
     public void modifyGroupTemplate(GroupTempRequest groupTempRequest) {
         WorkflowGroupTemp workflowGroupTemp = workflowGroupTempRepository.findById(groupTempRequest.getId()).get();
         workflowGroupTemp.setCode(groupTempRequest.getGroupTempCode());
         workflowGroupTemp.setName(groupTempRequest.getGroupTempName());
-        workflowGroupTemp.setFlagCompany(groupTempRequest.getFlagCompany());
-        workflowGroupTemp.setFlagOrganization(groupTempRequest.getFlagOrganization());
-        workflowGroupTemp.setFlagJobLevel(groupTempRequest.getFlagJobLevel());
-        workflowGroupTemp.setFlagJobTitle(groupTempRequest.getFlagJobTitle());
-        workflowGroupTemp.setFlagLocation(groupTempRequest.getFlagLocation());
-        workflowGroupTemp.setFlagPosition(groupTempRequest.getFlagPosition());
-        workflowGroupTemp.setFlagEmployee(groupTempRequest.getFlagEmployee());
-
-        if(groupTempRequest.getDocTypeCode() != null){
-            WorkflowDocType workflowDocType = workflowDocTypeRepository.findByCode(groupTempRequest.getDocTypeCode());
-            workflowGroupTemp.setWorkflowDocType(workflowDocType);
-        }
 
         if(groupTempRequest.getSequence() != null && !workflowGroupTemp.getSequence().equals(groupTempRequest.getSequence())){
             WorkflowGroupTemp detailWorkflowGroupTemp = workflowGroupTempRepository.findByDocTypeAndSequence(workflowGroupTemp.getWorkflowDocType().getId(), groupTempRequest.getSequence());
@@ -98,29 +70,6 @@ public class WorkflowGroupTempService {
 
         if(groupTempRequest.getActive() != null){
             workflowGroupTemp.setActive(groupTempRequest.getActive());
-        }
-
-        if(groupTempRequest.getTemplateList() != null){
-            List<WorkflowGroupTempDt> existingDetail = workflowGroupTempDtRepository.findByWorkflowGroupTemp(workflowGroupTemp.getId());
-            List<WorkflowTemp> existingTemplate = existingDetail.stream().map(WorkflowGroupTempDt::getWorkflowTemp).toList();
-
-            List<Long> added = new ArrayList<>(groupTempRequest.getTemplateList());
-            added.removeAll(existingTemplate.stream().map(WorkflowTemp::getId).toList());
-            List<Long> removed = new ArrayList<>(existingTemplate.stream().map(WorkflowTemp::getId).toList());
-            removed.removeAll(groupTempRequest.getTemplateList());
-
-            for(Long addedId : added){
-                WorkflowGroupTempDt workflowGroupTempDt = new WorkflowGroupTempDt();
-                workflowGroupTempDt.setWorkflowGroupTemp(workflowGroupTemp);
-                workflowGroupTempDt.setWorkflowTemp(workflowTempRepository.findById(addedId).get());
-                workflowGroupTempDtRepository.save(workflowGroupTempDt);
-            }
-
-            for(Long removedId : removed){
-                WorkflowTemp workflowTemp = workflowTempRepository.findById(removedId).get();
-                WorkflowGroupTempDt workflowGroupTempDt = workflowGroupTempDtRepository.findByWorkflowGroupTempAndWorkflowTemp(workflowGroupTemp, workflowTemp);
-                workflowGroupTempDtRepository.delete(workflowGroupTempDt);
-            }
         }
         workflowGroupTempRepository.save(workflowGroupTemp);
     }

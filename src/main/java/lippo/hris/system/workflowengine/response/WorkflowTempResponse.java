@@ -8,12 +8,6 @@ import java.util.List;
 public class WorkflowTempResponse {
     private String tempCode;
     private String tempName;
-    private Boolean flagCompany;
-    private Boolean flagOrganization;
-    private Boolean flagJobLevel;
-    private Boolean flagJobTitle;
-    private Boolean flagLocation;
-    private Boolean flagPosition;
-    private Boolean flagEmployee;
-    private List<WorkflowTempDtResponse> detailList;
+    private WorkflowTempApproveeResponse approveeList;
+    private List<WorkflowTempApproverResponse> approverList;
 }

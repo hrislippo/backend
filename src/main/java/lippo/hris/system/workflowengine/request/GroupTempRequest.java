@@ -19,5 +19,4 @@ public class GroupTempRequest {
     private Boolean flagLocation;
     private Boolean flagPosition;
     private Boolean flagEmployee;
-    private List<Long> templateList;
 }

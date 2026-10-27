@@ -30,8 +30,6 @@ public class WorkflowGroupTempController {
     @PutMapping("/grouptemp")
     public ApiResponse modifyGroupTemplate(@RequestBody GroupTempRequest groupTempRequest) {
         workflowGroupTempValidation.codeNameRequiredAndExists(groupTempRequest);
-        workflowGroupTempValidation.documentTypeRequired(groupTempRequest);
-        workflowGroupTempValidation.duplicateWorkflowGroup(groupTempRequest);
         workflowGroupTempService.modifyGroupTemplate(groupTempRequest);
         return ApiResponse.ok(null, "Modify Workflow Group Template Successfully");
     }
