@@ -25,9 +25,9 @@ public class TalentPoolStructureController {
 
     @GetMapping("/structure")
     public ApiResponse getStructure(@RequestParam(value = "empNIK") String empNIK,
-                                    @RequestParam(value = "posName") String posName,
+                                    @RequestParam(value = "posCode") String posCode,
                                     @RequestParam(value = "subordinateDepth") Integer subordinateDepth,
                                     @RequestParam(value = "superiorDepth") Integer superiorDepth){
-        return ApiResponse.ok(talentPoolStructureService.getTalentStructure(empNIK, posName, subordinateDepth, superiorDepth), "Get Talent Structure Successfully");
+        return ApiResponse.ok(talentPoolStructureService.getTalentStructure(empNIK, posCode, subordinateDepth, superiorDepth), "Get Talent Structure Successfully");
     }
 }

@@ -46,4 +46,25 @@ public interface WorkflowTempApproveeRepository extends JpaRepository<WorkflowTe
                                                             @Param("locCode") String locCode,
                                                             @Param("posCode") String posCode,
                                                             @Param("empNik") String empNik);
+
+    @Query(nativeQuery = true, value = "SELECT TOP 1 apr.* FROM WMGroupTemp gt " +
+            "INNER JOIN WMTemplate temp ON gt.WmGroupTempId = temp.WmGroupTempId " +
+            "INNER JOIN WMTempApprovee apr ON temp.WmTemplateId = apr.WmTemplateId " +
+            "WHERE gt.WmGroupTempActive = 1 AND temp.WmTemplateActive = 1 AND gt.WmDocTypeId = :docTypeId " +
+            "AND (apr.WmTempApproveeCompCode IS NULL OR apr.WmTempApproveeCompCode = :compCode) " +
+            "AND (apr.WmTempApproveeOrgCode IS NULL OR apr.WmTempApproveeOrgCode = :orgCode) " +
+            "AND (apr.WmTempApproveeJobLvlCode IS NULL OR apr.WmTempApproveeJobLvlCode = :jobLvlCode) " +
+            "AND (apr.WmTempApproveeJobTtlCode IS NULL OR apr.WmTempApproveeJobTtlCode = :jobTtlCode) " +
+            "AND (apr.WmTempApproveeLocCode IS NULL OR apr.WmTempApproveeLocCode = :locCode) " +
+            "AND (apr.WmTempApproveePosCode IS NULL OR apr.WmTempApproveePosCode = :posCode) " +
+            "AND (apr.WmTempApproveeEmpNik IS NULL OR apr.WmTempApproveeEmpNik = :empNik) " +
+            "ORDER BY gt.WmGroupTempSeq ")
+    WorkflowTempApprovee generateWorkflowTemp(@Param("docTypeId") Long docTypeId,
+                                              @Param("compCode") String compCode,
+                                              @Param("orgCode") String orgCode,
+                                              @Param("jobLvlCode") String jobLvlCode,
+                                              @Param("jobTtlCode") String jobTtlCode,
+                                              @Param("locCode") String locCode,
+                                              @Param("posCode") String posCode,
+                                              @Param("empNik") String empNik);
 }

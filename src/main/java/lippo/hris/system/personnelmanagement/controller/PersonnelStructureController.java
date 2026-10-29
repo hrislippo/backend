@@ -24,9 +24,9 @@ public class PersonnelStructureController {
 
     @GetMapping("/structure")
     public ApiResponse getStructure(@RequestParam(value = "empNIK", required = false) String empNIK,
-                                    @RequestParam(value = "posName") String posName,
+                                    @RequestParam(value = "posCode") String posCode,
                                     @RequestParam(value = "subordinateDepth") Integer subordinateDepth,
                                     @RequestParam(value = "superiorDepth") Integer superiorDepth) {
-        return ApiResponse.ok(personnelStructureService.getEmployeeStructure(empNIK, posName, subordinateDepth, superiorDepth), "Get Personnel Structure Successfully");
+        return ApiResponse.ok(personnelStructureService.getEmployeeStructure(empNIK, posCode, subordinateDepth, superiorDepth), "Get Personnel Structure Successfully");
     }
 }

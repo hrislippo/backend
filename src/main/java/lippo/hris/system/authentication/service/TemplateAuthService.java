@@ -160,7 +160,7 @@ public class TemplateAuthService {
         List<String> jobTitleCodes = templateAuthRepository.findJobTitleByTempName(tempAuthList);
         List<String> positionCodes = templateAuthRepository.findPosCodeByTempName(tempAuthList);
         List<String> locationCodes = templateAuthRepository.findLocCodeByTempName(tempAuthList);
-        Object employeeNIKData = proIntClient.getEmployeeAuth(compCodes, orgCodes, jobLevelCodes, jobTitleCodes, positionCodes, locationCodes).getData();
+        Object employeeNIKData = proIntClient.getEmployeeAuth(compCodes, orgCodes, jobLevelCodes, jobTitleCodes, positionCodes, locationCodes, new ArrayList<>()).getData();
         if(employeeNIKData == null){
             return null;
         }

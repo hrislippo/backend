@@ -55,7 +55,8 @@ public interface ProIntClient {
                                 @RequestParam(required = false) List<String> jobLevelCodes,
                                 @RequestParam(required = false) List<String> jobTitleCodes,
                                 @RequestParam(required = false) List<String> positionCodes,
-                                @RequestParam(required = false) List<String> locationCodes);
+                                @RequestParam(required = false) List<String> locationCodes,
+                                @RequestParam(required = false) List<String> employeeNiks);
 
     @GetMapping(value = "/api-proint/PMEmployeeDt")
     ApiResponse getEmployeeDetail(@RequestParam String empNIK);
@@ -66,11 +67,17 @@ public interface ProIntClient {
     @GetMapping(value = "/api-proint/PMEmployeePos")
     ApiResponse getEmployeePosition(@RequestParam String empName, @RequestParam String posName, Pageable pageable);
 
+    @GetMapping(value = "/api-proint/PMEmployeePosNik")
+    ApiResponse getEmployeePositionNik(@RequestParam String empNik);
+
     @GetMapping(value = "/api-proint/PMEmployeeStr")
-    ApiResponse getEmployeeStructure(@RequestParam(required = false) String empNIK, @RequestParam String posName, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth);
+    ApiResponse getEmployeeStructure(@RequestParam(required = false) String empNIK, @RequestParam String posCode, @RequestParam Integer subordinateDepth, @RequestParam Integer superiorDepth);
+
+    @GetMapping(value = "/api-proint/PMEmployeeSuperior")
+    ApiResponse getEmployeeSuperior(@RequestParam String empNik, @RequestParam String posCode, @RequestParam Integer superiorLevel);
 
     @GetMapping(value = "/api-proint/PMEmployeeData")
-    ApiResponse getEmployeeData(@RequestParam String empNIK);
+    ApiResponse getEmployeeData(@RequestParam String empNIK, @RequestParam String positionCode);
 
     @GetMapping(value = "/api-proint/MOTMAtdTemplate")
     ApiResponse getMOTMAtdTemplate(@RequestParam String tempCode);

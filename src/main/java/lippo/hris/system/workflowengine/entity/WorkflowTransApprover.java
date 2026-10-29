@@ -2,12 +2,15 @@ package lippo.hris.system.workflowengine.entity;
 
 import jakarta.persistence.*;
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.entity.Auditable;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "WMTransApprover", schema = "dbo")
-public class WorkflowTransApprover {
+public class WorkflowTransApprover extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +36,7 @@ public class WorkflowTransApprover {
 
     @Column(name = "WmTransApproverDesc")
     private String description;
+
+    @Column(name = "WmTransApproverActionTime")
+    private LocalDateTime actionTime;
 }

@@ -51,7 +51,7 @@ public interface TalentPoolRequestRepository extends JpaRepository<TalentPoolReq
     List<TalentPoolEmployeeReadinessResp> findTalentPoolRequestReadiness(@Param("posCode") String posCode);
 
     @Query(nativeQuery = true,
-            value="SELECT tp.TlTalentPoolEmpNIK AS empNik, tp.TlTalentPoolEmpName AS empName, hd.TlTalentPoolReqHdPosName AS posName " +
+            value="SELECT tp.TlTalentPoolEmpNIK AS empNik, tp.TlTalentPoolEmpName AS empName, hd.TlTalentPoolReqHdPosName AS posName, hd.TlTalentPoolReqHdPosCode AS posCode " +
                     "FROM TLTalentPoolReqHd hd " +
                     "INNER JOIN TLTalentPool tp ON hd.TlTalentPoolReqHdTalent = tp.TlTalentPoolId " +
                     "WHERE (:empName IS NULL OR tp.TlTalentPoolEmpName LIKE '%'+:empName+'%') " +

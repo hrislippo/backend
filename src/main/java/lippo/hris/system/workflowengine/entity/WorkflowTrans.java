@@ -15,6 +15,9 @@ public class WorkflowTrans extends Auditable {
     @Column(name = "WmTransactionId")
     private Long id;
 
+    @Column(name = "WmTransCode")
+    private String code;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "WmDocTypeId")
     private WorkflowDocType workflowDocType;

@@ -1,6 +1,7 @@
 package lippo.hris.system.workflowengine.repository;
 
 import lippo.hris.system.workflowengine.entity.WorkflowTemp;
+import lippo.hris.system.workflowengine.entity.WorkflowTempApprovee;
 import lippo.hris.system.workflowengine.entity.WorkflowTempApprover;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,10 @@ public interface WorkflowTempApproverRepository extends JpaRepository<WorkflowTe
                                                              @Param("jobLvlCode") String jobLvlCode, @Param("jobTtlCode") String jobTtlCode,
                                                              @Param("locCode") String locCode, @Param("posCode") String posCode,
                                                              @Param("empNik") String empNik, @Param("orgChartCode") String orgChartCode);
+
+    @Query(nativeQuery = true, value = "SELECT apr.* FROM WMTemplate temp " +
+            "INNER JOIN WMTempApprover apr ON temp.WmTemplateId = apr.WmTemplateId " +
+            "WHERE temp.WmTemplateId = :tempId " +
+            "ORDER BY apr.WmTempApproverLvl ")
+    List<WorkflowTempApprover> generateWorkflowTemp(@Param("tempId") Long tempId);
 }

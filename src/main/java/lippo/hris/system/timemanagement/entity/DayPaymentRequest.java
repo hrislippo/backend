@@ -1,5 +1,6 @@
 package lippo.hris.system.timemanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lippo.hris.system.entity.Auditable;
 import lombok.Data;
@@ -25,9 +26,11 @@ public class DayPaymentRequest extends Auditable {
     @Column(name = "TmDayPaymentReqCount")
     private Integer count;
 
+    @JsonFormat(pattern = "dd MMMM yyyy")
     @Column(name = "TmDayPaymentReqDate")
     private LocalDate date;
 
+    @JsonFormat(pattern = "dd MMMM yyyy")
     @Column(name = "TmDayPaymentReqExpDate")
     private LocalDate expiredDate;
 

@@ -4,4 +4,5 @@ public interface TalentPoolStructureResp {
     String getEmpNik();
     String getEmpName();
     String getPosName();
+    String getPosCode();
 }

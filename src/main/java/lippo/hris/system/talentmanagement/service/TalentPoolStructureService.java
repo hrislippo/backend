@@ -34,8 +34,8 @@ public class TalentPoolStructureService {
         return talentPoolRequestRepository.findTalentPoolRequest(name, position, pageable);
     }
 
-    public List<TalentStructureResp> getTalentStructure(String empNIK, String posName, Integer subordinateDepth, Integer superiorDepth){
-        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posName, subordinateDepth, superiorDepth).getData();
+    public List<TalentStructureResp> getTalentStructure(String empNIK, String posCode, Integer subordinateDepth, Integer superiorDepth){
+        Object employeeData = proIntClient.getEmployeeStructure(empNIK, posCode, subordinateDepth, superiorDepth).getData();
         List<TalentStructureResp> talents = objectMapper.convertValue(employeeData, new TypeReference<>(){});
 
         for(TalentStructureResp talent : talents){

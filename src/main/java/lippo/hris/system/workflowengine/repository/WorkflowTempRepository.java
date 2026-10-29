@@ -55,7 +55,6 @@ public interface WorkflowTempRepository extends JpaRepository<WorkflowTemp, Long
     @Query(nativeQuery = true, value = "SELECT DISTINCT TOP 1 tp.*, grp.WmGroupTempSeq " +
             "FROM WMGroupTemp grp " +
             "INNER JOIN WMDocType dt ON grp.WmDocTypeId = dt.WmDocTypeId " +
-            "INNER JOIN WMGroupTempDt gd ON grp.WmGroupTempid = gd.WmGroupTempId " +
             "INNER JOIN WMTemplate tp ON gd.WmTemplateId = tp.WmTemplateId " +
             "INNER JOIN WMTempApprovee ape ON tp.WmTemplateId  = ape.WmTemplateId " +
             "WHERE grp.WMGroupTempActive = 1 AND tp.WMTemplateActive = 1 AND dt.WmDocTypeCode = :docTypeCode " +
