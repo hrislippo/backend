@@ -12,6 +12,10 @@ public interface WorkflowTransApproverRepository extends JpaRepository<WorkflowT
 
     List<WorkflowTransApprover> findByLevelAndWorkflowTrans(Integer level, WorkflowTrans workflowTrans);
 
+    @Query(nativeQuery = true, value = "SELECT * FROM WMTransApprover WHERE WmTransApproverLvl > :level " +
+            "AND WmTransactionId = :transId")
+    List<WorkflowTransApprover> findNextApprover(@Param("level") Integer level, @Param("transId") Long transId);
+
     @Query(nativeQuery = true, value="SELECT MAX(WmTransApproverLvl) FROM WMTransApprover " +
             "WHERE WmTransactionId = :transId")
     Integer findMaxLevel(@Param("transId") Long transId);

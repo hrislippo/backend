@@ -10,6 +10,7 @@ public interface WorkflowTransResponse {
     LocalDate getApplyDate();
 
     Long getId();
+    Long getApproverId();
     String getTransactionCode();
     String getDocumentType();
     String getStatus();

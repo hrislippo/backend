@@ -4,6 +4,7 @@ import lippo.hris.system.config.FeignConfig;
 import lippo.hris.system.recruitment.request.RCCanPhotoReq;
 import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
+import lippo.hris.system.timemanagement.request.TMDPRightsFeignReq;
 import lippo.hris.system.timemanagement.request.TMDPRightsReq;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import java.util.List;
 public interface ProIntClient {
 
     @PostMapping(value = "/api-proint/TMDPRights", consumes = MediaType.APPLICATION_JSON_VALUE)
-    ApiResponse addDayPayment(@RequestBody TMDPRightsReq tmDPRightsReq);
+    ApiResponse addDayPayment(@RequestBody TMDPRightsFeignReq tmDPRightsFeignReq);
 
     @PostMapping(value = "/api-proint/MOTMAtdTempMbr", consumes = MediaType.APPLICATION_JSON_VALUE)
     void addMobileAttendanceTemplateMember(@RequestBody MOTMAtdTempMbrReq motmAtdTempMbrReq);

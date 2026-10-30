@@ -8,8 +8,10 @@ import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.timemanagement.entity.DayPaymentRequest;
 import lippo.hris.system.timemanagement.repository.DayPaymentRequestRepository;
+import lippo.hris.system.timemanagement.request.TMDPRightsFeignReq;
 import lippo.hris.system.workflowengine.entity.*;
 import lippo.hris.system.workflowengine.repository.*;
+import lippo.hris.system.workflowengine.request.WorkflowTransActionReq;
 import lippo.hris.system.workflowengine.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,8 +59,36 @@ public class WorkflowTransService {
     @Autowired
     DayPaymentRequestRepository dayPaymentRequestRepository;
 
-    public Page<WorkflowTransResponse> getApproverTransaction(String username, String docTypeCode, String status, LocalDate applyDate, String transactionCode, Pageable pageable) {
-        List<WorkflowTransResponse> workflowTransList = workflowTransRepository.getApproverTransaction(username, docTypeCode, status, applyDate, transactionCode);
+    public void actionTransaction(WorkflowTransActionReq workflowTransActionReq, String approverUsername) {
+        WorkflowTransApprover workflowTransApprover = workflowTransApproverRepository.findById(workflowTransActionReq.getApproverId()).get();
+        WorkflowTrans workflowTrans = workflowTransApprover.getWorkflowTrans();
+        workflowTransApprover.setDescription(workflowTransActionReq.getDescription());
+        workflowTransApprover.setActionTime(LocalDateTime.now());
+
+        if(workflowTransActionReq.getAction().equals("APPROVED")){
+            workflowTransApprover.setApprove(true);
+
+            List<WorkflowTransApprover> workflowTransApproverList = workflowTransApproverRepository.findNextApprover
+                    (workflowTransApprover.getLevel(), workflowTransApprover.getWorkflowTrans().getId());
+
+            if(workflowTransApproverList == null || workflowTransApproverList.isEmpty()){
+                workflowTrans.setWorkflowStatus(workflowStatusRepository.findByDescription("APPROVED"));
+                completeTransaction(workflowTrans, approverUsername);
+            } else{
+                workflowTrans.setWorkflowStatus(workflowStatusRepository.findByDescription("IN PROGRESS"));
+            }
+        }
+
+        if(workflowTransActionReq.getAction().equals("REJECTED")){
+            workflowTransApprover.setApprove(false);
+            workflowTrans.setWorkflowStatus(workflowStatusRepository.findByDescription("REJECTED"));
+        }
+        workflowTransApproverRepository.save(workflowTransApprover);
+        workflowTransRepository.save(workflowTrans);
+    }
+
+    public Page<WorkflowTransResponse> getApproverTransaction(String username, Pageable pageable) {
+        List<WorkflowTransResponse> workflowTransList = workflowTransRepository.getApproverTransaction(username);
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), workflowTransList.size());
@@ -191,7 +223,7 @@ public class WorkflowTransService {
         }
     }
 
-    public Set<String> generateSuperior(String empNik, String posCode, List<String> orgChartCodes){
+    private Set<String> generateSuperior(String empNik, String posCode, List<String> orgChartCodes){
         Set<String> superiorList = new HashSet<>();
         if(orgChartCodes.contains("S1")){
             String superiorNik = proIntClient.getEmployeeSuperior(empNik, posCode, 1).getData().toString();
@@ -212,7 +244,7 @@ public class WorkflowTransService {
         return superiorList;
     }
 
-    public String generateCode(String documentType) {
+    private String generateCode(String documentType) {
         String randomCode = UUID.randomUUID()
                 .toString()
                 .replace("-", "")
@@ -222,5 +254,30 @@ public class WorkflowTransService {
         return documentType.toUpperCase(Locale.ROOT)
                 + "-"
                 + randomCode;
+    }
+
+    private void completeTransaction(WorkflowTrans workflowTrans, String approverUsername){
+        if(workflowTrans.getWorkflowDocType().getCode().equals("DAYPAY")){
+            DayPaymentRequest dayPaymentRequest = dayPaymentRequestRepository.findById(workflowTrans.getDocId()).get();
+
+            TMDPRightsFeignReq tmDPRightsFeignReq = new TMDPRightsFeignReq();
+            tmDPRightsFeignReq.setEmployee(dayPaymentRequest.getEmployee());
+            tmDPRightsFeignReq.setNikEmpCreate(approverUsername);
+            tmDPRightsFeignReq.setDpCount(dayPaymentRequest.getCount());
+            tmDPRightsFeignReq.setDpDate(dayPaymentRequest.getDate());
+            tmDPRightsFeignReq.setDpExpiredDate(dayPaymentRequest.getExpiredDate());
+
+            Object result = proIntClient.addDayPayment(tmDPRightsFeignReq).getData();
+            Map<?, ?> rawMap = (Map<?, ?>) result;
+            Map<String, Long> mapResult = rawMap.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            entry -> String.valueOf(entry.getKey()),
+                            entry -> ((Number) entry.getValue()).longValue()
+                    ));
+
+            dayPaymentRequest.setDpRightsId(mapResult.get(dayPaymentRequest.getEmployee()));
+            dayPaymentRequestRepository.save(dayPaymentRequest);
+        }
     }
 }
