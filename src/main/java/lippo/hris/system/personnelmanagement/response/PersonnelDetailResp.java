@@ -9,6 +9,7 @@ public class PersonnelDetailResp {
     private String empName;
     private String empNIK;
     private String posName;
+    private String posCode;
     private String orgName;
     private String locationName;
     private String compName;

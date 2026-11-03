@@ -14,5 +14,4 @@ public class TMDPRightsReq {
     private LocalDate dpDate;
     private LocalDate dpExpiredDate;
     private String description;
-    private String approvalPositionCode;
 }

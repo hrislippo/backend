@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.exception.ConflictException;
 import lippo.hris.system.feign.ProIntClient;
+import lippo.hris.system.personnelmanagement.response.PersonnelDetailResp;
 import lippo.hris.system.timemanagement.entity.DayPaymentRequest;
 import lippo.hris.system.timemanagement.repository.DayPaymentRequestRepository;
 import lippo.hris.system.timemanagement.request.TMDPRightsEmployeeReq;
@@ -55,20 +56,13 @@ public class DayPaymentService {
             dayPaymentRequest.setDate(tmDPRightsReq.getDpDate());
             dayPaymentRequest.setExpiredDate(tmDPRightsReq.getDpExpiredDate());
             dayPaymentRequest.setDescription(tmDPRightsReq.getDescription());
-//            dayPaymentRequest.setDpRightsId(mapResult.get(employeeReq.getEmployeeNIK()));
             dayPaymentRequest = dayPaymentRequestRepository.save(dayPaymentRequest);
-            workflowTransService.generateTransaction(dayPaymentRequest.getId(), "DAYPAY", username, tmDPRightsReq.getApprovalPositionCode());
+
+            Object employeeData = proIntClient.getEmployeeDetail(username).getData();
+            PersonnelDetailResp employee = objectMapper.convertValue(employeeData, new TypeReference<>(){});
+
+            workflowTransService.generateTransaction(dayPaymentRequest.getId(), "DAYPAY", username, employee.getPosCode());
         }
-
-
-//        Object result = proIntClient.addDayPayment(tmDPRightsReq).getData();
-//        Map<?, ?> rawMap = (Map<?, ?>) result;
-//        Map<String, Long> mapResult = rawMap.entrySet()
-//                .stream()
-//                .collect(Collectors.toMap(
-//                        entry -> String.valueOf(entry.getKey()),
-//                        entry -> ((Number) entry.getValue()).longValue()
-//                ));
     }
 
     public Page<DayPaymentResp> getDayPayment(String empNIK, String empName, LocalDate startDate, LocalDate expiryDate, Pageable pageable, List<String> authorizations){

@@ -194,7 +194,7 @@ public class WorkflowTransService {
             Set<String> superiorNik = generateSuperior(username, positionCode, orgChartCodes);
             approverNikLevel.addAll(superiorNik);
 
-            if(!compCodes.isEmpty() || !orgCodes.isEmpty() && !jobLevelCodes.isEmpty() && !jobTitleCodes.isEmpty() && !locationCodes.isEmpty() && !positionCodes.isEmpty() && !employeeNiks.isEmpty()) {
+            if(!compCodes.isEmpty() || !orgCodes.isEmpty() || !jobLevelCodes.isEmpty() || !jobTitleCodes.isEmpty() || !locationCodes.isEmpty() || !positionCodes.isEmpty() || !employeeNiks.isEmpty()) {
                 Object employeeNIKData = proIntClient.getEmployeeAuth(compCodes, orgCodes, jobLevelCodes, jobTitleCodes, positionCodes, locationCodes, employeeNiks).getData();
                 if (employeeNIKData != null) {
                     Set<String> employeeNIKList = objectMapper.convertValue(employeeNIKData, new TypeReference<>() {});
