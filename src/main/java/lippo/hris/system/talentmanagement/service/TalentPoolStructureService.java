@@ -3,7 +3,6 @@ package lippo.hris.system.talentmanagement.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lippo.hris.system.feign.ProIntClient;
-import lippo.hris.system.personnelmanagement.response.PersonnelStructureResp;
 import lippo.hris.system.talentmanagement.entity.TalentPoolRequest;
 import lippo.hris.system.talentmanagement.repository.TalentPoolRequestRepository;
 import lippo.hris.system.talentmanagement.response.TalentPoolStructureResp;

@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.feign.ProIntClient;
-import lippo.hris.system.personnelmanagement.response.PersonnelDetailResp;
-import lippo.hris.system.personnelmanagement.response.PersonnelStructureNIKResp;
+import lippo.hris.system.personnel.response.PersonnelStructureNIKResp;
 import lippo.hris.system.talentmanagement.entity.*;
 import lippo.hris.system.talentmanagement.repository.*;
 import lippo.hris.system.talentmanagement.request.TalentPoolReq;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 

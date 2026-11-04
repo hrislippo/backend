@@ -1,6 +1,8 @@
 package lippo.hris.system.recruitment.response;
 
 import lippo.hris.system.authentication.entity.User;
+import lippo.hris.system.organization.entity.BusinessUnit;
+import lippo.hris.system.organization.entity.HRBP;
 import lippo.hris.system.recruitment.entity.*;
 import lombok.Data;
 

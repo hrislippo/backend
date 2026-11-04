@@ -1,10 +1,7 @@
 package lippo.hris.system.timemanagement.repository;
 
-import lippo.hris.system.recruitment.response.BusinessUnitResp;
 import lippo.hris.system.timemanagement.entity.DayPaymentRequest;
 import lippo.hris.system.timemanagement.response.DayPaymentResp;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

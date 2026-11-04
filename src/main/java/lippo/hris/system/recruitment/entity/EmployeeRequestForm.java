@@ -2,6 +2,8 @@ package lippo.hris.system.recruitment.entity;
 
 import jakarta.persistence.*;
 import lippo.hris.system.entity.Auditable;
+import lippo.hris.system.organization.entity.BusinessUnit;
+import lippo.hris.system.organization.entity.HRBP;
 import lippo.hris.system.recruitment.enumeration.EmployeeRequestFormStatus;
 import lombok.Data;
 

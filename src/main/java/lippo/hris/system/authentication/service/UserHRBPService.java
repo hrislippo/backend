@@ -5,8 +5,8 @@ import lippo.hris.system.authentication.entity.UserHRBP;
 import lippo.hris.system.authentication.repository.UserHRBPRepository;
 import lippo.hris.system.authentication.repository.UserRepository;
 import lippo.hris.system.authentication.request.UserHRBPRequest;
-import lippo.hris.system.recruitment.entity.HRBP;
-import lippo.hris.system.recruitment.repository.HRBPRepository;
+import lippo.hris.system.organization.entity.HRBP;
+import lippo.hris.system.organization.repository.HRBPRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Transactional

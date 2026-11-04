@@ -2,7 +2,7 @@ package lippo.hris.system.authentication.entity;
 
 import jakarta.persistence.*;
 import lippo.hris.system.entity.Auditable;
-import lippo.hris.system.recruitment.entity.HRBP;
+import lippo.hris.system.organization.entity.HRBP;
 import lombok.Data;
 
 @Data

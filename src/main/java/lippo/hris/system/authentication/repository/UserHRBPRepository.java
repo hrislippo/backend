@@ -1,16 +1,13 @@
 package lippo.hris.system.authentication.repository;
 
-import lippo.hris.system.authentication.entity.Role;
 import lippo.hris.system.authentication.entity.User;
 import lippo.hris.system.authentication.entity.UserHRBP;
-import lippo.hris.system.authentication.entity.UserRole;
-import lippo.hris.system.recruitment.entity.HRBP;
+import lippo.hris.system.organization.entity.HRBP;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserHRBPRepository extends JpaRepository<UserHRBP, Long> {
 
