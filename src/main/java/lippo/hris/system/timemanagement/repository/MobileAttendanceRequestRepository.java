@@ -14,20 +14,27 @@ import java.util.List;
 public interface MobileAttendanceRequestRepository extends JpaRepository<MobileAttendanceRequest, Long> {
 
     @Query(nativeQuery = true,
-            value = "SELECT ma.TmMobileAttendReqId AS id, ma.TmMobileAttendReqEmp AS empNIK, ma.TmMobileAttendReqEmpName AS empName, " +
+            value = "SELECT DISTINCT ma.TmMobileAttendReqId AS id, ma.TmMobileAttendReqEmp AS empNIK, ma.TmMobileAttendReqEmpName AS empName, " +
                     "ma.TmMobileAttendReqTempCode AS tempCode, ma.TmMobileAttendReqStartDate AS startDate, ma.TmMobileAttendReqEndDate AS endDate " +
                     "FROM TMMobileAttendReq ma " +
-                    "WHERE (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
+                    "LEFT JOIN TMMobileAttendGrpTempDt dt ON ma.TmMobileAttendReqTempCode = dt.MobileAttendTempCode " +
+                    "LEFT JOIN TMMobileAttendGrpTemp temp ON dt.MobileAttendGrpTempId = temp.MobileAttendGrpTempId " +
+                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR temp.RcmHRBPId IN  " +
+                    "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = " +
+                    "(SELECT UserId FROM URMUser WHERE UserName = :username))) " +
+                    "AND (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
                     "AND (:empName IS NULL OR ma.TmMobileAttendReqEmpName LIKE '%'+:empName+'%') " +
                     "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
                     "AND (:startDate IS NULL OR ma.TmMobileAttendReqStartDate = :startDate) " +
                     "AND (:endDate IS NULL OR ma.TmMobileAttendReqEndDate = :endDate) " +
                     "ORDER BY ma.TmMobileAttendReqStartDate DESC")
     List<MobileAttendanceResp> getMobileAttendance(@Param("empNIK") String empNIK,
-                                                        @Param("empName") String empName,
-                                                        @Param("tempCode") String tempCode,
-                                                        @Param("startDate") LocalDate startDate,
-                                                        @Param("endDate") LocalDate endDate);
+                                                   @Param("empName") String empName,
+                                                   @Param("tempCode") String tempCode,
+                                                   @Param("startDate") LocalDate startDate,
+                                                   @Param("endDate") LocalDate endDate,
+                                                   @Param("flagHRBP") Boolean flagHRBP,
+                                                   @Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "SELECT * " +

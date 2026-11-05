@@ -40,7 +40,7 @@ public class MobileAttendanceController {
                                      @RequestParam(value = "endDate", required = false) LocalDate endDate,
                                      Pageable pageable, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable, customUserDetails.getAuthorizations()), "Get Mobile Attendance Successfully");
+        return ApiResponse.ok(mobileAttendanceService.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, pageable, customUserDetails.getAuthorizations(), customUserDetails.getRoles(), customUserDetails.getUsername()), "Get Mobile Attendance Successfully");
     }
 
     @GetMapping("/mobile-attendance-detail")
@@ -49,7 +49,8 @@ public class MobileAttendanceController {
     }
 
     @GetMapping("/mobile-attendance-list")
-    public ApiResponse getMobileAttendanceAll() {
-        return ApiResponse.ok(mobileAttendanceService.getAllMobileTemplate(), "Get Mobile Attendance All Successfully");
+    public ApiResponse getMobileAttendanceAll(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(mobileAttendanceService.getAllMobileTemplate(customUserDetails.getRoles(), customUserDetails.getUsername()), "Get Mobile Attendance All Successfully");
     }
 }

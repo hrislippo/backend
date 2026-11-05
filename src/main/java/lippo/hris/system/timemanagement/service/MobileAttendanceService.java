@@ -6,6 +6,7 @@ import lippo.hris.system.authentication.service.TemplateAuthService;
 import lippo.hris.system.exception.NotFoundException;
 import lippo.hris.system.feign.ProIntClient;
 import lippo.hris.system.timemanagement.entity.MobileAttendanceRequest;
+import lippo.hris.system.timemanagement.repository.MobileAttendanceGroupTemplateDtRepository;
 import lippo.hris.system.timemanagement.repository.MobileAttendanceRequestRepository;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrEmpReq;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
@@ -35,6 +36,9 @@ public class MobileAttendanceService {
 
     @Autowired
     MobileAttendanceRequestRepository mobileAttendanceRequestRepository;
+
+    @Autowired
+    MobileAttendanceGroupTemplateDtRepository mobileAttendanceGroupTemplateDtRepository;
 
     @Autowired
     TemplateAuthService templateAuthService;
@@ -79,9 +83,14 @@ public class MobileAttendanceService {
     }
 
     public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String empName, String tempCode, LocalDate startDate, LocalDate endDate,
-                                                          Pageable pageable, List<String> authorizations){
+                                                          Pageable pageable, List<String> authorizations, List<String> roles, String username){
+        Boolean flagHRBP = false;
+        if(roles.contains("ROLE_HRBP")){
+            flagHRBP = true;
+        }
+
         List<String> authNIKList = templateAuthService.getAuthEmployees(authorizations);
-        List<MobileAttendanceResp> mobileAttendanceList = mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate);
+        List<MobileAttendanceResp> mobileAttendanceList = mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, flagHRBP, username);
         mobileAttendanceList = mobileAttendanceList.stream().filter(e -> authNIKList.contains(e.getEmpNIK())).toList();
 
         int start = (int) pageable.getOffset();
@@ -97,9 +106,15 @@ public class MobileAttendanceService {
         return mobileAttendanceRequestRepository.findById(id).get();
     }
 
-    public List<MobileTemplateResp> getAllMobileTemplate(){
+    public List<MobileTemplateResp> getAllMobileTemplate(List<String> roles, String username){
         Object result = proIntClient.getMOTMAtdTemplateAll().getData();
         List<MobileTemplateResp> mobileTemplate = objectMapper.convertValue(result, new TypeReference<>(){});
+
+        if(roles.contains("ROLE_HRBP")){
+            List<String> attendanceCodeList = mobileAttendanceGroupTemplateDtRepository.findAttendanceCodeByHrbp(username);
+            mobileTemplate = mobileTemplate.stream().filter(e -> attendanceCodeList.contains(e.getTempCode())).toList();
+        }
+
         return mobileTemplate;
     }
 }
