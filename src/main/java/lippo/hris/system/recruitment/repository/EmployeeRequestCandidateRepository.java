@@ -23,9 +23,9 @@ public interface EmployeeRequestCandidateRepository extends JpaRepository<Employ
                     "FROM RCMEmpReqCandidate c " +
                     "INNER JOIN RCMEmpRequest req ON c.EmpReqId = req.EmpReqId " +
                     "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    Integer countTotalCandidate(@Param("username") String username,
-                                @Param("flagHRBP") Boolean flagHRBP);
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer countTotalCandidate(@Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "WITH LastSixMonths AS ( " +
@@ -35,8 +35,7 @@ public interface EmployeeRequestCandidateRepository extends JpaRepository<Employ
                     "FROM LastSixMonths " +
                     "WHERE month_start < DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1)) " +
                     "SELECT LEFT(DATENAME(MONTH, m.month_start), 3) AS month, " +
-                    "COUNT(CASE WHEN :flagHRBP = CAST(0 AS BIT) THEN a.createdBy " +
-                    "WHEN uh.RcmHRBPId IS NOT NULL THEN a.createdBy END) AS applications " +
+                    "COUNT(CASE WHEN uh.RcmHRBPId IS NOT NULL THEN a.createdBy END) AS applications " +
                     "FROM LastSixMonths m " +
                     "LEFT JOIN RCMEmpReqCandidate a " +
                     "ON YEAR(a.createdDate) = YEAR(m.month_start) AND MONTH(a.createdDate) = MONTH(m.month_start) " +
@@ -47,8 +46,7 @@ public interface EmployeeRequestCandidateRepository extends JpaRepository<Employ
                     "GROUP BY m.month_start " +
                     "ORDER BY m.month_start " +
                     "OPTION (MAXRECURSION 6)")
-    List<ApplicationResp> getEmployeeRequestCandidateLastSixMonths(@Param("username") String username,
-                                                                   @Param("flagHRBP") Boolean flagHRBP);
+    List<ApplicationResp> getEmployeeRequestCandidateLastSixMonths(@Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "WITH LastSixMonths AS ( " +
@@ -73,12 +71,12 @@ public interface EmployeeRequestCandidateRepository extends JpaRepository<Employ
                     "FROM RCMEmpRequest req " +
                     "LEFT JOIN RCMEmpReqCandidate c ON c.EmpReqId = req.EmpReqId " +
                     "LEFT JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username))) " +
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username))) " +
                     "GROUP BY req.EmpReqName, req.createdDate " +
                     "ORDER BY req.createdDate DESC")
     List<JobOpeningResp> getRecentEmployeeRequestWithLimit(@Param("limit") Integer limit,
-                                                           @Param("username") String username,
-                                                           @Param("flagHRBP") Boolean flagHRBP);
+                                                           @Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "SELECT TOP(:limit) req.EmpReqName AS name, COUNT(c.EmpReqCanId) AS applicant " +

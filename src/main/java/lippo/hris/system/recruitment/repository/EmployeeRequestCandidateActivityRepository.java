@@ -58,9 +58,9 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "    SUM(CASE WHEN cs.StageName = 'Sign Agreement' THEN 1 ELSE 0 END) AS totalSignAgreement, " +
                     "    SUM(CASE WHEN cs.StageName = 'Onboarding' THEN 1 ELSE 0 END) AS totalOnboarding " +
                     "FROM CurrentStage cs " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR cs.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    DashboardPipelineResp getEmployeeRequestPipeline(@Param("username") String username,
-                                                     @Param("flagHRBP") Boolean flagHRBP);
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR cs.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    DashboardPipelineResp getEmployeeRequestPipeline(@Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "WITH StageOrder AS ( " +
@@ -110,9 +110,9 @@ public interface EmployeeRequestCandidateActivityRepository extends JpaRepositor
                     "INNER JOIN RCMEmpRequest req ON c.EmpReqId = req.EmpReqId " +
                     "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
                     "WHERE a2.RcmActGrp = 'Offering' AND a.EmpReqCanActStatus = 'COMPLETED' " +
-                    "AND (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    Integer getCompletedOfferings(@Param("username") String username,
-                                  @Param("flagHRBP") Boolean flagHRBP);
+                    "AND (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer getCompletedOfferings(@Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "SELECT COUNT(1) " +

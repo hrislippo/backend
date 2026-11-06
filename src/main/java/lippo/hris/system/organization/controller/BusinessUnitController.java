@@ -44,7 +44,7 @@ public class BusinessUnitController {
     @GetMapping("/business-unit-list")
     public ApiResponse getBusinessUnitList(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(businessUnitService.getBusinessUnitList(customUserDetails.getUsername(), customUserDetails.getRoles()), "Get Business Unit List Successfully");
+        return ApiResponse.ok(businessUnitService.getBusinessUnitList(customUserDetails.getUsername()), "Get Business Unit List Successfully");
     }
 
     @GetMapping("/business-unit-detail")

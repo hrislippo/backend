@@ -4,8 +4,10 @@ import lippo.hris.system.organization.request.HRBPReq;
 import lippo.hris.system.organization.service.HRBPService;
 import lippo.hris.system.organization.validation.HRBPValidation;
 import lippo.hris.system.response.ApiResponse;
+import lippo.hris.system.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,8 +43,10 @@ public class HRBPController {
     }
 
     @GetMapping("/hrbp-list")
-    public ApiResponse getHRBPList(@RequestParam(value = "BUId", required = false) Long BUId) {
-        return ApiResponse.ok(hrbpService.getHRBPList(BUId), "Get HRBP List Successfully");
+    public ApiResponse getHRBPList(@RequestParam(value = "BUId", required = false) Long BUId,
+                                   Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return ApiResponse.ok(hrbpService.getHRBPList(BUId, customUserDetails.getUsername()), "Get HRBP List Successfully");
     }
 
     @GetMapping("/hrbp-detail")

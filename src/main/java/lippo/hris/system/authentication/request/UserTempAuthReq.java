@@ -9,4 +9,5 @@ public class UserTempAuthReq {
     private String username;
     private List<Long> tempAuthId;
     private List<Long> canPoolId;
+    private List<Long> hrbpAuthId;
 }

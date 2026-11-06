@@ -13,7 +13,12 @@ import java.util.List;
 
 public interface HRBPRepository extends JpaRepository<HRBP, Long> {
     HRBP findByCode(String code);
-    List<HRBP> findByBusinessUnit(BusinessUnit businessUnit);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM RCMHRBP WHERE RcmBsUnitId = :businessUnitId " +
+            "AND (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :nik) " +
+            "OR RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :nik)))")
+    List<HRBP> findByBusinessUnit(@Param("businessUnitId") Long businessUnitId,
+                                  @Param("nik") String nik);
 
     @Query(nativeQuery = true,
             value = "SELECT hrbp.RcmHRBPId AS id, bu.RcmBsUnitName AS businessUnitName, " +

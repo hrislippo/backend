@@ -17,7 +17,7 @@ public interface EmployeeRequestResultRepository extends JpaRepository<EmployeeR
                     "FROM RCMEmpReqResult res " +
                     "INNER JOIN RCMEmpRequest req ON res.EmpReqId = req.EmpReqId " +
                     "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    Integer countAllHired(@Param("username") String username,
-                          @Param("flagHRBP") Boolean flagHRBP);
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer countAllHired(@Param("username") String username);
 }

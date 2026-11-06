@@ -19,9 +19,8 @@ public interface MobileAttendanceRequestRepository extends JpaRepository<MobileA
                     "FROM TMMobileAttendReq ma " +
                     "LEFT JOIN TMMobileAttendGrpTempDt dt ON ma.TmMobileAttendReqTempCode = dt.MobileAttendTempCode " +
                     "LEFT JOIN TMMobileAttendGrpTemp temp ON dt.MobileAttendGrpTempId = temp.MobileAttendGrpTempId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR temp.RcmHRBPId IN  " +
-                    "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = " +
-                    "(SELECT UserId FROM URMUser WHERE UserName = :username))) " +
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR temp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username))) " +
                     "AND (:empNIK IS NULL OR ma.TmMobileAttendReqEmp LIKE '%'+:empNIK+'%') " +
                     "AND (:empName IS NULL OR ma.TmMobileAttendReqEmpName LIKE '%'+:empName+'%') " +
                     "AND (:tempCode IS NULL OR ma.TmMobileAttendReqTempCode LIKE '%'+:tempCode+'%') " +
@@ -33,7 +32,6 @@ public interface MobileAttendanceRequestRepository extends JpaRepository<MobileA
                                                    @Param("tempCode") String tempCode,
                                                    @Param("startDate") LocalDate startDate,
                                                    @Param("endDate") LocalDate endDate,
-                                                   @Param("flagHRBP") Boolean flagHRBP,
                                                    @Param("username") String username);
 
     @Query(nativeQuery = true,

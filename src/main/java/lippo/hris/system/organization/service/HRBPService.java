@@ -49,12 +49,12 @@ public class HRBPService {
         return hrbpRepository.findByCodeAndName(BUName, code, name, pageable);
     }
 
-    public List<HRBP> getHRBPList(Long BUId) {
+    public List<HRBP> getHRBPList(Long BUId, String username) {
         List<HRBP> hrbpList = new ArrayList<>();
         hrbpList.add(null);
         if(BUId != null){
             BusinessUnit businessUnit = businessUnitRepository.findById(BUId).get();
-            hrbpList.addAll(hrbpRepository.findByBusinessUnit(businessUnit));
+            hrbpList.addAll(hrbpRepository.findByBusinessUnit(businessUnit.getId(), username));
         } else{
             hrbpList.addAll(hrbpRepository.findAll());
         }

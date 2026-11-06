@@ -51,6 +51,6 @@ public class MobileAttendanceController {
     @GetMapping("/mobile-attendance-list")
     public ApiResponse getMobileAttendanceAll(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return ApiResponse.ok(mobileAttendanceService.getAllMobileTemplate(customUserDetails.getRoles(), customUserDetails.getUsername()), "Get Mobile Attendance All Successfully");
+        return ApiResponse.ok(mobileAttendanceService.getAllMobileTemplate(customUserDetails.getUsername()), "Get Mobile Attendance All Successfully");
     }
 }

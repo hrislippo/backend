@@ -505,13 +505,8 @@ public class EmployeeRequestFormService {
     }
 
     public Page<EmployeeRequestResp> getEmployeeRequest(String code, String name, String buName, String hrbpName,
-                                                        String username, List<String> roles, String pic, String sla, String status, Pageable pageable) {
-        Boolean flagHRBP = false;
-        if(roles.contains("ROLE_HRBP")){
-            flagHRBP = true;
-        }
-
-        List<EmployeeRequestResp> employeeRequestList = employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, sla, status, flagHRBP);
+                                                        String username, String pic, String sla, String status, Pageable pageable) {
+        List<EmployeeRequestResp> employeeRequestList = employeeRequestFormRepository.getEmployeeRequest(code, name, buName, hrbpName, username, pic, sla, status);
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), employeeRequestList.size());
         if (start > employeeRequestList.size()) {

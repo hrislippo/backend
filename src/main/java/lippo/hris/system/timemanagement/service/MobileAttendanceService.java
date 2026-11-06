@@ -84,13 +84,8 @@ public class MobileAttendanceService {
 
     public Page<MobileAttendanceResp> getMobileAttendance(String empNIK, String empName, String tempCode, LocalDate startDate, LocalDate endDate,
                                                           Pageable pageable, List<String> authorizations, List<String> roles, String username){
-        Boolean flagHRBP = false;
-        if(roles.contains("ROLE_HRBP")){
-            flagHRBP = true;
-        }
-
         List<String> authNIKList = templateAuthService.getAuthEmployees(authorizations);
-        List<MobileAttendanceResp> mobileAttendanceList = mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, flagHRBP, username);
+        List<MobileAttendanceResp> mobileAttendanceList = mobileAttendanceRequestRepository.getMobileAttendance(empNIK, empName, tempCode, startDate, endDate, username);
         mobileAttendanceList = mobileAttendanceList.stream().filter(e -> authNIKList.contains(e.getEmpNIK())).toList();
 
         int start = (int) pageable.getOffset();
@@ -106,15 +101,14 @@ public class MobileAttendanceService {
         return mobileAttendanceRequestRepository.findById(id).get();
     }
 
-    public List<MobileTemplateResp> getAllMobileTemplate(List<String> roles, String username){
+    public List<MobileTemplateResp> getAllMobileTemplate(String username){
         Object result = proIntClient.getMOTMAtdTemplateAll().getData();
         List<MobileTemplateResp> mobileTemplate = objectMapper.convertValue(result, new TypeReference<>(){});
 
-        if(roles.contains("ROLE_HRBP")){
-            List<String> attendanceCodeList = mobileAttendanceGroupTemplateDtRepository.findAttendanceCodeByHrbp(username);
+        List<String> attendanceCodeList = mobileAttendanceGroupTemplateDtRepository.findAttendanceCodeByHrbp(username);
+        if(attendanceCodeList != null && !attendanceCodeList.isEmpty()){
             mobileTemplate = mobileTemplate.stream().filter(e -> attendanceCodeList.contains(e.getTempCode())).toList();
         }
-
         return mobileTemplate;
     }
 }

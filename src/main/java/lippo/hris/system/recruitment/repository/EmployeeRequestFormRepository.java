@@ -18,10 +18,9 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
             "FROM RCMEmpRequest req " +
             "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
             "WHERE req.EmpReqStatus IN ('OPEN', 'IN_PROGRESS') " +
-            "AND (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN " +
-            "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    Integer countOpenRequest(@Param("username") String username,
-                             @Param("flagHRBP") Boolean flagHRBP);
+            "AND (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+            "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer countOpenRequest(@Param("username") String username);
 
     @Query(nativeQuery = true,
     value = "SELECT TOP 1 REPLACE(EmpReqCode, :prefix, '') FROM RCMEmpRequest ORDER BY EmpReqCode DESC")
@@ -115,9 +114,8 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
             "LEFT JOIN (SELECT EmpReqId, StageOrder, StageName FROM StageAgg WHERE rn = 1) agg " +
             "ON agg.EmpReqId = req.EmpReqId " +
 
-            "WHERE (:flagHRBP = CAST(0 AS BIT) OR hrbp.RcmHRBPId IN " +
-            "(SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = " +
-            "(SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
+            "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :userName) " +
+            "OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :userName))) " +
             "AND (:code IS NULL OR req.EmpReqCode LIKE '%' + :code + '%') " +
             "AND (:name IS NULL OR req.EmpReqName LIKE '%' + :name + '%') " +
             "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%' + :buName + '%') " +
@@ -138,8 +136,7 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
                                                  @Param("userName") String username,
                                                  @Param("pic") String pic,
                                                  @Param("sla") String sla,
-                                                 @Param("status") String status,
-                                                 @Param("flagHRBP") Boolean flagHRBP);
+                                                 @Param("status") String status);
 
     @Query(nativeQuery = true,
             value = "SELECT req.EmpReqCode AS code, req.EmpReqName AS name, " +
@@ -155,7 +152,6 @@ public interface EmployeeRequestFormRepository extends JpaRepository<EmployeeReq
     List<EmployeeRequestCandidateResp> getEmployeeRequestCandidate(@Param("id") Long id);
 
     @Query(nativeQuery = true,
-            value = "EXECUTE sp_GetTop10EmployeeRequestDashboard @FlagHRBP = :flagHRBP, @Username = :username")
-    List<EmployeeRequestSLAResp> getEmployeeRequestSLA(@Param("username") String username,
-                                                       @Param("flagHRBP") Boolean flagHRBP);
+            value = "EXECUTE sp_GetTop10EmployeeRequestDashboard @Username = :username")
+    List<EmployeeRequestSLAResp> getEmployeeRequestSLA(@Param("username") String username);
 }

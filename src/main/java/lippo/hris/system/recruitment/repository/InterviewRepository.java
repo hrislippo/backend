@@ -23,9 +23,9 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
                     "INNER JOIN RCMEmpReqCandidate c ON a.EmpReqCanId = c.EmpReqCanId " +
                     "INNER JOIN RCMEmpRequest req ON c.EmpReqId = req.EmpReqId " +
                     "INNER JOIN RCMHRBP h ON req.RcmHRBPId = h.RcmHRBPId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
-    Integer countTotalInterview(@Param("username") String username,
-                                @Param("flagHRBP") Boolean flagHRBP);
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username)))")
+    Integer countTotalInterview(@Param("username") String username);
 
     Integer countByCreatedByAndEmployeeRequestCandidateActivityIsNotNull(String createdBy);
 
@@ -58,12 +58,12 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
                     "INNER JOIN RCMCANCanData d ON c.CanId = d.CanId " +
                     "INNER JOIN RCMEmpRequest r ON c.EmpReqId = r.EmpReqId " +
                     "INNER JOIN RCMHRBP h ON r.RcmHRBPId = h.RcmHRBPId " +
-                    "WHERE (:flagHRBP = CAST(0 AS BIT) OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username))) " +
+                    "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :username) " +
+                    "OR h.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :username))) " +
                     "AND i.StartTime IS NULL AND a.EmpReqCanActSchedule > GETDATE() " +
                     "ORDER BY a.EmpReqCanActSchedule")
     List<UpcomingInterviewResp> getUpcomingInterview(@Param("limit") Integer limit,
-                                                     @Param("username") String username,
-                                                     @Param("flagHRBP") Boolean flagHRBP);
+                                                     @Param("username") String username);
 
     @Query(nativeQuery = true,
             value = "SELECT TOP (:limit) d.CanName AS candidateName, r.EmpReqName AS requestName, a.EmpReqCanActSchedule AS interviewTime " +

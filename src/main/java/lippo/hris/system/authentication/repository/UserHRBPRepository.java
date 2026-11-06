@@ -12,6 +12,7 @@ import java.util.List;
 public interface UserHRBPRepository extends JpaRepository<UserHRBP, Long> {
 
     UserHRBP findByUserAndHrbp(User user, HRBP hrbp);
+    List<UserHRBP> findByUser(User user);
 
     @Query(nativeQuery = true,
             value="SELECT h.RcmHRBPCode " +

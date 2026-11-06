@@ -168,7 +168,7 @@ public class EmployeeRequestFormController {
                                           Pageable pageable, Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         return ApiResponse.ok(employeeRequestFormService.getEmployeeRequest(code, name, buName, hrbpName,
-                        customUserDetails.getUsername(), customUserDetails.getRoles(), pic, sla, status, pageable),
+                        customUserDetails.getUsername(), pic, sla, status, pageable),
                 "Get Employee Request Successfully");
     }
 
