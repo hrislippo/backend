@@ -1,5 +1,6 @@
 package lippo.hris.system.recruitment.controller;
 
+import lippo.hris.system.recruitment.request.CandidateBlacklistReq;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
 import lippo.hris.system.recruitment.validation.CandidateValidation;
@@ -65,6 +66,12 @@ public class CandidateController {
     public ApiResponse modifyShortlist(@RequestBody CandidateShortlistReq candidateShortlistReq) {
         candidateService.modifyShortlist(candidateShortlistReq);
         return ApiResponse.ok(null, "Shortlist Modified");
+    }
+
+    @PutMapping("/candidate-blacklist")
+    public ApiResponse modifyBlacklist(@RequestBody CandidateBlacklistReq candidateBlacklistReq) {
+        candidateService.modifyBlacklist(candidateBlacklistReq);
+        return ApiResponse.ok(null, "Candidate Blacklisted");
     }
 
     @GetMapping("/candidate")

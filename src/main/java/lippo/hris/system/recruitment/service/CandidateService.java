@@ -12,6 +12,7 @@ import lippo.hris.system.google.service.GoogleDriveService;
 import lippo.hris.system.recruitment.entity.*;
 import lippo.hris.system.recruitment.enumeration.GoogleDriveRecruitmentFolder;
 import lippo.hris.system.recruitment.repository.*;
+import lippo.hris.system.recruitment.request.CandidateBlacklistReq;
 import lippo.hris.system.recruitment.request.CandidateReq;
 import lippo.hris.system.recruitment.request.CandidateShortlistReq;
 import lippo.hris.system.recruitment.request.RCCanPhotoReq;
@@ -97,6 +98,9 @@ public class CandidateService {
 
     @Autowired
     PermissionRoleRepository permissionRoleRepository;
+
+    @Autowired
+    CandidateBlacklistRepository candidateBlacklistRepository;
 
     @Autowired
     ProIntClient proIntClient;
@@ -268,6 +272,18 @@ public class CandidateService {
         candidateRepository.save(candidate);
     }
 
+    public void modifyBlacklist(CandidateBlacklistReq candidateBlacklistReq){
+        Candidate candidate = candidateRepository.findById(candidateBlacklistReq.getCandidateId()).get();
+
+        if(candidateBlacklistReq.getBlacklist() == true){
+            CandidateBlacklist candidateBlacklist = new CandidateBlacklist();
+            candidateBlacklist.setCandidate(candidate);
+            candidateBlacklist.setReason(candidateBlacklistReq.getReason());
+            candidateBlacklist.setSource(candidateBlacklistReq.getSource());
+            candidateBlacklistRepository.save(candidateBlacklist);
+        }
+    }
+
     public Page<CandidateResp> getCandidate(String keywords, Pageable pageable, String username){
         return candidateRepository.getCandidate(keywords, pageable, username);
     }
@@ -292,7 +308,8 @@ public class CandidateService {
             candidateReq.setCurrentSalary(candidate.getCurrentSalary());
             candidateReq.setExpectedSalary(candidate.getExpectedSalary());
 
-            if(permissionRoleRepository.findByUser(username).contains("CANDIDATE_MODIFY")){
+            if(permissionRoleRepository.findByUser(username).contains("CANDIDATE_MODIFY")
+                    && candidateBlacklistRepository.findByCandidate(candidate) == null){
                 candidateReq.setEligibleModify(true);
             }
         }

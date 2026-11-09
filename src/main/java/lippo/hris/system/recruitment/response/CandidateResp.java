@@ -1,9 +1,5 @@
 package lippo.hris.system.recruitment.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.time.LocalDate;
-
 public interface CandidateResp {
 
     Long getCanId();
@@ -11,5 +7,5 @@ public interface CandidateResp {
     String getCanPhone();
     String getCanEmail();
     Boolean getCanFgShortlist();
-    Boolean getEligible();
+    Boolean getCanFgBlacklist();
 }

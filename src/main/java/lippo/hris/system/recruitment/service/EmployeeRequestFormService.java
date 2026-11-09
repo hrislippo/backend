@@ -140,6 +140,9 @@ public class EmployeeRequestFormService {
     @Autowired
     EmployeeRequestCancelRepository employeeRequestCancelRepository;
 
+    @Autowired
+    CandidateBlacklistRepository candidateBlacklistRepository;
+
     public void addEmployeeRequest(@RequestBody EmployeeRequestReq employeeRequestReq) {
         RecruitmentTemplate recruitmentTemplate = recruitmentTemplateRepository.findById(employeeRequestReq.getTemplate()).get();
         RecruitmentLevelTemplate recruitmentLevelTemplate = recruitmentLevelTemplateRepository.findById(employeeRequestReq.getTemplateLevel()).get();
@@ -603,7 +606,11 @@ public class EmployeeRequestFormService {
         EmployeeRequestKanbanDetailResp employeeRequestKanbanDetailResp = new EmployeeRequestKanbanDetailResp();
         EmployeeRequestCandidate employeeRequestCandidate = employeeRequestCandidateRepository.findById(id).get();
         employeeRequestKanbanDetailResp.setName(employeeRequestCandidate.getCandidate().getName());
-        employeeRequestKanbanDetailResp.setErfName(employeeRequestCandidate.getEmployeeRequestForm().getName());
+        employeeRequestKanbanDetailResp.setCandidateId(employeeRequestCandidate.getCandidate().getId());
+
+        if(candidateBlacklistRepository.findByCandidate(employeeRequestCandidate.getCandidate()) != null){
+            employeeRequestKanbanDetailResp.setCandidateBlacklist(true);
+        }
 
         List<EmployeeRequestKanbanDetail> employeeRequestKanbanDetailList = new ArrayList<>();
         List<EmployeeRequestCandidateActivity> employeeRequestCandidateActivities = filterActivity(employeeRequestCandidateActivityRepository.

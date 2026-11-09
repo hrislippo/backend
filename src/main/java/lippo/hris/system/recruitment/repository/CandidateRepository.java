@@ -29,7 +29,9 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
                     "INNER JOIN RCMCanPoolMbr mbr ON rd.CanId = mbr.CanId " +
                     "INNER JOIN URMUser usr ON usr.UserName = :username " +
                     "LEFT JOIN URMUserCanPool pool ON usr.UserId = pool.UserId " +
+                    "LEFT JOIN RCMCanBlacklist bl ON rd.CanId = bl.CanId " +
                     "WHERE rd.CanFgShortlist = 'true' AND pool.RcmCanPoolId IN (mbr.RcmCanPoolId) " +
+                    "AND bl.CanId IS NULL " +
                     "ORDER BY rd.CanName")
     List<Candidate> getCandidateList(@Param("username") String username);
 

@@ -7,7 +7,8 @@ import java.util.List;
 @Data
 public class EmployeeRequestKanbanDetailResp {
     private String name;
-    private String erfName;
+    private Long candidateId;
+    private Boolean candidateBlacklist = false;
     private String status;
     private List<EmployeeRequestKanbanDetail> listActivities;
 }
