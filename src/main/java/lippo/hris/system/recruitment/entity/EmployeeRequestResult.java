@@ -21,4 +21,7 @@ public class EmployeeRequestResult extends Auditable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "EmpReqId")
     private EmployeeRequestForm employeeRequestForm;
+
+    @Column(name = "EmpReqResFgSync")
+    private Boolean syncFlag;
 }

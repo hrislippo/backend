@@ -205,6 +205,15 @@ public class EmployeeRequestFormController {
         return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestDetail(id), "Get Employee Request Detail Successfully");
     }
 
+    @GetMapping("/erf-sync-result")
+    public ApiResponse getEmployeeRequestSyncResult(@RequestParam(value = "canName", required = false) String canName,
+                                                @RequestParam(value = "erfName", required = false) String erfName,
+                                                @RequestParam(value = "buName", required = false) String buName,
+                                                @RequestParam(value = "syncSearch", required = false) Boolean syncSearch,
+                                                Pageable pageable) {
+        return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestSyncResult(canName, erfName, buName, syncSearch, pageable), "Get Employee Request Sync Result Successfully");
+    }
+
     @GetMapping("/erf-activity-schedule")
     public ApiResponse getEmployeeRequestActivitySchedule(@RequestParam(value = "id") Long id) {
         return ApiResponse.ok(employeeRequestFormService.getEmployeeRequestActivitySchedule(id), "Get Employee Request Activity Schedule");

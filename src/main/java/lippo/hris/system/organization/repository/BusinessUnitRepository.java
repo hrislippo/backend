@@ -27,7 +27,7 @@ public interface BusinessUnitRepository extends JpaRepository<BusinessUnit, Long
                                              Pageable pageable);
 
     @Query(nativeQuery = true, value = "SELECT DISTINCT bu.* FROM RCMBusinessUnit bu " +
-            "INNER JOIN RCMHRBP hrbp ON bu.RcmBsUnitId = hrbp.RcmBsUnitId " +
+            "LEFT JOIN RCMHRBP hrbp ON bu.RcmBsUnitId = hrbp.RcmBsUnitId " +
             "WHERE (NOT EXISTS (SELECT 1 FROM URMUserHRBP uh INNER JOIN URMUser u ON uh.UserId = u.UserId WHERE u.UserName = :nik) " +
             "OR hrbp.RcmHRBPId IN (SELECT uh.RcmHRBPId FROM URMUserHRBP uh WHERE uh.UserId = (SELECT UserId FROM URMUser WHERE UserName = :nik)))")
     List<BusinessUnit> findByHRBP(@Param("nik") String nik);

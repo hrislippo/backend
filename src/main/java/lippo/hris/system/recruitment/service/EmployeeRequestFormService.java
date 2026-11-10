@@ -460,6 +460,7 @@ public class EmployeeRequestFormService {
             EmployeeRequestResult employeeRequestResult = new EmployeeRequestResult();
             employeeRequestResult.setCandidate(candidate);
             employeeRequestResult.setEmployeeRequestForm(employeeRequestForm);
+            employeeRequestResult.setSyncFlag(false);
             employeeRequestResultRepository.save(employeeRequestResult);
 
             if(checkERFCompleted(employeeRequestForm)){
@@ -682,6 +683,18 @@ public class EmployeeRequestFormService {
         EmployeeRequestForm employeeRequestForm = employeeRequestFormRepository.findById(id).get();
         return employeeRequestResultRepository.findByEmployeeRequestForm(employeeRequestForm).stream()
                 .map(e -> e.getCandidate().getName()).collect(Collectors.toList());
+    }
+
+    public Page<EmployeeRequestSyncResp> getEmployeeRequestSyncResult(String canName, String erfName, String buName,
+                                                                      Boolean syncSearch, Pageable pageable){
+        List<EmployeeRequestSyncResp> employeeRequestSyncList = employeeRequestResultRepository.getEmployeeRequestSyncResult(canName, erfName, buName, syncSearch);
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), employeeRequestSyncList.size());
+        if (start > employeeRequestSyncList.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, employeeRequestSyncList.size());
+        }
+        List<EmployeeRequestSyncResp> pageContent = employeeRequestSyncList.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, employeeRequestSyncList.size());
     }
 
     public ScheduleResp getEmployeeRequestSchedule(Long id){
