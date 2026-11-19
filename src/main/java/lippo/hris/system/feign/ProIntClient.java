@@ -2,6 +2,7 @@ package lippo.hris.system.feign;
 
 import lippo.hris.system.config.FeignConfig;
 import lippo.hris.system.recruitment.request.RCCanPhotoReq;
+import lippo.hris.system.recruitment.request.RCCandidateFeignReq;
 import lippo.hris.system.response.ApiResponse;
 import lippo.hris.system.timemanagement.request.MOTMAtdTempMbrReq;
 import lippo.hris.system.timemanagement.request.TMDPRightsFeignReq;
@@ -26,8 +27,14 @@ public interface ProIntClient {
     @PostMapping(value = "/api-proint/RCCanPhoto", consumes = MediaType.APPLICATION_JSON_VALUE)
     void insertCandidatePhoto(@RequestBody RCCanPhotoReq rcCanPhotoReq);
 
+    @PostMapping(value = "/api-proint/RCCandidate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ApiResponse syncCandidate(@RequestBody RCCandidateFeignReq rcCandidateFeignReq);
+
     @GetMapping(value = "/api-proint/ODPositionActive")
     ApiResponse getActivePosition();
+
+    @GetMapping(value = "/api-proint/ODPositionRelated")
+    ApiResponse getRelatedPosition(@RequestParam String posCode);
 
     @GetMapping(value = "/api-proint/ODOrgActive")
     ApiResponse getActiveOrganization();
@@ -43,6 +50,21 @@ public interface ProIntClient {
 
     @GetMapping(value = "/api-proint/ODLocationActive")
     ApiResponse getActiveLocation();
+
+    @GetMapping(value = "/api-proint/PMEmpTypeActive")
+    ApiResponse getActiveEmploymentType();
+
+    @GetMapping(value = "/api-proint/PMMaritalSt")
+    ApiResponse getAllMaritalStatus();
+
+    @GetMapping(value = "/api-proint/PMReligion")
+    ApiResponse getAllReligion();
+
+    @GetMapping(value = "/api-proint/PMGenderMs")
+    ApiResponse getAllGender();
+
+    @GetMapping(value = "/api-proint/LCCostCenterActive")
+    ApiResponse getActiveCostCenter();
 
     @GetMapping(value = "/api-proint/PMEmployee")
     ApiResponse getEmployeeInfo(@RequestParam List<String> nikList);

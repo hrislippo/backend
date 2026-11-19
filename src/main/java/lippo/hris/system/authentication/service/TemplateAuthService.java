@@ -198,6 +198,18 @@ public class TemplateAuthService {
         return locations;
     }
 
+    public List<CostCenterResponse> getActiveCostCenter() {
+        Object costCenterData = proIntClient.getActiveCostCenter().getData();
+        List<CostCenterResponse> costCenters = objectMapper.convertValue(costCenterData, new TypeReference<>(){});
+        return costCenters;
+    }
+
+    public List<EmpTypeResponse> getActiveEmploymentType() {
+        Object empTypeData = proIntClient.getActiveEmploymentType().getData();
+        List<EmpTypeResponse> empTypes = objectMapper.convertValue(empTypeData, new TypeReference<>(){});
+        return empTypes;
+    }
+
     public void deleteTemplateAuth(Long id){
         TemplateAuth templateAuth = templateAuthRepository.findById(id).get();
         List<TemplateAuthDetail> templateAuthDetailList = templateAuthDetailRepository.findByTemplateAuth(templateAuth);

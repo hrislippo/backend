@@ -24,13 +24,17 @@ public interface EmployeeRequestResultRepository extends JpaRepository<EmployeeR
     Integer countAllHired(@Param("username") String username);
 
     @Query(nativeQuery = true,
-            value = "SELECT can.CanName AS candidateName, req.EmpReqName AS employeeRequestName, " +
+            value = "SELECT res.EmpReqResId AS id, can.CanName AS candidateName, req.EmpReqName AS employeeRequestName, " +
                     "bu.RcmBsUnitName AS businessUnitName, " +
-                    "CASE WHEN res.EmpReqResFgSync = 1 THEN 'SYNC' ELSE 'NOT_SYNC' END AS syncStatus " +
+                    "CASE WHEN res.EmpReqResFgSync = 1 THEN 'SYNC' ELSE 'NOT_SYNC' END AS syncStatus, " +
+                    "CASE WHEN emp.EmpReqResEmpDtId IS NULL THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS employeeData, " +
+                    "CASE WHEN psn.EmpReqResPsnDtId IS NULL THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS personalData " +
                     "FROM RCMEmpReqResult res " +
                     "INNER JOIN RCMCANCanData can ON res.CanId = can.CanId " +
                     "INNER JOIN RCMEmpRequest req ON res.EmpReqId = req.EmpReqId " +
                     "INNER JOIN RCMBusinessUnit bu ON req.RcmBsUnitId = bu.RcmBsUnitId " +
+                    "LEFT JOIN RCMEmpReqResEmpDt emp ON res.EmpReqResId = emp.EmpReqResId " +
+                    "LEFT JOIN RCMEmpReqResPsnDt psn ON res.EmpReqResId = psn.EmpReqResId " +
                     "WHERE (:canName IS NULL OR can.CanName LIKE '%'+:canName+'%') " +
                     "AND (:reqName IS NULL OR req.EmpReqName LIKE '%'+:reqName+'%') " +
                     "AND (:buName IS NULL OR bu.RcmBsUnitName LIKE '%'+:buName+'%') " +

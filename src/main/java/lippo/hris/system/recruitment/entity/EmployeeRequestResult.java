@@ -24,4 +24,7 @@ public class EmployeeRequestResult extends Auditable {
 
     @Column(name = "EmpReqResFgSync")
     private Boolean syncFlag;
+
+    @Column(name = "CanProIntId")
+    private Long canProIntId;
 }

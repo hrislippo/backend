@@ -78,6 +78,16 @@ public class TemplateAuthController {
         return ApiResponse.ok(templateAuthService.getActiveJobTitle(), "Get Active Job Title Successfully");
     }
 
+    @GetMapping("/costcenter-active")
+    public ApiResponse getActiveCostCenter() {
+        return ApiResponse.ok(templateAuthService.getActiveCostCenter(), "Get Active Cost Center Successfully");
+    }
+
+    @GetMapping("/employmenttype-active")
+    public ApiResponse getActiveEmploymentType() {
+        return ApiResponse.ok(templateAuthService.getActiveEmploymentType(), "Get Active Cost Center Successfully");
+    }
+
     @DeleteMapping("/tempauth")
     public ApiResponse deleteTemplateAuth(@RequestParam("templateId") Long templateId) {
         tempAuthValidation.templateUsed(templateId);

@@ -65,6 +65,9 @@ public class EmployeeRequestResultEmployeeDt extends Auditable {
     @Column(name = "EmpReqResEmployType")
     private String employmentType;
 
+    @Column(name = "EmpReqResEmployTypeMonth")
+    private Integer employmentTypeMonth;
+
     @Column(name = "EmpReqResJobStartDate")
     private LocalDate jobStartDate;
 
